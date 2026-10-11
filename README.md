@@ -1,11 +1,10 @@
 # itemplate
 
-`itemplate` is a Typst template for generating interactive HTML documents. It compiles Typst markup into a self-contained HTML bundle with a responsive layout, featuring a sidebar table of contents, a header with navigation actions, and a main article area.
+`itemplate` is a Typst template for generating interactive HTML documents. It compiles Typst markup into a self-contained HTML file with a responsive layout, featuring a sidebar table of contents, a header with navigation actions, and a main article area.
 
 The template comes with built-in support for:
 
 - **Interactive UI** such as title numbering, expand/collapse of sections, and home / GitHub / print / paintbrush shortcuts.
-- **Custom assets** via the bundled `style.css` and `script.js`.
 - **Three.js** for embedding 3D scenes (e.g. the orbital cube demo).
 
 > This is an amateur project, please use with caution.
@@ -14,8 +13,8 @@ The template comes with built-in support for:
 
 ```typst
 // example.typ
-#import "@preview/itemplate:0.4.0": *
-#show: itemplate.with(doc-title: "example", doc-author: "Author")
+#import "@preview/itemplate:0.5.0": *
+#show: itemplate.with(doc-title: "example")
 
 = #lorem(3)
 
@@ -44,20 +43,35 @@ The template comes with built-in support for:
 )
 ```
 
-# Compile to Bundle
+# Compile to HTML
+
+## use Tinymist Typst plugin in VS Code
+
+- install Tinymist Typst plugin in VS Code
+- add the following settings to your `.vscode/settings.json` file:
+
+```
+"tinymist.typstExtraArgs": ["--features=html", "--features=bundle"],
+```
+- The exported HTML file will be saved in the same directory as the example.typ file
+
+## use typst cli
 
 - install typst cli on your computer
-- compile the example.typ to bundle in the command line:
+- compile the example.typ to html in the command line:
 
 ```powershell
 cd path/to/your/example.typ
-typst compile example.typ --features html,bundle --format bundle
+typst compile example.typ --features html --format html
 ```
-- or watch example.typ and auto-compile it to bundle in the command line:
+
+- or watch example.typ and auto-compile it to HTML in the command line:
 
 ```powershell
 cd path/to/your/example.typ
-typst watch example.typ --features html,bundle --format bundle
+typst watch example.typ --features html --format html
 ```
+
+- The exported HTML file will be saved in the same directory as the example.typ file
 
 <img src="./assets/example.png" alt="output of the above code" width="900" />

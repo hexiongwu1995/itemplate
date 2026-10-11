@@ -2,6 +2,8 @@ name: Publish to fork
 
 # a test message to prove the workflow works
 # 推送以 v 开头的 tag 时触发
+# 注意：GitHub Actions 的 tag 触发器无法直接限定分支（branches 与 tags 过滤器
+# 是「或」的关系），因此「tag 必须位于 main 分支」的校验在下方步骤中完成
 on:
   push:
     tags:
@@ -16,6 +18,17 @@ jobs:
     steps:
       - name: Checkout this repository
         uses: actions/checkout@v7
+        # 拉取完整历史，否则无法用 merge-base 判断 tag 是否位于 main 分支
+        with:
+          fetch-depth: 0
+
+      - name: Verify tag is on main branch
+        run: |
+          if ! git merge-base --is-ancestor "refs/tags/${GITHUB_REF_NAME}" origin/main; then
+            echo "::error::Tag ${GITHUB_REF_NAME} is not on the main branch."
+            exit 1
+          fi
+          echo "Tag ${GITHUB_REF_NAME} is on main."
 
       - name: Verify tag matches package version
         run: |

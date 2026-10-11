@@ -48,7 +48,7 @@ The template comes with built-in support for:
 ## use Tinymist Typst plugin in VS Code
 
 - install Tinymist Typst plugin in VS Code
-- add the following settings to your `.vscode/settings.json` file:
+- append the following settings to your `.vscode/settings.json` file:
 
 ```
 "tinymist.typstExtraArgs": ["--features=html", "--features=bundle"],

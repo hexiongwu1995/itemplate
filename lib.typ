@@ -815,7 +815,7 @@
                   a.appendChild(arrow);
                 }
               } else if (enableNumbering === "true") {
-                heading.textContent = heading.getAttribute("data-numbering") + ". " + heading.getAttribute("data-original-text");
+                heading.textContent = heading.getAttribute("data-numbering") + " " + heading.getAttribute("data-original-text");
                 a.innerHTML = "";
                 a.textContent = heading.textContent;
                 if (arrow) {

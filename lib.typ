@@ -1067,6 +1067,8 @@
         })
       })
     })
+  } else if target() == "bundle" {
+    panic("bundle export is not supported by itemplate(version 0.5.0), please export the document to html instead")
   } else {
     body
   }

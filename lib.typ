@@ -1,28 +1,61 @@
-
 #let itemplate(
   doc-title: "Document",
   doc-author: "Author",
   lang: "en",
+  github-url: "https://github.com/hexiongwu1995/itemplate",
   body,
 ) = {
   context if target() == "html" {
     html.html(lang: lang, {
       html.head({
-        html.meta(
-          charset: "utf-8",
-        )
+        html.meta(charset: "utf-8")
 
-        html.meta(
-          name: "viewport",
-          content: "width=device-width, initial-scale=1.0",
-        )
+        html.meta(name: "viewport", content: "width=device-width, initial-scale=1.0")
+
+        html.meta(name: "author", content: doc-author)
+
+        html.meta(name: "generator", content: "itemplate 0.6.0 (Typst HTML export)")
 
         html.title(doc-title)
+
+        // 内联 SVG 站点图标，避免 favicon 404
+        html.link(
+          rel: "icon",
+          href: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23b06f24'/%3E%3Ctext x='32' y='46' font-family='Georgia,serif' font-size='38' font-weight='700' fill='%23fdfbf6' text-anchor='middle'%3Ei%3C/text%3E%3C/svg%3E",
+        )
+
+        // 主题预置脚本：在样式应用前确定 light/dark，避免页面闪烁
+        html.script(
+          ```js
+          (function () {
+            var theme = "light";
+            try {
+              theme = localStorage.getItem("itemplate-theme") || theme;
+            } catch (e) {}
+            if (theme !== "light" && theme !== "dark") {
+              theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+            }
+            document.documentElement.setAttribute("data-theme", theme);
+          })();
+          ```.text,
+        )
 
         html.link(
           rel: "stylesheet",
           blocking: "blocking",
           href: "https://cdn.jsdelivr.net/npm/@hexiongwu1995/itemplate/icon_font/iconfont.css",
+        )
+
+        html.link(rel: "preconnect", href: "https://fonts.googleapis.com")
+        html.link(rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous")
+        html.link(
+          rel: "stylesheet",
+          href: "https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap",
+        )
+
+        html.link(
+          rel: "stylesheet",
+          href: "https://fred-wang.github.io/MathFonts/NewComputerModern/mathfonts.css",
         )
 
         html.script(
@@ -38,128 +71,694 @@
           }
           ```.text,
         )
-        // a test message to prove the workflow works
-        // another test message to prove the workflow works in the process of pull request reviewing
-
-        // html.script(
-        //   ```js
-        //   MathJax = {
-        //     loader: {
-        //       load: ['input/asciimath', 'output/chtml']
-        //     }
-        //   };
-        //   ```.text,
-        // )
-
-        // html.script(src: "https://cdn.jsdelivr.net/npm/mathjax@4/startup.js", defer: true)
-
-        // html.script(src: "https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js", defer: true)
-
-        // html.link(rel: "stylesheet", href: "https://unpkg.com/@hexiongwu1995/itemplate/styles/style.css")
-
-        // html.link(rel: "stylesheet", href: "./assets/style.css")
 
         html.style(
           ```css
+          /* ==================================================
+             itemplate 0.6.0 — Scholar Manuscript 主题
+             结构：设计变量 / 基础 / 布局 / 侧栏 / 顶栏 /
+                   正文排版 / 内容元素 / 响应式 / 打印
+             ================================================== */
+
+          /* ---------- 设计变量：浅色（默认） ---------- */
           :root {
-            --enable-numbering: true;
-            --all-expanded: false;
+            color-scheme: light;
+
+            /* 字体 */
+            --font-ui: "IBM Plex Sans", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+            --font-body: "Source Serif 4", Georgia, "Times New Roman", "Noto Serif CJK SC", "Source Han Serif SC", "SimSun", serif;
+            --font-display: "Fraunces", "Source Serif 4", Georgia, "Noto Serif CJK SC", "Source Han Serif SC", serif;
+            --font-mono: "IBM Plex Mono", "Cascadia Code", Consolas, "Courier New", monospace;
+
+            /* 色彩 */
+            --bg-main: #fdfbf6;
+            --bg-aside: #f6f0e4;
+            --bg-aside-title: #efe7d5;
+            --bg-inset: #f2ecdf;
+            --bg-hover: #ece4d1;
+            --bg-active: rgba(176, 111, 36, 0.12);
+
+            --text-strong: #2e281f;
+            --text-body: #453d30;
+            --text-muted: #93876f;
+
+            --accent: #b06f24;
+            --accent-strong: #8c5615;
+
+            --border: #e8dfcc;
+            --border-strong: #d8cbae;
+            --header-bg: rgba(253, 251, 246, 0.88);
+
+            --shadow-sm: 0 1px 3px rgba(74, 56, 28, 0.07);
+            --shadow-md: 0 10px 30px rgba(74, 56, 28, 0.12);
+
+            /* 布局 */
             --aside-width: 320px;
             --header-height: 60px;
-            --article-height: calc(100vh - var(--header-height));
+            --aside-title-height: 58px;
+            --article-width: 820px;
 
-            --aside-title-height: 60px;
-            --function-panel-height: 60px;
-            --aside-nav-height: calc(100vh - var(--aside-title-height) - var(--function-panel-height));
-
-            --level-1-height: 40px;
-            --level-others-height: 30px;
-
-            --aside-title-padding: 10px 20px;
-            --aside-function-item-padding: 10px 20px 10px 20px;
-            --toc-root-level-1-padding: 10px 20px 10px 20px;
-            --toc-root-level-2-padding: 10px 20px 10px 30px;
-            --toc-root-level-3-padding: 10px 20px 10px 40px;
-
-            --aside-bag: #f5f2ed;
-            --aside-title-bag: #ede8dffb;
-            /* --function-item-bag: transparent; */
-            /* --aside-icon-bag: transparent; */
-
-            --aside-title-hover-bag: #eee5d3;
-            --aside-function-item-hover-bag: #eee5d3;
-            --toc-root-a-hover-bag: #eee5d3;
-            --resize-handle-hover-bag: #dfb663;
-
-            --aside-title-font-color: #924d0ca9;
-            /* --aside-normal-font-color: #2d2d2d; */
-            --aside-function-item-font-color: #69390963;
-            --toc-root-a-font-color: #542d06;
-
-            --aside-divider-color: #eae5defe;
-
-            --main-bag: #fffefc;
-            --header-bag: #fffefc;
-            --header-button-bag: #ebe5d9;
-            /* --header-icon-bag: transparent; */
-
-            --header-button-hover-bag: #dfb663;
-
-            --header-border-color: #dfdfdf;
-
-            --header-button-font-color: #2d2d2d;
-            --header-title-font-color: #aeaeae;
-            --header-icon-font-color: #b0b0b0;
-
-            --active-font-color: #0574ea;
-
-            --aside-title-font-size: 1.2rem;
-            --aside-function-icon-font-size: 1rem;
-            --aside-function-text-font-size: 0.8rem;
-            /* --toc-root-a-line-height: 1.5rem; */
-            --toc-root-a-level-1-font-size: 1rem;
-            --toc-root-a-others-font-size: 1rem;
-            --toc-root-arrow-font-size: 1.2rem;
-
-            --header-button-font-size: 2rem;
-            --header-button-padding: 10px;
-            --header-button-border-radius: 50%;
-            --header-title-font-size: 1.5rem;
-            --header-icon-font-size: 1.5rem;
-            --header-icon-padding: 10px;
-
-            --article-font-color: #2d2d2d;
-
-            --article-font-size: 1rem;
-            /* --article-p-margin-top: 1.5rem; */
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --ease: cubic-bezier(0.25, 0.6, 0.3, 1);
           }
 
+          /* ---------- 设计变量：深色 ---------- */
+          [data-theme="dark"] {
+            color-scheme: dark;
+
+            --bg-main: #1b1712;
+            --bg-aside: #151109;
+            --bg-aside-title: #221b10;
+            --bg-inset: #251f15;
+            --bg-hover: #2d2518;
+            --bg-active: rgba(223, 167, 87, 0.14);
+
+            --text-strong: #eee5d2;
+            --text-body: #d0c5b0;
+            --text-muted: #92866e;
+
+            --accent: #dfa757;
+            --accent-strong: #eebd72;
+
+            --border: #2e271b;
+            --border-strong: #423927;
+            --header-bg: rgba(27, 23, 18, 0.85);
+
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+            --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.5);
+          }
+
+          /* ---------- 基础 ---------- */
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+
+          html {
+            scroll-behavior: smooth;
+          }
+
+          body {
+            font-family: var(--font-ui);
+            color: var(--text-body);
+            background-color: var(--bg-main);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+          }
+
+          button {
+            font: inherit;
+            color: inherit;
+            background: none;
+            border: 0;
+            cursor: pointer;
+          }
+
+          a {
+            color: inherit;
+          }
+
+          ::selection {
+            background: var(--bg-active);
+            color: var(--text-strong);
+          }
+
+          :focus-visible {
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
+            border-radius: var(--radius-sm);
+          }
+
+          /* ---------- 布局 ---------- */
+          .container {
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-start;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+          }
+
+          main {
+            position: relative;
+            z-index: 5;
+            width: calc(100vw - var(--aside-width));
+            height: 100vh;
+            height: 100dvh;
+            background-color: var(--bg-main);
+            overflow-y: auto;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            transition: width 0.3s var(--ease);
+          }
+
+          main.full {
+            width: 100vw;
+          }
+
+          body.resizing aside,
+          body.resizing main {
+            transition: none;
+          }
+
+          /* ---------- 侧栏 ---------- */
+          aside {
+            position: relative;
+            width: var(--aside-width);
+            height: 100vh;
+            height: 100dvh;
+            background-color: var(--bg-aside);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s var(--ease);
+          }
+
+          aside.hidden {
+            width: 0;
+          }
+
+          .aside-title {
+            flex: none;
+            height: var(--aside-title-height);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 10px 0 22px;
+            background-color: var(--bg-aside-title);
+            border-bottom: 1px solid var(--border);
+            color: var(--text-strong);
+            font-family: var(--font-display);
+            font-size: 1.08rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+          }
+
+          .aside-title-text {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .aside-title-btn {
+            flex: none;
+            width: 30px;
+            height: 30px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: var(--radius-md);
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            transition: color 0.2s var(--ease), background-color 0.2s var(--ease);
+          }
+
+          .aside-title-btn:hover {
+            background-color: var(--bg-hover);
+            color: var(--text-strong);
+          }
+
+          .aside-title-btn[aria-pressed="true"] {
+            color: var(--accent-strong);
+          }
+
+          nav {
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 12px 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-strong) transparent;
+          }
+
+          nav::-webkit-scrollbar {
+            width: 6px;
+          }
+
+          nav::-webkit-scrollbar-thumb {
+            background-color: var(--border-strong);
+            border-radius: 3px;
+          }
+
+          nav::-webkit-scrollbar-track {
+            background: transparent;
+          }
+
+          #toc-root,
+          #toc-root ol,
+          #toc-root li {
+            width: 100%;
+          }
+
+          /* 注意：a 元素不能再设 width:100%，
+             否则加上左右 margin 后会超出侧栏宽度，箭头被裁剪 */
+          #toc-root li {
+            list-style: none;
+          }
+
+          #toc-root ol {
+            display: none;
+          }
+
+          #toc-root ol.show {
+            display: block;
+            animation: toc-expand 0.25s var(--ease);
+          }
+
+          @keyframes toc-expand {
+            from {
+              opacity: 0;
+              transform: translateY(-4px);
+            }
+            to {
+              opacity: 1;
+              transform: none;
+            }
+          }
+
+          #toc-root a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            margin: 1px 12px;
+            padding: 7px 10px;
+            border-radius: var(--radius-md);
+            color: var(--text-body);
+            font-size: 0.92rem;
+            line-height: 1.4;
+            text-decoration: none;
+            transition: background-color 0.15s var(--ease), color 0.15s var(--ease);
+          }
+
+          #toc-root a .toc-text {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          #toc-root a:hover {
+            background-color: var(--bg-hover);
+            color: var(--text-strong);
+          }
+
+          #toc-root a.active {
+            background-color: var(--bg-active);
+            color: var(--accent-strong);
+            font-weight: 600;
+          }
+
+          #toc-root > li > a {
+            padding-left: 14px;
+            font-family: var(--font-ui);
+            font-weight: 600;
+          }
+
+          #toc-root > li > ol > li > a {
+            padding-left: 34px;
+            font-weight: 400;
+          }
+
+          #toc-root > li > ol > li > ol > li > a {
+            padding-left: 54px;
+            font-size: 0.88rem;
+          }
+
+          #toc-root > li > ol > li > ol > li > ol > li > a {
+            padding-left: 74px;
+            font-size: 0.85rem;
+          }
+
+          #toc-root span.icon-arrow2 {
+            flex: none;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            transform: rotate(0deg);
+            transition: transform 0.25s var(--ease);
+          }
+
+          #toc-root span.icon-arrow2.rotate-90 {
+            transform: rotate(90deg);
+          }
+
+          #resize-handle {
+            position: absolute;
+            top: 0;
+            right: -2px;
+            z-index: 30;
+            width: 5px;
+            height: 100%;
+            background-color: transparent;
+            cursor: col-resize;
+            transition: background-color 0.2s var(--ease);
+          }
+
+          #resize-handle:hover,
+          body.resizing #resize-handle {
+            background-color: var(--accent);
+          }
+
+          /* ---------- 顶栏 ---------- */
+          header {
+            position: sticky;
+            z-index: 10;
+            top: 0;
+            width: 100%;
+            height: var(--header-height);
+            background-color: var(--header-bg);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 16px;
+            overflow: hidden;
+            transition: box-shadow 0.3s var(--ease);
+          }
+
+          main.scrolled header {
+            box-shadow: var(--shadow-sm);
+          }
+
+          .header-left,
+          .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            min-width: 0;
+          }
+
+          .header-right {
+            justify-content: flex-end;
+          }
+
+          .header-middle {
+            flex: none;
+            max-width: 50%;
+            padding: 0 12px;
+            text-align: center;
+            font-family: var(--font-display);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+          }
+
+          .header-btn {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            color: var(--text-muted);
+            font-size: 1.15rem;
+            transition: background-color 0.2s var(--ease), color 0.2s var(--ease),
+              transform 0.2s var(--ease);
+          }
+
+          .header-btn:hover {
+            background-color: var(--bg-hover);
+            color: var(--accent-strong);
+            transform: scale(1.06);
+          }
+
+          a.header-btn {
+            text-decoration: none;
+          }
+
+          #toggle-aside {
+            display: inline-flex;
+          }
+
+          #toggle-menu {
+            display: none;
+          }
+
+          /* ---------- 遮罩 ---------- */
+          .overlay {
+            display: none;
+          }
+
+          /* ---------- 正文排版 ---------- */
+          article {
+            width: 100%;
+            max-width: var(--article-width);
+            margin: 0 auto;
+            padding: 48px 56px 160px;
+            font-family: var(--font-body);
+            font-size: 1.0625rem;
+            line-height: 1.75;
+            color: var(--text-body);
+            overflow-x: hidden;
+          }
+
+          article h2,
+          article h3,
+          article h4,
+          article h5 {
+            font-family: var(--font-display);
+            color: var(--text-strong);
+            line-height: 1.3;
+            scroll-margin-top: calc(var(--header-height) + 16px);
+          }
+
+          article h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            margin: 2em 0 0.8em;
+            padding-bottom: 0.35em;
+            border-bottom: 1px solid var(--border);
+          }
+
+          article h3 {
+            font-size: 1.42rem;
+            font-weight: 600;
+            margin: 1.7em 0 0.65em;
+          }
+
+          article h4 {
+            font-size: 1.12rem;
+            font-weight: 600;
+            margin: 1.5em 0 0.55em;
+          }
+
+          article h5 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 1.2em 0 0.5em;
+          }
+
+          article .heading-number {
+            margin-right: 0.55em;
+            color: var(--accent);
+            font-size: 0.62em;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            vertical-align: 0.18em;
+          }
+
+          article p {
+            margin: 0 0 1.1em;
+          }
+
+          article a {
+            color: var(--accent-strong);
+            text-decoration: underline;
+            text-decoration-color: var(--border-strong);
+            text-underline-offset: 3px;
+            transition: text-decoration-color 0.2s var(--ease);
+          }
+
+          article a:hover {
+            text-decoration-color: var(--accent-strong);
+          }
+
+          article strong {
+            color: var(--text-strong);
+            font-weight: 600;
+          }
+
+          article ul,
+          article ol {
+            margin: 0 0 1.1em;
+            padding-left: 1.7em;
+          }
+
+          article li {
+            margin: 0.35em 0;
+            line-height: 1.7;
+          }
+
+          article li::marker {
+            color: var(--accent);
+          }
+
+          article hr {
+            border: 0;
+            height: 1px;
+            margin: 2.4em 0;
+            background: linear-gradient(to right, transparent, var(--border-strong), transparent);
+          }
+
+          /* ---------- 内容元素 ---------- */
+          article pre,
+          div.highlight {
+            margin: 1.5em 0;
+            padding: 16px 20px;
+            background-color: var(--bg-inset);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            line-height: 1.65;
+            color: var(--text-strong);
+            overflow-x: auto;
+          }
+
+          article :not(pre) > code,
+          article .raw-inline {
+            padding: 0.12em 0.45em;
+            background-color: var(--bg-inset);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.86em;
+            color: var(--text-strong);
+          }
+
+          article table {
+            display: block;
+            width: 100%;
+            margin: 1.6em 0;
+            border-collapse: collapse;
+            font-size: 0.95em;
+            overflow-x: auto;
+          }
+
+          article th,
+          article td {
+            border: 1px solid var(--border-strong);
+            padding: 9px 14px;
+            text-align: left;
+            vertical-align: top;
+          }
+
+          article th {
+            background-color: var(--bg-inset);
+            color: var(--text-strong);
+            font-family: var(--font-ui);
+            font-size: 0.88em;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+          }
+
+          article tbody tr:nth-child(even) {
+            background-color: var(--bg-inset);
+          }
+
+          article tbody tr:hover {
+            background-color: var(--bg-hover);
+          }
+
+          article blockquote {
+            margin: 1.5em 0;
+            padding: 14px 22px;
+            border-left: 3px solid var(--accent);
+            background-color: var(--bg-active);
+            border-radius: 0 var(--radius-md) var(--radius-md) 0;
+            color: var(--text-body);
+          }
+
+          article figure {
+            width: auto;
+            max-width: 100%;
+            margin: 2em auto;
+            text-align: center;
+            overflow: visible;
+            scroll-margin-top: calc(var(--header-height) + 16px);
+          }
+
+          article figure img {
+            max-width: 100%;
+            border-radius: var(--radius-md);
+          }
+
+          article figcaption {
+            margin-top: 0.8em;
+            font-family: var(--font-ui);
+            font-size: 0.88em;
+            color: var(--text-muted);
+          }
+
+          /* ---------- 数学公式 ---------- */
+          math {
+            font-family: "NewComputerModernMath", "Latin Modern Math", "STIX Two Math", "Noto Sans Math", math;
+            font-weight: 400;
+            font-style: normal;
+            font-size: 1.02em;
+          }
+
+          math[display="block"] {
+            /* 不能设 display: block —— 会覆盖 MathML 专用的 "block math"
+               布局类型，导致公式内部排版散架。浏览器对
+               <math display="block"> 本来就按块级渲染 */
+            max-width: 100%;
+            margin: 1.3em 0;
+            padding: 0.2em 0;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+          }
+
+          math[display="block"]::-webkit-scrollbar {
+            display: none;
+          }
+
+          /* 注：历史版本曾在此处为箭头重音设置 margin-left: 0.2em 补丁，已移除。
+             2026-10 复测（DOM 矩形 + canvas 字形墨迹度量，17px 真实字号）确认根因：
+             Typst HTML 导出把 arrow() 输出为零宽组合字符 U+20D7，Chromium（MathML
+             Core）按字距盒将其原点对齐到底符中心，而 NewComputerModern Math 的
+             U+20D7 字形墨迹全部位于原点左侧，导致箭头恒定左偏约半个箭宽（~4.5px）；
+             换用间距字符 U+2192 则渲染居中。属 Typst 导出端问题，已提交上游
+             issue typst/typst#8961。按根因修复原则，模板侧不做任何补丁。 */
+
+          /* ---------- three.js 控制面板（lil-gui） ---------- */
           .lil-gui.root {
             position: absolute;
-            top: 0px;
-            right: 0px;
+            top: 0;
+            right: 0;
             z-index: 10;
             width: 25%;
             max-width: 250px;
           }
 
           .lil-gui {
-            --background-color: #dddddd;
-            --title-background-color: #cccccc;
-            --title-text-color: #000000;
-            --widget-color: #cccccc;
-            --hover-color: #bbbbbb;
-            --text-color: #000000;
-            --string-color: #017005;
-            --number-color: #090909;
-          }
-
-          .lil-gui .title {
-            background-color: #cccccc;
-          }
-
-          .lil-gui .controller {
-            background-color: #dddddd;
+            --background-color: var(--bg-inset);
+            --title-background-color: var(--bg-aside-title);
+            --title-text-color: var(--text-strong);
+            --widget-color: var(--bg-hover);
+            --hover-color: var(--bg-active);
+            --focus-color: var(--bg-active);
+            --text-color: var(--text-body);
+            --string-color: var(--accent);
+            --number-color: var(--accent-strong);
+            --font-family: var(--font-mono);
           }
 
           @media screen and (max-width: 700px) {
@@ -168,348 +767,45 @@
             }
           }
 
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-
-          html,
-          body,
-          .container {
-            width: 100vw;
-            height: 100vh;
-            margin: 0;
-            padding: 0;
-          }
-
-          .container {
-            display: flex;
-            justify-content: flex-end;
-            align-items: flex-start;
-            position: relative;
-          }
-
-          aside {
-            position: relative;
-            width: var(--aside-width);
-            height: 100vh;
-            background-color: var(--aside-bag);
-            overflow: hidden;
-            transition: width 0.3s ease;
-          }
-
-          aside.resizing {
-            transition: none;
-          }
-
-          aside.hidden {
-            width: 0;
-          }
-
-          .aside-title-large-screen,
-          .aside-title-small-screen {
-            display: block;
-            width: 100%;
-            line-height: var(--aside-title-height);
-            padding-left: 20px;
-            text-align: left;
-            background-color: var(--aside-title-bag);
-            color: var(--aside-title-font-color);
-            font-size: var(--aside-title-font-size);
-            font-weight: 500;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-
-          .aside-title-large-screen:hover,
-          .aside-title-small-screen:hover {
-            background-color: var(--aside-title-hover-bag);
-          }
-
-          .aside-title-small-screen {
-            display: none;
-          }
-
-          #resize-handle {
-            position: absolute;
-            /* z-index: 10; */
-            top: 0;
-            right: 0;
-            width: 4px;
-            height: 100vh;
-            background-color: transparent;
-          }
-
-          #resize-handle:hover {
-            background-color: var(--resize-handle-hover-bag);
-            cursor: col-resize;
-          }
-
-          #resize-handle.resizing {
-            background-color: var(--resize-handle-hover-bag);
-            cursor: col-resize;
-          }
-
-          .function-panel {
-            width: 100%;
-            height: var(--function-panel-height);
-            border-bottom: 2px solid var(--aside-divider-color);
-            background-color: transparent;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-
-          .icon-Numbering,
-          .icon-expand-all {
-            width: 50%;
-            height: 100%;
-            padding: var(--aside-function-item-padding);
-            display: flex;
-            justify-content: flex-start;
-            align-items: center;
-            gap: 20px;
-            background-color: transparent;
-            color: var(--aside-function-item-font-color);
-            font-size: var(--aside-function-icon-font-size);
-            overflow: hidden;
-          }
-
-          .icon-Numbering .numbering-text,
-          .icon-expand-all .expand-all-text {
-            font-size: var(--aside-function-text-font-size);
-          }
-
-          .icon-Numbering:hover,
-          .icon-expand-all:hover {
-            background-color: var(--aside-function-item-hover-bag);
-            cursor: pointer;
-          }
-
-          nav {
-            width: 100%;
-            height: var(--aside-nav-height);
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 10px 0;
-            scrollbar-width: none;
-            /* Firefox 隐藏滚动条 */
-            -ms-overflow-style: none;
-            /* IE/Edge 旧版本隐藏滚动条 */
-          }
-
-          nav::-webkit-scrollbar {
-            /*  Chrome、Safari、新版 Edge 隐藏滚动条 */
-            display: none;
-          }
-
-          #toc-root,
-          #toc-root ol,
-          #toc-root li,
-          #toc-root a {
-            width: 100%;
-          }
-
-          #toc-root li {
-            list-style: none;
-          }
-
-          #toc-root a {
-            font-size: var(--toc-root-a-others-font-size);
-            /* line-height: 2em; */
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: nowrap;
-            color: var(--toc-root-a-font-color);
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-          }
-
-          #toc-root > li > a {
-            font-size: var(--toc-root-a-level-1-font-size);
-            padding: var(--toc-root-level-1-padding);
-            font-weight: 500;
-          }
-
-          #toc-root > li > ol > li > a {
-            padding: var(--toc-root-level-2-padding);
-          }
-
-          #toc-root > li > ol > li > ol > li > a {
-            padding: var(--toc-root-level-3-padding);
-          }
-
-          #toc-root li a:hover {
-            background-color: var(--toc-root-a-hover-bag);
-          }
-
-          aside a {
-            text-decoration: none;
-            /* color: var(--aside-normal-font-color); */
-          }
-
-          #toc-root li ol {
-            display: none;
-            opacity: 0;
-          }
-
-          #toc-root li ol.show {
-            display: block;
-            opacity: 1;
-          }
-
-          span.icon-arrow2 {
-            font-size: var(--toc-root-arrow-font-size);
-            padding: 0px 10px;
-          }
-
-          span.rotate-90 {
-            transform: rotate(90deg);
-            transition: transform 0.3s ease;
-          }
-
-          .overlay {
-            display: none;
-          }
-
-          main {
-            position: relative;
-            z-index: 5;
-            width: calc(100vw - var(--aside-width));
-            height: 100vh;
-            background-color: var(--main-bag);
-            overflow-y: auto;
-            overflow-x: hidden;
-            transition: width 0.3s ease;
-          }
-
-          main.hidden {
-            width: 100vw;
-          }
-
-          main.resizing {
-            transition: none;
-          }
-
-          header {
-            position: sticky;
-            z-index: 10;
-            top: 0;
-            width: 100%;
-            height: var(--header-height);
-            background-color: var(--header-bag);
-            border-bottom: 1px solid var(--header-border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0px 20px;
-            overflow: hidden;
-          }
-
-          .header-left {
-            width: 33%;
-          }
-
-          .header-middle {
-            width: 33%;
-            text-align: center;
-            font-size: var(--header-title-font-size);
-            font-weight: 500;
-            color: var(--header-title-font-color);
-            overflow: hidden;
-          }
-
-          .header-right {
-            width: 33%;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 30px;
-            overflow: hidden;
-            background-color: transparent;
-            color: var(--header-icon-font-color);
-            font-size: var(--header-icon-font-size);
-          }
-
-          .icon-Aside,
-          .icon-menu3 {
-            font-size: var(--header-button-font-size);
-            padding: var(--header-button-padding);
-            background-color: var(--header-button-bag);
-            color: var(--header-button-font-color);
-            border-radius: var(--header-button-border-radius);
-          }
-
-          .icon-Aside:hover,
-          .icon-menu3:hover {
-            background-color: var(--header-button-hover-bag);
-            transform: translateY(-5px);
-            transition: transform 0.3s ease;
-            cursor: pointer;
-          }
-
-          .icon-menu3 {
-            display: none;
-          }
-
-          header a {
-            text-decoration: none;
-            color: var(--header-icon-font-color);
-          }
-
+          /* ---------- 页面载入动画 ---------- */
           article {
-            width: 100%;
-            height: auto;
-            max-width: 1000px;
-            margin: 20px auto;
-            padding: 20px 20px 150px 20px;
-            overflow-x: hidden;
-            overflow-y: auto;
+            animation: article-in 0.6s var(--ease) both;
           }
 
-          article li {
-            /* list-style: none; */
-            list-style-position: inside;
-            padding-left: 2em;
+          @keyframes article-in {
+            from {
+              opacity: 0;
+              transform: translateY(10px);
+            }
+            to {
+              opacity: 1;
+              transform: none;
+            }
           }
 
-          article a {
-            color: var(--article-font-color);
-          }
-
+          /* ---------- 响应式（≤1000px：抽屉式侧栏） ---------- */
           @media screen and (max-width: 1000px) {
             :root {
+              --header-height: 52px;
               --aside-width: 300px;
-              --header-height: 0;
             }
 
             aside {
-              position: absolute;
+              position: fixed;
               z-index: 20;
               top: 0;
-              left: calc(-1 * var(--aside-width));
+              left: 0;
+              transform: translateX(-100%);
+              transition: transform 0.3s var(--ease);
+              box-shadow: var(--shadow-md);
             }
 
             aside.show {
-              transform: translateX(var(--aside-width));
-              transition: transform 0.3s ease-in-out;
+              transform: translateX(0);
             }
 
-            .aside-title-large-screen {
-              display: none;
-            }
-
-            .aside-title-small-screen {
-              display: block;
+            aside.hidden {
+              width: var(--aside-width);
             }
 
             #resize-handle {
@@ -522,497 +818,530 @@
 
             .overlay.show {
               display: block;
-              position: absolute;
-              z-index: 10;
-              top: 0;
-              left: 0;
-              width: 100vw;
-              height: 100vh;
-              background-color: rgba(1, 1, 1, 0.3);
+              position: fixed;
+              z-index: 15;
+              inset: 0;
+              background-color: rgba(10, 8, 5, 0.45);
+              -webkit-backdrop-filter: blur(2px);
+              backdrop-filter: blur(2px);
             }
 
-            main {
-              position: relative;
-              z-index: 5;
+            main,
+            main.full {
               width: 100vw;
             }
 
-            header {
-              height: var(--header-height);
-              overflow: hidden;
+            article {
+              padding: 32px 22px 120px;
             }
 
-            /*
-            .header-left {
-              width: 20%;
-            }
-
-            .header-middle {
-              text-align: left;
-              width: 0;
-            }
-
-            .header-right {
-              width: 45%;
-              gap: 20px;
-            }
-            */
-
-            .icon-Aside {
+            #toggle-aside {
               display: none;
             }
 
-            .icon-menu3 {
-              display: block;
-              position: fixed;
-              z-index: 100;
-              right: 40px;
-              bottom: 100px;
+            #toggle-menu {
+              display: inline-flex;
             }
 
-            .icon-menu3:hover {
-              transform: rotateX(180deg);
-              transition: transform 0.3s ease;
-              cursor: pointer;
+            .header-btn {
+              width: 36px;
+              height: 36px;
+              font-size: 1.05rem;
+            }
+
+            .header-middle {
+              font-size: 0.95rem;
             }
           }
 
-          /* 行间距和段间距 */
-          p {
-            line-height: 1.2;
-            margin: 1rem 0;
+          /* ---------- 动效偏好 ---------- */
+          @media (prefers-reduced-motion: reduce) {
+            html,
+            main {
+              scroll-behavior: auto;
+            }
+
+            *,
+            *::before,
+            *::after {
+              animation-duration: 0.01ms !important;
+              animation-iteration-count: 1 !important;
+              transition-duration: 0.01ms !important;
+            }
           }
 
-          /* 标题跳转时留出 header 高度 + 缓冲间距，防止被遮挡 */
-          article :is(h1, h2, h3, h4, h5, h6) {
-            scroll-margin-top: calc(var(--header-height) + 2px);
-          }
+          /* ---------- 打印样式 ---------- */
+          @media print {
+            :root {
+              --header-height: 0px;
+              --bg-main: #ffffff;
+              --text-body: #000000;
+              --text-strong: #000000;
+            }
 
-          /* highlight.css */
+            aside,
+            header,
+            #resize-handle,
+            .overlay,
+            .lil-gui.root {
+              display: none !important;
+            }
 
-          div.highlight {
-            width: 90%;
-            padding: 10px 15px;
-            margin: 2rem 0;
-            border-left: 3px solid #b8b8b8;
-            background-color: #f8f9fa;
-            border-radius: 4px;
-          }
+            .container,
+            main,
+            main.full {
+              width: 100% !important;
+              height: auto !important;
+              overflow: visible !important;
+            }
 
-          table {
-            width: 90%;
-            border: 1px solid;
-            border-collapse: collapse;
-            overflow-x: auto;
-          }
+            article {
+              max-width: 100%;
+              padding: 0;
+              animation: none;
+              font-size: 11.5pt;
+              line-height: 1.6;
+            }
 
-          table th,
-          table td {
-            border: 1px solid;
-            padding: 8px;
-          }
+            article a {
+              color: #000000;
+              text-decoration: none;
+            }
 
-          /* theoframe.css */
+            article pre,
+            div.highlight,
+            article table,
+            article blockquote,
+            article figure,
+            math[display="block"] {
+              break-inside: avoid;
+            }
 
-          figure {
-            width: 95%;
-            margin: 20px auto;
-            scroll-margin-top: calc(var(--header-height) + 2px);
-            overflow: hidden;
-          }
-
-          article a {
-            color: var(--article-font-color);
-            text-decoration: none;
-          }
-
-          /* mathfonts.css */
-
-          html {
-            font-family: "NewComputerModern10", "Latin Modern Math", "STIX Two Math", "Noto Sans Math", "Cambria Math", "Fira Math", "Times New Roman", "KaiTi", sans-serif;
-          }
-
-          math {
-            font-family: "NewComputerModernMath", "Latin Modern Math", "STIX Two Math", "Noto Sans Math", math;
-            font-weight: 400;
-            font-style: normal;
-          }
-
-          mover[accent="true"] > mo {
-            margin-left: 0.2em;
-          }
-
-          /* 调整行间距和段间距 */
-
-          p {
-            line-height: 1.5;
-            margin-bottom: 0.8em;
-          }
-
-          article div {
-            line-height: 1.5;
-            margin-bottom: 0.8em;
-          }
-
-          article li {
-            line-height: 1.5;
-          }
-
-          math {
-            font-size: clamp(0.6rem, 3.5vw, 1rem);
-            line-height: 1.5;
-            margin-bottom: 0.8em;
-          }
-
-          math[display="block"] {
-            max-width: 100%;
-            overflow-x: auto;
-            overflow-y: hidden;
-            scrollbar-width: none; /* Firefox */
-            -ms-overflow-style: none; /* IE 10+ */
-          }
-
-          math[display="block"]::-webkit-scrollbar {
-            display: none; /* Chrome, Safari, Edge */
+            article h2,
+            article h3,
+            article h4,
+            article h5 {
+              break-after: avoid;
+            }
           }
           ```.text,
         )
 
-        html.link(rel: "stylesheet", href: "https://fred-wang.github.io/MathFonts/NewComputerModern/mathfonts.css")
-        // html.link(rel: "stylesheet", href: "https://fred-wang.github.io/MathFonts/LatinModern/mathfonts.css")
-        // html.link(rel: "preconnect", href: "https://fonts.googleapis.com")
-        // html.link(rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous")
-        // html.link(rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Noto+Sans+Math&family=STIX+Two+Math&display=swap")
-
-        // html.script(src: "https://unpkg.com/@hexiongwu1995/itemplate/scripts/script.js", defer: true)
-        // html.script(src: "./assets/script.js", defer: true)
         html.script(
           type: "module",
           ```js
-          /*
-          方案二： 在script.js中统一管理所有动画的可见性和启停。
-          问题：IntersectionObserver 只能观察 DOM 元素，但无法直接控制另一个文件中的 requestAnimationFrame 循环。
-          需要跨文件通信才能统一管理所有 three-animation 元素的动画启停，而且同样需要在每个动画文件中通过isIntersecting和isVisible控制动画启停。
-          这是更加复杂的方案，因为逻辑拆分在多个文件中，难以理解。
-          */
+          /* ============================================================
+             itemplate 0.6.0 — 交互脚本
+             1) initHeadings   检测标题自带编号，生成 id 与多级编号
+             2) buildToc       依据标题层级构建侧边目录
+             3) 交互绑定       目录折叠 / 侧栏开合 / 宽度拖拽
+             4) initScrollspy  滚动时高亮当前章节
+             5) 顶栏动作       返回顶部 / 打印 / 主题切换
+             ============================================================ */
+
+          const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+          const headings = $$("article h2, article h3, article h4, article h5");
+          const tocLinkMap = new Map();
+          // 点击目录跳转后的高亮锁定目标 id（null = 未锁定）
+          let tocPinId = null;
+          function releaseTocPin() {
+            tocPinId = null;
+          }
+
+          /* ---------- 1. 标题 id 与编号 ---------- */
+
+          // 匹配标题文字开头的编号前缀。若文档（如设置了 heading.numbering 的
+          // Typst 源）已自带编号，则原样保留并同步计数器，避免与模板自动编号叠加：
+          //   1.2 / 1.2.3 / 3.1. / 1. / 1、 / 1) / "1 简介" / 第一章 / 第 3 节 / 一、 / I. / A)
+          // 负向断言避免误伤 "2.4G"、"U.S." 这类非编号开头；
+          // 单个 1~2 位数字必须后接空白（避免误伤 "2001 太空漫游"）
+          const LEADING_NUMBER_RE = new RegExp(
+            "^(?:"
+            + [
+              "\\d+(?:[.．]\\d+)+[.、．)）]?(?![.\\dA-Za-z])",       // 1.2 / 1.2.3 / 3.1.
+              "\\d{1,2}(?=\\s)",                                      // 1~99 + 空白："1 简介"
+              "\\d+[.、．)）](?![.\\dA-Za-z])",                      // 1. / 1、 / 1)
+              "第\\s*[一二三四五六七八九十百\\d]+\\s*[章节讲部分回]", // 第一章 / 第 3 节
+              "[一二三四五六七八九十百]+[、.．，]",                  // 一、
+              "[IVXLCDM]+[.、．)）](?=\\s)",                         // I. / IV)
+              "[A-Za-z][.、．)）](?=\\s)",                           // A. / a)
+            ].join("|")
+            + ")\\s*",
+          );
+
+          function initHeadings() {
+            const counters = [];
+            let uid = 0;
+            headings.forEach((heading) => {
+              const level = getLevel(heading);
+
+              // 检测标题自带的编号前缀（先去除首部空白再匹配）
+              const firstNode = heading.firstChild;
+              if (firstNode && firstNode.nodeType === Node.TEXT_NODE) {
+                firstNode.textContent = firstNode.textContent.replace(/^\s+/, "");
+              }
+              const own = heading.textContent.match(LEADING_NUMBER_RE);
+              const ownNumber = own ? own[0].trim() : null;
+
+              if (ownNumber && /^\d+(\.\d+)*\.?$/.test(ownNumber)) {
+                // 自带阿拉伯层级编号：同步计数器，使后续无编号标题正确接续
+                const segs = ownNumber.replace(/\.$/, "").split(".").map(Number);
+                counters.length = segs.length;
+                segs.forEach((n, i) => (counters[i] = n));
+              } else if (!ownNumber) {
+                // 无自带编号：模板自动生成
+                while (counters.length < level - 1) counters.push(0);
+                counters.length = level - 1;
+                counters[level - 2] = (counters[level - 2] || 0) + 1;
+              }
+              const numbering = ownNumber || counters.join(".");
+
+              heading.id = "heading-" + ++uid;
+              heading.dataset.numbering = numbering;
+
+              // 编号放进 span.heading-number（自带编号与自动编号共用同一套样式），
+              // 其余原始内容包进 span.heading-text，不破坏标题里的公式等富文本
+              const num = document.createElement("span");
+              num.className = "heading-number";
+              num.setAttribute("aria-hidden", "true");
+              num.textContent = numbering;
+              const wrap = document.createElement("span");
+              wrap.className = "heading-text";
+              if (ownNumber) {
+                // 将开头的编号字符从原文本节点切出（含尾随空白），其余留给正文
+                let remaining = own[0].length;
+                while (heading.firstChild) {
+                  const node = heading.firstChild;
+                  if (remaining > 0 && node.nodeType === Node.TEXT_NODE) {
+                    const text = node.textContent;
+                    if (text.length <= remaining) {
+                      remaining -= text.length;
+                      heading.removeChild(node);
+                    } else {
+                      node.textContent = text.slice(remaining);
+                      remaining = 0;
+                    }
+                  } else {
+                    wrap.appendChild(node);
+                  }
+                }
+              } else {
+                while (heading.firstChild) wrap.appendChild(heading.firstChild);
+              }
+              heading.appendChild(num);
+              heading.appendChild(wrap);
+            });
+          }
 
           function getLevel(heading) {
             return parseInt(heading.tagName[1], 10);
           }
 
-          // 给每个 heading 生成id、添加numbering和data-original-text属性
-          function initHeadings() {
-            const headings = Array.from(document.querySelectorAll("h2, h3, h4"));
-
-            const counters = [];
-
-            if (headings.length > 0) {
-              headings.forEach((heading) => {
-                const level = getLevel(heading);
-
-                // 确保数组有足够的长度
-                while (counters.length < level - 1) {
-                  counters.push(0);
-                }
-                // 截断到当前层级
-                counters.length = level - 1;
-                // 当前层级计数+1（用 level-2 作为索引）
-                counters[level - 2] = counters[level - 2] + 1;
-
-                const id = counters.join("-");
-                heading.id = "heading-" + id;
-
-                const numbering = counters.join(".");
-
-                heading.setAttribute("data-original-text", heading.textContent);
-                heading.setAttribute("data-numbering", numbering);
-              });
-            }
-          }
-
-          // 保存 heading 与 TOC 中 <a> 元素的映射，用于后续更新文本而不重建结构
-          const tocLinkMap = new Map();
+          /* ---------- 2. 目录构建 ---------- */
 
           function buildToc() {
-            const headings = Array.from(document.querySelectorAll("h2, h3, h4"));
             const tocRoot = document.getElementById("toc-root");
             if (headings.length === 0) return;
 
             tocRoot.innerHTML = "";
-            tocLinkMap.clear();
 
             const stack = [{ level: getLevel(headings[0]), ol: tocRoot }];
 
             headings.forEach((heading, index) => {
-              const currentLevel = getLevel(heading);
+              const level = getLevel(heading);
 
-              const arrow = document.createElement("span");
-              arrow.classList.add("iconfont", "icon-arrow2");
-
-              // 新建一个li元素，用于承载当前的heading元素
               const li = document.createElement("li");
               const a = document.createElement("a");
               a.href = "#" + heading.id;
 
-              // 保存映射关系，方便后续更新文本
-              tocLinkMap.set(heading, a);
+              const text = document.createElement("span");
+              text.className = "toc-text";
+              // 目录文字 = 编号 + 标题文字（编号可能来自文档自带或模板自动生成）
+              text.textContent =
+                heading.dataset.numbering + " " + heading.querySelector(".heading-text").textContent;
+              a.appendChild(text);
 
-              // 判断当前 heading 后面是否存在层级更深的子 heading
-              const nextHeading = headings[index + 1];
-              const hasChildren = nextHeading && getLevel(nextHeading) > currentLevel;
-
-              if (hasChildren) {
+              // 若存在下一级标题，则添加折叠箭头
+              const next = headings[index + 1];
+              if (next && getLevel(next) > level) {
+                const arrow = document.createElement("span");
+                arrow.className = "iconfont icon-arrow2";
+                arrow.setAttribute("aria-hidden", "true");
                 a.appendChild(arrow);
+                a.setAttribute("aria-expanded", "false");
               }
+
               li.appendChild(a);
+              tocLinkMap.set(heading, { link: a, text: text });
 
-              // 如果栈顶的heading level 大于 当前的heading level，让栈顶回退到栈顶level等于当前heading level的状态
-              while (stack[stack.length - 1].level > currentLevel) {
-                stack.pop();
-              }
+              while (stack[stack.length - 1].level > level) stack.pop();
 
-              if (currentLevel > stack[stack.length - 1].level) {
-                // 如果当前的heading level 大于栈顶的heading level
-
-                // 新建一个空的ol元素，挂在栈顶的ol元素的最后一个li元素下
+              if (level > stack[stack.length - 1].level) {
                 const newOl = document.createElement("ol");
                 const parentLi = stack[stack.length - 1].ol.lastElementChild;
-                if (parentLi) {
-                  parentLi.appendChild(newOl);
-                }
-
-                // 将当前的heading level 和 新建的ol元素压到栈顶
-                stack.push({ level: currentLevel, ol: newOl });
+                if (parentLi) parentLi.appendChild(newOl);
+                stack.push({ level: level, ol: newOl });
               }
 
-              // 将li元素添加到栈顶的ol元素下
               stack[stack.length - 1].ol.appendChild(li);
             });
-
-            updateHeadingText();
           }
 
-          // 只更新 TOC 和 heading 的文本内容，不重建 DOM 结构
-          function updateHeadingText() {
-            const root = document.documentElement;
-            const headings = Array.from(document.querySelectorAll("h2, h3, h4"));
-            if (headings.length === 0) return;
+          /* ---------- 3. 目录折叠 ---------- */
 
-            const enableNumbering = getComputedStyle(root).getPropertyValue("--enable-numbering").trim();
+          function initTocToggle() {
+            document.querySelector("nav").addEventListener("click", (e) => {
+              const arrow = e.target.closest(".icon-arrow2");
+              if (!arrow) return;
 
-            headings.forEach((heading) => {
-              const a = tocLinkMap.get(heading);
+              e.preventDefault();
+              const li = arrow.closest("li");
+              const ol = li.querySelector(":scope > ol");
+              if (!ol) return;
 
-              // 保留 arrow 元素，只更新文本部分
-              const arrow = a.querySelector(".icon-arrow2");
-
-              if (enableNumbering === "false") {
-                heading.textContent = heading.getAttribute("data-original-text");
-
-                a.innerHTML = "";
-                a.textContent = heading.textContent;
-                if (arrow) {
-                  a.appendChild(arrow);
-                }
-              } else if (enableNumbering === "true") {
-                heading.textContent = heading.getAttribute("data-numbering") + " " + heading.getAttribute("data-original-text");
-                a.innerHTML = "";
-                a.textContent = heading.textContent;
-                if (arrow) {
-                  a.appendChild(arrow);
-                }
-              } else {
-                console.log("--enable-numbering:", enableNumbering);
-                console.log(new Error("--enable-numbering must be true or false"));
-              }
+              const open = ol.classList.toggle("show");
+              arrow.classList.toggle("rotate-90", open);
+              arrow.closest("a").setAttribute("aria-expanded", String(open));
             });
           }
 
-          // 显示/隐藏目录编号
-          function switchNumbering() {
-            const root = document.documentElement;
-            const toggleNumbering = document.querySelector(".icon-Numbering");
-            const iconNumbering = document.querySelector(".icon-Numbering");
+          let allExpanded = false;
 
-            if (toggleNumbering) {
-              toggleNumbering.addEventListener("click", () => {
-                iconNumbering.style.userSelect = "none";
-                const enableNumbering = getComputedStyle(root).getPropertyValue("--enable-numbering").trim();
-                const resetNumbering = enableNumbering === "true" ? "false" : "true";
-                root.style.setProperty("--enable-numbering", resetNumbering);
-
-                updateHeadingText();
-              });
-            }
+          function initExpandAll() {
+            const btn = document.getElementById("toggle-expand");
+            btn.addEventListener("click", () => {
+              allExpanded = !allExpanded;
+              btn.setAttribute("aria-pressed", String(allExpanded));
+              $$("#toc-root ol").forEach((ol) => ol.classList.toggle("show", allExpanded));
+              $$("#toc-root a[aria-expanded]").forEach((a) =>
+                a.setAttribute("aria-expanded", String(allExpanded)),
+              );
+              $$("#toc-root .icon-arrow2").forEach((arrow) =>
+                arrow.classList.toggle("rotate-90", allExpanded),
+              );
+            });
           }
 
-          // 点击arrow切换目录展开状态
-          function toggleNestedToc() {
-            const nav = document.querySelector("nav");
-            if (nav) {
-              nav.addEventListener("click", (e) => {
-                const arrow = e.target.closest(".icon-arrow2");
-                if (!arrow) return;
+          /* ---------- 4. 侧栏开合 ---------- */
 
-                e.preventDefault();
-                e.stopPropagation();
-
-                const li = arrow.closest("li");
-                const nestedOl = li.querySelector(":scope > ol");
-
-                if (!nestedOl) return;
-
-                nestedOl.classList.toggle("show");
-                arrow.classList.toggle("rotate-90");
-              });
-            }
-          }
-
-          // 展开/收起 所有目录
-          function toggleAllToc() {
-            const root = document.documentElement;
-            const iconExpand = document.querySelector(".icon-expand-all");
-            const tocRoot = document.getElementById("toc-root");
-
-            if (iconExpand) {
-              iconExpand.addEventListener("click", () => {
-                iconExpand.style.userSelect = "none";
-                const ol = tocRoot.querySelectorAll("ol");
-                const arrows = tocRoot.querySelectorAll(".icon-arrow2");
-                const allExpandedValue = getComputedStyle(root).getPropertyValue("--all-expanded").trim();
-                const newAllExpanded = allExpandedValue === "false" ? "true" : "false";
-                root.style.setProperty("--all-expanded", newAllExpanded);
-
-                if (newAllExpanded === "true") {
-                  ol.forEach((item) => {
-                    item.classList.add("show");
-                  });
-                  arrows.forEach((arrow) => {
-                    arrow.classList.add("rotate-90");
-                  });
-                } else if (newAllExpanded === "false") {
-                  ol.forEach((item) => {
-                    item.classList.remove("show");
-                  });
-                  arrows.forEach((arrow) => {
-                    arrow.classList.remove("rotate-90");
-                  });
-                } else {
-                  alert("展开/收起所有目录失败");
-                }
-              });
-            }
-          }
-
-          // 大屏状态下 显示/隐藏 侧边栏
-          function largeScreenToggleAside() {
-            const iconAside = document.querySelector(".icon-Aside");
+          function initAsideToggles() {
             const aside = document.querySelector("aside");
             const main = document.querySelector("main");
-
-            if (iconAside) {
-              iconAside.addEventListener("click", () => {
-                main.classList.toggle("hidden");
-                aside.classList.toggle("hidden");
-              });
-            }
-          }
-
-          // 小屏状态下 显示/隐藏 侧边栏
-          function smallScreenToggleAside() {
-            const aside = document.querySelector("aside");
-            const iconMenu3 = document.querySelector(".icon-menu3");
             const overlay = document.querySelector(".overlay");
+            const desktopBtn = document.getElementById("toggle-aside");
+            const mobileBtn = document.getElementById("toggle-menu");
 
-            if (iconMenu3) {
-              iconMenu3.addEventListener("click", () => {
-                iconMenu3.classList.toggle("show");
-                aside.classList.toggle("show");
-                overlay.classList.toggle("show");
-              });
+            // 大屏：折叠 / 展开侧栏
+            desktopBtn.addEventListener("click", () => {
+              aside.classList.toggle("hidden");
+              main.classList.toggle("full");
+            });
+
+            // 小屏：抽屉式侧栏
+            function closeDrawer() {
+              aside.classList.remove("show");
+              overlay.classList.remove("show");
+              mobileBtn.setAttribute("aria-expanded", "false");
             }
 
-            if (overlay) {
-              overlay.addEventListener("click", () => {
-                iconMenu3.classList.remove("show");
-                aside.classList.remove("show");
-                overlay.classList.remove("show");
-              });
-            }
+            mobileBtn.addEventListener("click", () => {
+              const open = aside.classList.toggle("show");
+              overlay.classList.toggle("show", open);
+              mobileBtn.setAttribute("aria-expanded", String(open));
+            });
+
+            overlay.addEventListener("click", closeDrawer);
           }
 
-          // 侧边栏宽度调整
-          function adjustAsideWidth() {
+          /* ---------- 5. 侧栏宽度拖拽 ---------- */
+
+          function initResize() {
+            const handle = document.getElementById("resize-handle");
             const root = document.documentElement;
-            const resizeHandle = document.querySelector("#resize-handle");
-            const asideEl = document.querySelector("aside");
-            const mainEl = document.querySelector("main");
+            const MIN = 240;
+            const MAX = 520;
 
-            if (resizeHandle && asideEl && mainEl) {
-              let isResizing = false;
-              let startX = 0;
-              let startWidth = 0;
-              let rafId = null;
-              const minWidth = 0;
-              const maxWidth = 500;
+            let resizing = false;
+            let startX = 0;
+            let startWidth = 0;
+            let raf = null;
 
-              resizeHandle.addEventListener("mousedown", (e) => {
-                isResizing = true;
-                startX = e.clientX;
-                const currentWidth = parseInt(getComputedStyle(root).getPropertyValue("--aside-width").trim(), 10);
-                startWidth = currentWidth;
-                resizeHandle.classList.add("resizing");
-                asideEl.classList.add("resizing");
-                mainEl.classList.add("resizing");
-                document.body.style.userSelect = "none";
+            handle.addEventListener("mousedown", (e) => {
+              resizing = true;
+              startX = e.clientX;
+              startWidth = parseFloat(getComputedStyle(root).getPropertyValue("--aside-width"));
+              document.body.classList.add("resizing");
+              e.preventDefault();
+            });
+
+            document.addEventListener("mousemove", (e) => {
+              if (!resizing || raf) return;
+              raf = requestAnimationFrame(() => {
+                raf = null;
+                const width = Math.min(MAX, Math.max(MIN, startWidth + e.clientX - startX));
+                root.style.setProperty("--aside-width", width + "px");
               });
+            });
 
-              document.addEventListener("mousemove", (e) => {
-                if (!isResizing) return;
-                if (rafId) return;
-
-                rafId = requestAnimationFrame(() => {
-                  rafId = null;
-                  const delta = e.clientX - startX;
-                  let newWidth = startWidth + delta;
-                  if (newWidth < minWidth) newWidth = minWidth;
-                  if (newWidth > maxWidth) newWidth = maxWidth;
-                  root.style.setProperty("--aside-width", newWidth + "px");
-                });
-              });
-
-              document.addEventListener("mouseup", () => {
-                if (!isResizing) return;
-                isResizing = false;
-                if (rafId) {
-                  cancelAnimationFrame(rafId);
-                  rafId = null;
-                }
-                resizeHandle.classList.remove("resizing");
-                asideEl.classList.remove("resizing");
-                mainEl.classList.remove("resizing");
-                document.body.style.userSelect = "";
-              });
-            }
+            document.addEventListener("mouseup", () => {
+              if (!resizing) return;
+              resizing = false;
+              if (raf) {
+                cancelAnimationFrame(raf);
+                raf = null;
+              }
+              document.body.classList.remove("resizing");
+            });
           }
+
+          /* ---------- 6. 滚动监听：高亮当前章节 ---------- */
+
+          function initScrollspy() {
+            if (headings.length === 0) return;
+
+            const linkById = new Map();
+            tocLinkMap.forEach((value, heading) => linkById.set(heading.id, value.link));
+
+            const main = document.querySelector("main");
+            const header = document.querySelector("header");
+            // 判定线 = 吸顶栏下缘 + 标题的 scroll-margin-top（再留 1px 容差）：
+            // 点击目录跳转后标题正好停在该线上，顶线必须与落点一致，
+            // 否则跳转结束后高亮会停留在上一个章节
+            const spyOffset =
+              (header ? header.getBoundingClientRect().bottom : 0) +
+              (parseFloat(getComputedStyle(headings[0]).scrollMarginTop) || 0) +
+              1;
+            let currentId = null;
+            let raf = null;
+
+            function setActive(id) {
+              const link = linkById.get(id);
+              if (!link) return;
+
+              $$("#toc-root a.active").forEach((a) => {
+                a.classList.remove("active");
+                a.removeAttribute("aria-current");
+              });
+              link.classList.add("active");
+              link.setAttribute("aria-current", "true");
+
+              // 自动展开 active 所在的各级父目录
+              let node = link.parentElement;
+              while (node && node.id !== "toc-root") {
+                if (node.tagName === "OL") {
+                  node.classList.add("show");
+                  const li = node.closest("li");
+                  const arrow = li && li.querySelector(":scope > a > .icon-arrow2");
+                  if (arrow) arrow.classList.add("rotate-90");
+                }
+                node = node.parentElement;
+              }
+            }
+
+            function update() {
+              raf = null;
+
+              // 目录点击锁定期：高亮跟随用户意图，不做滚动推断
+              if (tocPinId) {
+                currentId = tocPinId;
+                return;
+              }
+
+              // 当前章节 = 目录锚点落点线（spyOffset）之上最后一个标题，
+              // 即滚动位置所对应的“视口最顶部”的章节
+              let id = null;
+              for (const h of headings) {
+                if (h.getBoundingClientRect().top <= spyOffset) id = h.id;
+                else break;
+              }
+
+              // 滚动到底时高亮最后一个章节（否则结尾较短的章节永远无法选中）
+              if (main.scrollTop + main.clientHeight >= main.scrollHeight - 2) {
+                id = headings[headings.length - 1].id;
+              }
+
+              if (id && id !== currentId) {
+                currentId = id;
+                setActive(id);
+              }
+            }
+
+            // 点击目录：立即高亮目标章节并锁定（展开箭头除外）
+            const aside = document.querySelector("aside");
+            aside.addEventListener("click", (e) => {
+              if (e.target.closest(".icon-arrow2")) return;
+              const a = e.target.closest('#toc-root a[href^="#"]');
+              if (!a) return;
+              const id = a.getAttribute("href").slice(1);
+              if (!linkById.has(id)) return;
+              tocPinId = id;
+              currentId = id;
+              setActive(id);
+            });
+
+            // 手动滚动（滚轮 / 触摸 / 拖动滚动条）解除锁定，恢复滚动推断
+            main.addEventListener("wheel", releaseTocPin, { passive: true });
+            main.addEventListener("touchstart", releaseTocPin, { passive: true });
+            main.addEventListener("pointerdown", releaseTocPin);
+
+            main.addEventListener(
+              "scroll",
+              () => {
+                if (raf) return;
+                raf = requestAnimationFrame(update);
+              },
+              { passive: true },
+            );
+
+            update();
+          }
+
+          /* ---------- 7. 顶栏动作 ---------- */
+
+          function initHeaderActions() {
+            const main = document.querySelector("main");
+
+            // 返回顶部（滚动容器是 main，而不是 window）
+            document.getElementById("go-home").addEventListener("click", () => {
+              releaseTocPin();
+              main.scrollTo({ top: 0, behavior: "smooth" });
+            });
+
+            // 打印
+            document.getElementById("print-doc").addEventListener("click", () => {
+              window.print();
+            });
+
+            // 主题切换（light / dark），并持久化到 localStorage
+            document.getElementById("toggle-theme").addEventListener("click", () => {
+              const rootEl = document.documentElement;
+              const next = rootEl.getAttribute("data-theme") === "dark" ? "light" : "dark";
+              rootEl.setAttribute("data-theme", next);
+              try {
+                localStorage.setItem("itemplate-theme", next);
+              } catch (e) {}
+            });
+
+            // 顶栏滚动阴影
+            main.addEventListener(
+              "scroll",
+              () => main.classList.toggle("scrolled", main.scrollTop > 8),
+              { passive: true },
+            );
+          }
+
+          /* ---------- 启动 ---------- */
 
           function initializeApp() {
             initHeadings();
-            console.log("已为标题添加id, 多级序号属性和原始标题内容属性");
             buildToc();
-            console.log("已构建目录");
-            switchNumbering();
-            console.log("开始监听目录编号显示/隐藏的切换按钮");
-            toggleNestedToc();
-            console.log("开始监听目录展开/收起的切换箭头");
-            toggleAllToc();
-            console.log("开始监听目录全部展开/收起的切换按钮");
-            largeScreenToggleAside();
-            console.log("开始监听大屏状态下侧边栏显示/隐藏的切换按钮");
-            smallScreenToggleAside();
-            console.log("开始监听小屏状态下侧边栏显示/隐藏的切换按钮");
-            adjustAsideWidth();
-            console.log("开始监听侧边栏宽度调整的resizeHandle");
+            initTocToggle();
+            initExpandAll();
+            initAsideToggles();
+            initResize();
+            initScrollspy();
+            initHeaderActions();
           }
 
           initializeApp();
@@ -1022,15 +1351,15 @@
       html.body({
         html.div(class: ("container",), {
           html.aside({
-            html.span(class: ("aside-title-large-screen",), "Table of Contents")
-            html.span(class: ("aside-title-small-screen",), doc-title)
-            html.div(class: ("function-panel",), {
-              html.span(class: ("iconfont", "icon-Numbering"), {
-                html.span(class: "numbering-text")[Numbering Titles]
-              })
-              html.span(class: ("iconfont", "icon-expand-all"), {
-                html.span(class: "expand-all-text")[Expand All]
-              })
+            html.div(class: ("aside-title",), {
+              html.span(class: ("aside-title-text",), doc-title)
+              html.elem("button", attrs: (
+                type: "button",
+                id: "toggle-expand",
+                class: "aside-title-btn",
+                "aria-pressed": "false",
+                title: "展开 / 收起全部目录",
+              ), html.span(class: ("iconfont", "icon-expand-all"))[])
             })
             html.nav({
               html.ol(id: "toc-root")[]
@@ -1041,22 +1370,60 @@
           html.main({
             html.header({
               html.span(class: ("header-left",), {
-                html.span(class: ("iconfont", "icon-Aside"))[]
-                html.span(class: ("iconfont", "icon-menu3"))[]
+                html.elem("button", attrs: (
+                  type: "button",
+                  id: "toggle-aside",
+                  class: "header-btn",
+                  "aria-label": "显示 / 隐藏侧边栏",
+                ), {
+                  html.span(class: ("iconfont", "icon-Aside"))[]
+                })
+                html.elem("button", attrs: (
+                  type: "button",
+                  id: "toggle-menu",
+                  class: "header-btn",
+                  "aria-label": "打开目录",
+                  "aria-expanded": "false",
+                ), {
+                  html.span(class: ("iconfont", "icon-menu3"))[]
+                })
               })
               html.span(class: ("header-middle",), doc-title)
               html.span(class: ("header-right",), {
-                html.a(class: ("iconfont-home",), {
+                html.elem("button", attrs: (
+                  type: "button",
+                  id: "go-home",
+                  class: "header-btn",
+                  "aria-label": "返回顶部",
+                  title: "返回顶部",
+                ), {
                   html.span(class: ("iconfont", "icon-home"))[]
                 })
-                html.a(class: ("iconfont-github",), {
-                  html.span(class: ("iconfont", "icon-github"))[]
-                })
-                html.a(class: ("iconfont-print",), {
+                html.elem("a", attrs: (
+                  class: "header-btn",
+                  href: github-url,
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  "aria-label": "GitHub 仓库",
+                  title: "GitHub 仓库",
+                ), html.span(class: ("iconfont", "icon-github"))[])
+                html.elem("button", attrs: (
+                  type: "button",
+                  id: "print-doc",
+                  class: "header-btn",
+                  "aria-label": "打印文档",
+                  title: "打印文档",
+                ), {
                   html.span(class: ("iconfont", "icon-print"))[]
                 })
-                html.a(class: ("iconfont-paintbrush",), {
-                  html.span(class: ("iconfont", "icon-paintbrush"))[]
+                html.elem("button", attrs: (
+                  type: "button",
+                  id: "toggle-theme",
+                  class: "header-btn",
+                  "aria-label": "切换深浅主题",
+                  title: "切换深浅主题",
+                ), {
+                  html.span(class: ("iconfont", "icon-theme"))[]
                 })
               })
             })
@@ -1068,7 +1435,7 @@
       })
     })
   } else if target() == "bundle" {
-    panic("bundle export is not supported by itemplate(version 0.5.0), please export the document to html instead")
+    panic("bundle export is not supported by itemplate (version 0.6.0), please export the document to html instead")
   } else {
     body
   }

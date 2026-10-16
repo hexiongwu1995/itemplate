@@ -4,7 +4,7 @@
 
 The template comes with built-in support for:
 
-- **Interactive UI** such as title numbering, expand/collapse of sections, and home / GitHub / print / paintbrush shortcuts.
+- **Interactive UI** such as automatic title numbering (keeps numbers already present in headings), expand/collapse of sections, and home / GitHub / print / paintbrush shortcuts.
 - **Three.js** for embedding 3D scenes (e.g. the orbital cube demo).
 
 > This is an amateur project, please use with caution.
@@ -13,7 +13,7 @@ The template comes with built-in support for:
 
 ```typst
 // example.typ
-#import "@preview/itemplate:0.5.0": *
+#import "@preview/itemplate:0.6.0": *
 #show: itemplate.with(doc-title: "example")
 
 = #lorem(3)

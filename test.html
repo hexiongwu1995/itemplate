@@ -882,6 +882,14 @@ function releaseTocPin() {
   tocPinId = null;
 }
 
+// 收起小屏抽屉式侧栏。大屏下这些类名本就不存在，
+// 调用是无害的空操作，因此点击目录后可以无条件调用
+function closeDrawer() {
+  document.querySelector("aside").classList.remove("show");
+  document.querySelector(".overlay").classList.remove("show");
+  document.getElementById("toggle-menu").setAttribute("aria-expanded", "false");
+}
+
 /* ---------- 1. 标题 id 与编号 ---------- */
 
 // 匹配标题文字开头的编号前缀。若文档（如设置了 heading.numbering 的
@@ -1071,13 +1079,7 @@ function initAsideToggles() {
     main.classList.toggle("full");
   });
 
-  // 小屏：抽屉式侧栏
-  function closeDrawer() {
-    aside.classList.remove("show");
-    overlay.classList.remove("show");
-    mobileBtn.setAttribute("aria-expanded", "false");
-  }
-
+  // 小屏：抽屉式侧栏（关闭逻辑复用全局 closeDrawer）
   mobileBtn.addEventListener("click", () => {
     const open = aside.classList.toggle("show");
     overlay.classList.toggle("show", open);
@@ -1200,7 +1202,10 @@ function initScrollspy() {
     }
   }
 
-  // 点击目录：立即高亮目标章节并锁定（展开箭头除外）
+  // 点击目录：立即高亮目标章节并锁定（展开箭头除外）。
+  // 跳转不依赖浏览器原生锚点行为：移动端抽屉是 position:fixed，
+  // 部分移动浏览器（如 iOS Safari）不对 fixed 容器内的锚点链接
+  // 执行滚动，统一改为显式 scrollIntoView 保证各端行为一致
   const aside = document.querySelector("aside");
   aside.addEventListener("click", (e) => {
     if (e.target.closest(".icon-arrow2")) return;
@@ -1208,9 +1213,35 @@ function initScrollspy() {
     if (!a) return;
     const id = a.getAttribute("href").slice(1);
     if (!linkById.has(id)) return;
+
+    const target = document.getElementById(id);
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      // 同步地址栏 hash（不触发原生跳转）；同 hash 时不再追加历史记录
+      if (location.hash !== "#" + id) {
+        try {
+          history.pushState(null, "", "#" + id);
+        } catch (err) {}
+      }
+    }
+    // 小屏抽屉跳转后自动收起，露出正文（大屏为空操作）
+    closeDrawer();
+
     tocPinId = id;
     currentId = id;
     setActive(id);
+  });
+
+  // 浏览器前进 / 后退（hash 变化）时滚动到对应章节
+  window.addEventListener("hashchange", () => {
+    const id = location.hash.slice(1);
+    const target = linkById.has(id) ? document.getElementById(id) : null;
+    if (!target) return;
+    tocPinId = id;
+    currentId = id;
+    setActive(id);
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
   });
 
   // 手动滚动（滚轮 / 触摸 / 拖动滚动条）解除锁定，恢复滚动推断

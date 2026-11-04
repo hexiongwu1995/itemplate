@@ -13,7 +13,7 @@ The template comes with built-in support for:
 
 ```typst
 // example.typ
-#import "@preview/itemplate:0.5.0": *
+#import "@preview/itemplate:0.6.0": *
 #show: itemplate.with(doc-title: "example")
 
 = #lorem(3)
@@ -53,7 +53,7 @@ The template comes with built-in support for:
 ```
 "tinymist.typstExtraArgs": ["--features=html", "--features=bundle"],
 ```
-- The exported HTML file will be saved in the same directory as the example.typ file
+- The exported HTML file will be placed in the same directory as the example.typ file
 
 ## use typst cli
 
@@ -72,6 +72,6 @@ cd path/to/your/example.typ
 typst watch example.typ --features html --format html
 ```
 
-- The exported HTML file will be saved in the same directory as the example.typ file
+- The exported HTML file will be placed in the same directory as the example.typ file
 
 <img src="./assets/example.png" alt="output of the above code" width="900" />

@@ -1,10 +1,9 @@
 
 /* 
-This is a Typst template for generating interactive HTML documents. It compiles Typst markup into a self-contained HTML file with a responsive layout, featuring a sidebar table of contents, a header with navigation actions, and a main article area.
+This is a Typst template for generating interactive HTML documents. It compiles Typst markup into a self-contained HTML file with a responsive layout, featuring a sidebar table of contents.
 
 The template comes with built-in support for:
 
-- **Interactive UI** such as title numbering, expand/collapse of sections, and home / GitHub / print / paintbrush shortcuts.
 - **Three.js** for embedding 3D scenes (e.g. the orbital cube demo).
 */
 
@@ -200,9 +199,11 @@ The template comes with built-in support for:
               white-space: nowrap;
           }
 
-          .aside-title-large-screen:hover,
-          .aside-title-small-screen:hover {
-              background-color: var(--aside-title-hover-bag);
+          @media (hover: hover) {
+              .aside-title-large-screen:hover,
+              .aside-title-small-screen:hover {
+                  background-color: var(--aside-title-hover-bag);
+              }
           }
 
           .aside-title-small-screen {
@@ -219,9 +220,11 @@ The template comes with built-in support for:
               background-color: transparent;
           }
 
-          #resize-handle:hover {
-              background-color: var(--resize-handle-hover-bag);
-              cursor: col-resize;
+          @media (hover: hover) {
+              #resize-handle:hover {
+                  background-color: var(--resize-handle-hover-bag);
+                  cursor: col-resize;
+              }
           }
 
           #resize-handle.resizing {
@@ -285,8 +288,10 @@ The template comes with built-in support for:
               padding: var(--toc-root-level-3-padding);
           }
 
-          #toc-root li a:hover {
-              background-color: var(--toc-root-a-hover-bag);
+          @media (hover: hover) {
+              #toc-root li a:hover {
+                  background-color: var(--toc-root-a-hover-bag);
+              }
           }
 
           aside a {
@@ -385,11 +390,13 @@ The template comes with built-in support for:
               border-radius: var(--header-button-border-radius);
           }
 
-          .icon-Aside:hover {
-              background-color: var(--header-button-hover-bag);
-              transform: translateY(-5px);
-              transition: transform 0.3s ease;
-              cursor: pointer;
+          @media (hover: hover) {
+              .icon-Aside:hover {
+                  background-color: var(--header-button-hover-bag);
+                  transform: translateY(-5px);
+                  transition: transform 0.3s ease;
+                  cursor: pointer;
+              }
           }
 
           header a {
@@ -478,8 +485,6 @@ The template comes with built-in support for:
               }
 
             }
-
-
 
           /* 标题跳转时留出 header 高度 + 缓冲间距，防止被遮挡 */
           article :is(h1, h2, h3, h4, h5, h6) {
@@ -748,20 +753,20 @@ The template comes with built-in support for:
           // 小屏状态下 显示/隐藏 侧边栏
           function smallScreenToggleAside() {
             const aside = document.querySelector("aside");
-            const iconMenu3 = document.querySelector(".icon-menu3");
+            // const iconMenu3 = document.querySelector(".icon-menu3");
             const overlay = document.querySelector(".overlay");
 
-            if (iconMenu3) {
-              iconMenu3.addEventListener("click", () => {
-                iconMenu3.classList.toggle("show");
-                aside.classList.toggle("show");
-                overlay.classList.toggle("show");
-              });
-            }
+            // if (iconMenu3) {
+            //   iconMenu3.addEventListener("click", () => {
+            //     iconMenu3.classList.toggle("show");
+            //     aside.classList.toggle("show");
+            //     overlay.classList.toggle("show");
+            //   });
+            // }
 
             if (overlay) {
               overlay.addEventListener("click", () => {
-                iconMenu3.classList.remove("show");
+                // iconMenu3.classList.remove("show");
                 aside.classList.remove("show");
                 overlay.classList.remove("show");
               });
@@ -891,8 +896,8 @@ The template comes with built-in support for:
             console.log("开始监听目录展开/收起的切换箭头");
             largeScreenToggleAside();
             console.log("开始监听大屏状态下侧边栏显示/隐藏的切换按钮");
-            // smallScreenToggleAside();
-            // console.log("开始监听小屏状态下侧边栏显示/隐藏的切换按钮");
+            smallScreenToggleAside();
+            console.log("开始监听小屏状态下侧边栏显示/隐藏的切换按钮");
             touchSwipeAside();
             console.log("开始监听小屏状态下侧边栏的触摸滑动手势");
             adjustAsideWidth();

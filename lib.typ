@@ -1,5 +1,4 @@
 
-
 /* 
 This is a Typst template for generating interactive HTML documents. It compiles Typst markup into a self-contained HTML file with a responsive layout, featuring a sidebar table of contents, a header with navigation actions, and a main article area.
 
@@ -8,10 +7,6 @@ The template comes with built-in support for:
 - **Interactive UI** such as title numbering, expand/collapse of sections, and home / GitHub / print / paintbrush shortcuts.
 - **Three.js** for embedding 3D scenes (e.g. the orbital cube demo).
 */
-
-
-
-#show heading: set heading(numbering: none)
 
 #let itemplate(
   doc-title: "Document",
@@ -1140,6 +1135,7 @@ The template comes with built-in support for:
   } else {
     body
   }
+
 }
 
 #let myutils-setup(doc) = {

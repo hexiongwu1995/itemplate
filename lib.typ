@@ -753,20 +753,10 @@ The template comes with built-in support for:
           // 小屏状态下 显示/隐藏 侧边栏
           function smallScreenToggleAside() {
             const aside = document.querySelector("aside");
-            // const iconMenu3 = document.querySelector(".icon-menu3");
             const overlay = document.querySelector(".overlay");
-
-            // if (iconMenu3) {
-            //   iconMenu3.addEventListener("click", () => {
-            //     iconMenu3.classList.toggle("show");
-            //     aside.classList.toggle("show");
-            //     overlay.classList.toggle("show");
-            //   });
-            // }
 
             if (overlay) {
               overlay.addEventListener("click", () => {
-                // iconMenu3.classList.remove("show");
                 aside.classList.remove("show");
                 overlay.classList.remove("show");
               });

@@ -53,43 +53,31 @@ The template comes with built-in support for:
         html.style(
           ```css
             :root {
-              /*  --enable-numbering: true;
-                  --all-expanded: false; */
 
               --aside-width: 320px;
               --header-height: 60px;
               --article-height: calc(100vh - var(--header-height));
 
               --aside-title-height: 60px;
-              /* --function-panel-height: 60px;
-                 --aside-nav-height: calc(100vh - var(--aside-title-height) - var(--function-panel-height)); */
               --aside-nav-height: calc(100vh - var(--aside-title-height));
 
               --level-1-height: 40px;
               --level-others-height: 30px;
 
               --aside-title-padding: 10px 20px;
-              /* --aside-function-item-padding: 10px 20px 10px 20px; */
               --toc-root-level-1-padding: 10px 20px 10px 20px;
               --toc-root-level-2-padding: 10px 20px 10px 30px;
               --toc-root-level-3-padding: 10px 20px 10px 40px;
 
               --aside-bag: #f5f2ed;
               --aside-title-bag: #ede8dffb;
-              /* --function-item-bag: transparent; */
-              /* --aside-icon-bag: transparent; */
 
               --aside-title-hover-bag: #eee5d3;
-              /* --aside-function-item-hover-bag: #eee5d3; */
               --toc-root-a-hover-bag: #eee5d3;
               --resize-handle-hover-bag: #dfb663;
 
               --aside-title-font-color: #924d0ca9;
-              /* --aside-normal-font-color: #2d2d2d; */
-              /* --aside-function-item-font-color: #69390963; */
               --toc-root-a-font-color: #542d06;
-
-              /* --aside-divider-color: #eae5defe; */
 
               --main-bag: #fffefc;
               --header-bag: #fffefc;
@@ -104,12 +92,8 @@ The template comes with built-in support for:
               --header-title-font-color: #aeaeae;
               --header-icon-font-color: #b0b0b0;
 
-              /* --active-font-color: #0574ea; */
-
               --aside-title-font-size: 1.2rem;
-              /* --aside-function-icon-font-size: 1rem; */
-              /* --aside-function-text-font-size: 0.8rem; */
-              /* --toc-root-a-line-height: 1.5rem; */
+
               --toc-root-a-level-1-font-size: 1rem;
               --toc-root-a-others-font-size: 1rem;
               --toc-root-arrow-font-size: 1.2rem;
@@ -244,46 +228,6 @@ The template comes with built-in support for:
               background-color: var(--resize-handle-hover-bag);
               cursor: col-resize;
           }
-
-          /* .function-panel {
-              width: 100%;
-              height: var(--function-panel-height);
-              border-bottom: 2px solid var(--aside-divider-color);
-              background-color: transparent;
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              flex-wrap: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              white-space: nowrap;
-          } */
-
-          /* .icon-Numbering,
-          .icon-expand-all {
-              width: 50%;
-              height: 100%;
-              padding: var(--aside-function-item-padding);
-              display: flex;
-              justify-content: flex-start;
-              align-items: center;
-              gap: 20px;
-              background-color: transparent;
-              color: var(--aside-function-item-font-color);
-              font-size: var(--aside-function-icon-font-size);
-              overflow: hidden;
-          } */
-
-          /* .icon-Numbering .numbering-text,
-          .icon-expand-all .expand-all-text {
-              font-size: var(--aside-function-text-font-size);
-          } */
-
-          /* .icon-Numbering:hover,
-          .icon-expand-all:hover {
-              background-color: var(--aside-function-item-hover-bag);
-              cursor: pointer;
-          } */
 
           nav {
               width: 100%;
@@ -533,16 +477,7 @@ The template comes with built-in support for:
                   display: none;
               }
 
-              /* 已由小屏触摸滑动手势取代，隐藏 .icon-menu3 */
-              /* .icon-menu3 {
-                  display: none;
-                  position: fixed;
-                  z-index: 100;
-                  right: 40px;
-                  bottom: 100px;
-              } */
-
-          }
+            }
 
 
 
@@ -552,15 +487,6 @@ The template comes with built-in support for:
           }
 
           /* highlight.css */
-
-          /* div.highlight {
-              width: 90%;
-              padding: 10px 15px;
-              margin: 2rem 0;
-              border-left: 3px solid #b8b8b8;
-              background-color: #f8f9fa;
-              border-radius: 4px;
-          } */
 
           table {
               width: 90%;
@@ -762,13 +688,10 @@ The template comes with built-in support for:
             updateHeadingText();
           }
 
-          // 只更新 TOC 和 heading 的文本内容，不重建 DOM 结构
+          // 只更新 TOC 和 heading 的文本内容（默认带编号），不重建 DOM 结构
           function updateHeadingText() {
-            const root = document.documentElement;
             const headings = Array.from(document.querySelectorAll("h2, h3, h4"));
             if (headings.length === 0) return;
-
-            const enableNumbering = getComputedStyle(root).getPropertyValue("--enable-numbering").trim();
 
             headings.forEach((heading) => {
               const a = tocLinkMap.get(heading);
@@ -776,44 +699,14 @@ The template comes with built-in support for:
               // 保留 arrow 元素，只更新文本部分
               const arrow = a.querySelector(".icon-arrow2");
 
-              if (enableNumbering === "false") {
-                heading.textContent = heading.getAttribute("data-original-text");
-
-                a.innerHTML = "";
-                a.textContent = heading.textContent;
-                if (arrow) {
-                  a.appendChild(arrow);
-                }
-              } else if (enableNumbering === "true") {
-                heading.textContent = heading.getAttribute("data-numbering") + " " + heading.getAttribute("data-original-text");
-                a.innerHTML = "";
-                a.textContent = heading.textContent;
-                if (arrow) {
-                  a.appendChild(arrow);
-                }
-              } else {
-                console.log("--enable-numbering:", enableNumbering);
-                console.log(new Error("--enable-numbering must be true or false"));
+              const text = heading.getAttribute("data-numbering") + " " + heading.getAttribute("data-original-text");
+              heading.textContent = text;
+              a.innerHTML = "";
+              a.textContent = text;
+              if (arrow) {
+                a.appendChild(arrow);
               }
             });
-          }
-
-          // 显示/隐藏目录编号
-          function switchNumbering() {
-            const root = document.documentElement;
-            const toggleNumbering = document.querySelector(".icon-Numbering");
-            const iconNumbering = document.querySelector(".icon-Numbering");
-
-            if (toggleNumbering) {
-              toggleNumbering.addEventListener("click", () => {
-                iconNumbering.style.userSelect = "none";
-                const enableNumbering = getComputedStyle(root).getPropertyValue("--enable-numbering").trim();
-                const resetNumbering = enableNumbering === "true" ? "false" : "true";
-                root.style.setProperty("--enable-numbering", resetNumbering);
-
-                updateHeadingText();
-              });
-            }
           }
 
           // 点击arrow切换目录展开状态
@@ -834,42 +727,6 @@ The template comes with built-in support for:
 
                 nestedOl.classList.toggle("show");
                 arrow.classList.toggle("rotate-90");
-              });
-            }
-          }
-
-          // 展开/收起 所有目录
-          function toggleAllToc() {
-            const root = document.documentElement;
-            const iconExpand = document.querySelector(".icon-expand-all");
-            const tocRoot = document.getElementById("toc-root");
-
-            if (iconExpand) {
-              iconExpand.addEventListener("click", () => {
-                iconExpand.style.userSelect = "none";
-                const ol = tocRoot.querySelectorAll("ol");
-                const arrows = tocRoot.querySelectorAll(".icon-arrow2");
-                const allExpandedValue = getComputedStyle(root).getPropertyValue("--all-expanded").trim();
-                const newAllExpanded = allExpandedValue === "false" ? "true" : "false";
-                root.style.setProperty("--all-expanded", newAllExpanded);
-
-                if (newAllExpanded === "true") {
-                  ol.forEach((item) => {
-                    item.classList.add("show");
-                  });
-                  arrows.forEach((arrow) => {
-                    arrow.classList.add("rotate-90");
-                  });
-                } else if (newAllExpanded === "false") {
-                  ol.forEach((item) => {
-                    item.classList.remove("show");
-                  });
-                  arrows.forEach((arrow) => {
-                    arrow.classList.remove("rotate-90");
-                  });
-                } else {
-                  alert("展开/收起所有目录失败");
-                }
               });
             }
           }
@@ -1029,13 +886,9 @@ The template comes with built-in support for:
             initHeadings();
             console.log("已为标题添加id, 多级序号属性和原始标题内容属性");
             buildToc();
-            console.log("已构建目录");
-            switchNumbering();
-            console.log("开始监听目录编号显示/隐藏的切换按钮");
+            console.log("已构建目录（标题默认编号）");
             toggleNestedToc();
             console.log("开始监听目录展开/收起的切换箭头");
-            toggleAllToc();
-            console.log("开始监听目录全部展开/收起的切换按钮");
             largeScreenToggleAside();
             console.log("开始监听大屏状态下侧边栏显示/隐藏的切换按钮");
             // smallScreenToggleAside();
@@ -1055,14 +908,6 @@ The template comes with built-in support for:
           html.aside({
             html.span(class: ("aside-title-large-screen",), "Table of Contents")
             html.span(class: ("aside-title-small-screen",), doc-title)
-            // html.div(class: ("function-panel",), {
-            //   html.span(class: ("iconfont", "icon-Numbering"), {
-            //     html.span(class: "numbering-text")[Numbering Titles]
-            //   })
-            //   html.span(class: ("iconfont", "icon-expand-all"), {
-            //     html.span(class: "expand-all-text")[Expand All]
-            //   })
-            // })
             html.nav({
               html.ol(id: "toc-root")[]
             })
@@ -1140,8 +985,6 @@ The template comes with built-in support for:
       ```.text,
     )
 
-    // show grid: it => html.elem("div", attrs: (class: "svg-graph"), html.frame(it))
-    // show image: it => html.img(src: it.source)
     // show规则的作用域必须改为全局
   }
 

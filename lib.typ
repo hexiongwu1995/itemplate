@@ -597,180 +597,108 @@ The template comes with built-in support for:
           这是更加复杂的方案，因为逻辑拆分在多个文件中，难以理解。
           */
 
-          function getLevel(heading) {
-            return parseInt(heading.tagName[1], 10);
+          const HEADING_SELECTOR = "h2, h3, h4";
+
+          const root = document.documentElement;
+          const tocRoot = document.getElementById("toc-root");
+          const aside = document.querySelector("aside");
+          const main = document.querySelector("main");
+          const overlay = document.querySelector(".overlay");
+          const resizeHandle = document.querySelector("#resize-handle");
+
+          const getLevel = (heading) => Number(heading.tagName[1]);
+
+          // 小屏状态下 显示/隐藏 侧边栏及其遮罩层
+          function setAsideOpen(open) {
+            aside.classList.toggle("show", open);
+            overlay.classList.toggle("show", open);
           }
 
-          // 给每个 heading 生成id、添加numbering和data-original-text属性
-          function initHeadings() {
-            const headings = Array.from(document.querySelectorAll("h2, h3, h4"));
-
-            const counters = [];
-
-            if (headings.length > 0) {
-              headings.forEach((heading) => {
-                const level = getLevel(heading);
-
-                // 确保数组有足够的长度
-                while (counters.length < level - 1) {
-                  counters.push(0);
-                }
-                // 截断到当前层级
-                counters.length = level - 1;
-                // 当前层级计数+1（用 level-2 作为索引）
-                counters[level - 2] = counters[level - 2] + 1;
-
-                const id = counters.join("-");
-                heading.id = "heading-" + id;
-
-                const numbering = counters.join(".");
-
-                heading.setAttribute("data-original-text", heading.textContent);
-                heading.setAttribute("data-numbering", numbering);
-              });
-            }
-          }
-
-          // 保存 heading 与 TOC 中 <a> 元素的映射，用于后续更新文本而不重建结构
-          const tocLinkMap = new Map();
-
+          // 给每个标题生成 id、多级编号，并据此构建侧边栏目录
           function buildToc() {
-            const headings = Array.from(document.querySelectorAll("h2, h3, h4"));
-            const tocRoot = document.getElementById("toc-root");
-            if (headings.length === 0) return;
+            const headings = Array.from(document.querySelectorAll(HEADING_SELECTOR));
+            if (!tocRoot || headings.length === 0) return;
 
-            tocRoot.innerHTML = "";
-            tocLinkMap.clear();
+            tocRoot.replaceChildren();
 
-            const stack = [{ level: getLevel(headings[0]), ol: tocRoot }];
+            const levels = headings.map(getLevel);
+            const counters = [];
+            // 栈顶记录当前标题应插入的 ol 及其层级
+            const stack = [{ level: Math.min(...levels), ol: tocRoot }];
 
             headings.forEach((heading, index) => {
-              const currentLevel = getLevel(heading);
+              const level = levels[index];
+              const originalText = heading.textContent;
 
-              const arrow = document.createElement("span");
-              arrow.classList.add("iconfont", "icon-arrow2");
+              // 多级编号：h2 -> 1，h3 -> 1.1，h4 -> 1.1.1
+              while (counters.length < level - 1) counters.push(0);
+              counters.length = level - 1;
+              counters[level - 2] += 1;
 
-              // 新建一个li元素，用于承载当前的heading元素
+              const numbering = counters.join(".");
+              heading.id = "heading-" + counters.join("-");
+              heading.dataset.numbering = numbering;
+              heading.dataset.originalText = originalText;
+              heading.textContent = numbering + " " + originalText;
+
               const li = document.createElement("li");
               const a = document.createElement("a");
               a.href = "#" + heading.id;
+              a.textContent = heading.textContent;
 
-              // 保存映射关系，方便后续更新文本
-              tocLinkMap.set(heading, a);
-
-              // 判断当前 heading 后面是否存在层级更深的子 heading
-              const nextHeading = headings[index + 1];
-              const hasChildren = nextHeading && getLevel(nextHeading) > currentLevel;
-
-              if (hasChildren) {
-                a.appendChild(arrow);
+              // 后面存在层级更深的标题时，才显示展开/收起箭头
+              if (levels[index + 1] > level) {
+                const arrow = document.createElement("span");
+                arrow.className = "iconfont icon-arrow2";
+                a.append(arrow);
               }
-              li.appendChild(a);
+              li.append(a);
 
-              // 如果栈顶的heading level 大于 当前的heading level，让栈顶回退到栈顶level等于当前heading level的状态
-              while (stack[stack.length - 1].level > currentLevel) {
-                stack.pop();
-              }
+              // 回退到与当前标题同级的 ol
+              while (stack[stack.length - 1].level > level) stack.pop();
 
-              if (currentLevel > stack[stack.length - 1].level) {
-                // 如果当前的heading level 大于栈顶的heading level
-
-                // 新建一个空的ol元素，挂在栈顶的ol元素的最后一个li元素下
-                const newOl = document.createElement("ol");
-                const parentLi = stack[stack.length - 1].ol.lastElementChild;
-                if (parentLi) {
-                  parentLi.appendChild(newOl);
-                }
-
-                // 将当前的heading level 和 新建的ol元素压到栈顶
-                stack.push({ level: currentLevel, ol: newOl });
+              // 首次出现更深的层级时，在上一个 li 中新建子 ol
+              if (level > stack[stack.length - 1].level) {
+                const subOl = document.createElement("ol");
+                stack[stack.length - 1].ol.lastElementChild?.append(subOl);
+                stack.push({ level, ol: subOl });
               }
 
-              // 将li元素添加到栈顶的ol元素下
-              stack[stack.length - 1].ol.appendChild(li);
-            });
-
-            updateHeadingText();
-          }
-
-          // 只更新 TOC 和 heading 的文本内容（默认带编号），不重建 DOM 结构
-          function updateHeadingText() {
-            const headings = Array.from(document.querySelectorAll("h2, h3, h4"));
-            if (headings.length === 0) return;
-
-            headings.forEach((heading) => {
-              const a = tocLinkMap.get(heading);
-
-              // 保留 arrow 元素，只更新文本部分
-              const arrow = a.querySelector(".icon-arrow2");
-
-              const text = heading.getAttribute("data-numbering") + " " + heading.getAttribute("data-original-text");
-              heading.textContent = text;
-              a.innerHTML = "";
-              a.textContent = text;
-              if (arrow) {
-                a.appendChild(arrow);
-              }
+              stack[stack.length - 1].ol.append(li);
             });
           }
 
-          // 点击arrow切换目录展开状态
-          function toggleNestedToc() {
-            const nav = document.querySelector("nav");
-            if (nav) {
-              nav.addEventListener("click", (e) => {
-                const arrow = e.target.closest(".icon-arrow2");
-                if (!arrow) return;
+          // 点击箭头展开/收起子目录
+          function initTocToggle() {
+            tocRoot?.addEventListener("click", (e) => {
+              const arrow = e.target.closest(".icon-arrow2");
+              if (!arrow) return;
 
-                e.preventDefault();
-                e.stopPropagation();
+              e.preventDefault();
+              e.stopPropagation();
 
-                const li = arrow.closest("li");
-                const nestedOl = li.querySelector(":scope > ol");
+              const nestedOl = arrow.closest("li").querySelector(":scope > ol");
+              if (!nestedOl) return;
 
-                if (!nestedOl) return;
-
-                nestedOl.classList.toggle("show");
-                arrow.classList.toggle("rotate-90");
-              });
-            }
+              nestedOl.classList.toggle("show");
+              arrow.classList.toggle("rotate-90");
+            });
           }
 
-          // 大屏状态下 显示/隐藏 侧边栏
-          function largeScreenToggleAside() {
-            const iconAside = document.querySelector(".icon-Aside");
-            const aside = document.querySelector("aside");
-            const main = document.querySelector("main");
+          // 大屏按钮开合侧边栏；小屏点击遮罩收起侧边栏
+          function initAsideToggle() {
+            document.querySelector(".icon-Aside")?.addEventListener("click", () => {
+              main.classList.toggle("hidden");
+              aside.classList.toggle("hidden");
+            });
 
-            if (iconAside) {
-              iconAside.addEventListener("click", () => {
-                main.classList.toggle("hidden");
-                aside.classList.toggle("hidden");
-              });
-            }
-          }
-
-          // 小屏状态下 显示/隐藏 侧边栏
-          function smallScreenToggleAside() {
-            const aside = document.querySelector("aside");
-            const overlay = document.querySelector(".overlay");
-
-            if (overlay) {
-              overlay.addEventListener("click", () => {
-                aside.classList.remove("show");
-                overlay.classList.remove("show");
-              });
-            }
+            overlay?.addEventListener("click", () => setAsideOpen(false));
           }
 
           // 小屏状态下 手指右滑滑出侧边栏，左滑收起侧边栏
-          function touchSwipeAside() {
-            const aside = document.querySelector("aside");
-            const overlay = document.querySelector(".overlay");
-            if (!aside || !overlay) return;
-
+          function initAsideSwipe() {
             const mediaQuery = window.matchMedia("(max-width: 1000px)");
-            const swipeThreshold = 50;
+            const SWIPE_THRESHOLD = 50;
             let startX = 0;
             let startY = 0;
             let tracking = false;
@@ -781,10 +709,9 @@ The template comes with built-in support for:
               let el = target instanceof Element ? target : null;
               while (el && el !== document.body) {
                 if (el instanceof HTMLCanvasElement) return true;
-                const style = getComputedStyle(el);
-                const overflowX = style.overflowX;
+                const overflowX = getComputedStyle(el).overflowX;
                 if ((overflowX === "auto" || overflowX === "scroll" || overflowX === "overlay") &&
-                    el.scrollWidth > el.clientWidth + 1) {
+                  el.scrollWidth > el.clientWidth + 1) {
                   return true;
                 }
                 el = el.parentElement;
@@ -793,8 +720,7 @@ The template comes with built-in support for:
             }
 
             document.addEventListener("touchstart", (e) => {
-              if (!mediaQuery.matches || e.touches.length !== 1) return;
-              if (isInScrollableArea(e.target)) return;
+              if (!mediaQuery.matches || e.touches.length !== 1 || isInScrollableArea(e.target)) return;
               startX = e.touches[0].clientX;
               startY = e.touches[0].clientY;
               tracking = true;
@@ -808,93 +734,65 @@ The template comes with built-in support for:
               const dy = e.changedTouches[0].clientY - startY;
 
               // 水平位移足够大且以水平为主时才视为有效滑动
-              if (Math.abs(dx) < swipeThreshold || Math.abs(dx) <= Math.abs(dy)) return;
+              if (Math.abs(dx) < SWIPE_THRESHOLD || Math.abs(dx) <= Math.abs(dy)) return;
 
-              if (dx > 0 && !aside.classList.contains("show")) {
-                // 右滑：滑出侧边栏
-                aside.classList.add("show");
-                overlay.classList.add("show");
-              } else if (dx < 0 && aside.classList.contains("show")) {
-                // 左滑：收起侧边栏
-                aside.classList.remove("show");
-                overlay.classList.remove("show");
-              }
+              // 右滑滑出侧边栏，左滑收起侧边栏
+              setAsideOpen(dx > 0);
             }, { passive: true });
           }
 
-          // 侧边栏宽度调整
-          function adjustAsideWidth() {
-            const root = document.documentElement;
-            const resizeHandle = document.querySelector("#resize-handle");
-            const asideEl = document.querySelector("aside");
-            const mainEl = document.querySelector("main");
+          // 拖拽 resizeHandle 调整侧边栏宽度
+          function initAsideResize() {
+            if (!resizeHandle) return;
 
-            if (resizeHandle && asideEl && mainEl) {
-              let isResizing = false;
-              let startX = 0;
-              let startWidth = 0;
-              let rafId = null;
-              const minWidth = 0;
-              const maxWidth = 500;
+            const MIN_WIDTH = 0;
+            const MAX_WIDTH = 500;
+            let startX = 0;
+            let startWidth = 0;
+            let frame = 0;
 
-              resizeHandle.addEventListener("mousedown", (e) => {
-                isResizing = true;
-                startX = e.clientX;
-                const currentWidth = parseInt(getComputedStyle(root).getPropertyValue("--aside-width").trim(), 10);
-                startWidth = currentWidth;
-                resizeHandle.classList.add("resizing");
-                asideEl.classList.add("resizing");
-                mainEl.classList.add("resizing");
-                document.body.style.userSelect = "none";
+            const onMouseMove = (e) => {
+              if (frame) return;
+
+              frame = requestAnimationFrame(() => {
+                frame = 0;
+                const width = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startWidth + e.clientX - startX));
+                root.style.setProperty("--aside-width", width + "px");
               });
+            };
 
-              document.addEventListener("mousemove", (e) => {
-                if (!isResizing) return;
-                if (rafId) return;
+            const onMouseUp = () => {
+              if (frame) {
+                cancelAnimationFrame(frame);
+                frame = 0;
+              }
+              resizeHandle.classList.remove("resizing");
+              aside.classList.remove("resizing");
+              main.classList.remove("resizing");
+              document.body.style.userSelect = "";
+              // 仅在拖拽期间监听，避免全局 mousemove 常驻
+              document.removeEventListener("mousemove", onMouseMove);
+              document.removeEventListener("mouseup", onMouseUp);
+            };
 
-                rafId = requestAnimationFrame(() => {
-                  rafId = null;
-                  const delta = e.clientX - startX;
-                  let newWidth = startWidth + delta;
-                  if (newWidth < minWidth) newWidth = minWidth;
-                  if (newWidth > maxWidth) newWidth = maxWidth;
-                  root.style.setProperty("--aside-width", newWidth + "px");
-                });
-              });
-
-              document.addEventListener("mouseup", () => {
-                if (!isResizing) return;
-                isResizing = false;
-                if (rafId) {
-                  cancelAnimationFrame(rafId);
-                  rafId = null;
-                }
-                resizeHandle.classList.remove("resizing");
-                asideEl.classList.remove("resizing");
-                mainEl.classList.remove("resizing");
-                document.body.style.userSelect = "";
-              });
-            }
+            resizeHandle.addEventListener("mousedown", (e) => {
+              startX = e.clientX;
+              startWidth = parseFloat(getComputedStyle(root).getPropertyValue("--aside-width")) ||
+                aside.getBoundingClientRect().width;
+              resizeHandle.classList.add("resizing");
+              aside.classList.add("resizing");
+              main.classList.add("resizing");
+              document.body.style.userSelect = "none";
+              document.addEventListener("mousemove", onMouseMove);
+              document.addEventListener("mouseup", onMouseUp);
+            });
           }
 
-          function initializeApp() {
-            initHeadings();
-            console.log("已为标题添加id, 多级序号属性和原始标题内容属性");
-            buildToc();
-            console.log("已构建目录（标题默认编号）");
-            toggleNestedToc();
-            console.log("开始监听目录展开/收起的切换箭头");
-            largeScreenToggleAside();
-            console.log("开始监听大屏状态下侧边栏显示/隐藏的切换按钮");
-            smallScreenToggleAside();
-            console.log("开始监听小屏状态下侧边栏显示/隐藏的切换按钮");
-            touchSwipeAside();
-            console.log("开始监听小屏状态下侧边栏的触摸滑动手势");
-            adjustAsideWidth();
-            console.log("开始监听侧边栏宽度调整的resizeHandle");
-          }
-
-          initializeApp();
+          buildToc();
+          initTocToggle();
+          initAsideToggle();
+          initAsideSwipe();
+          initAsideResize();
           ```.text,
         )
       })

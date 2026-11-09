@@ -11,7 +11,7 @@ The template comes with built-in support for:
 
 
 
-
+#show heading: set heading(numbering: none)
 
 #let itemplate(
   doc-title: "Document",
@@ -1140,4 +1140,59 @@ The template comes with built-in support for:
   } else {
     body
   }
+}
+
+#let myutils-setup(doc) = {
+  context if (target() == "html" or target() == "bundle") {
+    html.elem(
+      "style",
+      ```css
+      .svg-graph > svg, img {
+        display: block;
+        max-width: 95%;
+        height: auto;
+        margin: 0 auto;
+      }
+
+      @media screen and (max-width: 601px) {
+        img {
+          width: 95%;
+          max-width: 600px;
+        }
+      }
+
+      @media screen and (min-width: 602px) and (max-width: 1001px) {
+        img {
+          width: 80%;
+          max-width: 600px;
+        }
+      }
+
+      @media screen and (min-width: 1001px) {
+        img {
+          width: 70%;
+          max-width: 600px;
+        }
+      }
+      ```.text,
+    )
+
+    // show grid: it => html.elem("div", attrs: (class: "svg-graph"), html.frame(it))
+    // show image: it => html.img(src: it.source)
+    // show规则的作用域必须改为全局
+  }
+
+  show heading: set heading(numbering: none)
+
+  show grid: it => if (target() == "html" or target() == "bundle") {
+    html.elem("div", attrs: (class: "svg-graph"), html.frame(it))
+  } else { it }
+
+  show image: it => if (target() == "html" or target() == "bundle") {
+    html.img(src: it.source)
+  } else {
+    it
+  }
+
+  doc
 }

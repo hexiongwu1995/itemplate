@@ -13,7 +13,7 @@ The template comes with built-in support for:
 
 ```typst
 // example.typ
-#import "@preview/itemplate:0.6.0": *
+#import "@preview/itemplate:0.7.0": *
 #show: itemplate.with(doc-title: "example")
 
 = #lorem(3)

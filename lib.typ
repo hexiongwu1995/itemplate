@@ -7,46 +7,7 @@ The template comes with built-in support for:
 - **Three.js** for embedding 3D scenes (e.g. the orbital cube demo).
 */
 
-// 语义化颜色令牌：模拟中性纸张（暖调纸面 + 墨色文字），调整配色只需修改这里的映射。
-#let theme = (
-  color-page-bg: rgb("fbf8f1"),
-  // 主内容区、顶部栏以及 lil-gui 面板的背景色（纸面本色）
-  color-aside-bg: rgb("f1ece0"),
-  // 左侧目录侧栏的背景色（略深一档的纸色）
-  color-aside-title-bg: rgb("#e8e2cffb"),
-  // 侧栏顶部标题条、lil-gui 标题栏的背景色
-  color-aside-title: rgb("#383838e2"),
-  // 侧栏顶部标题的文字颜色（淡墨）
-  color-hover-bg: rgb("e5ddca"),
-  // 侧栏标题、目录项以及 lil-gui 控件的悬停背景色
-  color-accent: rgb("6d6558"),
-  // 侧栏拖拽分隔条的高亮色、顶部图标按钮悬停时的背景色（中性墨褐）
-  color-accent-fg: rgb("fbf8f1"),
-  // 顶部图标按钮悬停时的图标颜色（搭配 color-accent 背景使用）
-  color-nav-fg: rgb("403a31"),
-  // 目录导航项的文字颜色
-  color-button-bg: rgb("e9e2d2"),
-  // 顶部圆形按钮以及 lil-gui 控件的背景色
-  color-button-fg: rgb("403a31"),
-  // 顶部圆形按钮的图标颜色
-  color-muted-fg: rgb("#8c8c8cb4"),
-  // 顶部栏的文档标题、图标按钮默认状态等次要文字的颜色
-  color-border: rgb("d9d0bc"),
-  // 顶部栏底边线、表格等内容的边框颜色
-  color-text: rgb("2c261e"),
-  // 正文文字、正文链接以及 lil-gui 文字/数值的颜色（墨色）
-  color-overlay: rgb("57534b"),
-  // 小屏展开侧栏时覆盖正文的半透明遮罩颜色
-  color-code-string: rgb("5d564a"),
-  // lil-gui 面板中字符串类型参数值的文字颜色
-)
-
-#let theme-css = (
-  theme
-    .pairs()
-    .map(((name, c)) => "  --" + name + ": " + c.to-hex() + ";")
-    .join("\n")
-)
+#import "@preview/typewind:0.2.0"
 
 #let itemplate(
   doc-title: "Document",
@@ -107,6 +68,29 @@ The template comes with built-in support for:
               --toc-root-level-2-padding: 10px 20px 10px 30px;
               --toc-root-level-3-padding: 10px 20px 10px 40px;
 
+              --aside-bag: #f5f2ed;
+              --aside-title-bag: #ede8dffb;
+
+              --aside-title-hover-bag: #eee5d3;
+              --toc-root-a-hover-bag: #eee5d3;
+              --resize-handle-hover-bag: #dfb663;
+
+              --aside-title-font-color: #924d0ca9;
+              --toc-root-a-font-color: #542d06;
+
+              --main-bag: #fffefc;
+              --header-bag: #fffefc;
+              --header-button-bag: #ebe5d9;
+              --header-icon-bag: transparent;
+
+              --header-button-hover-bag: #dfb663;
+
+              --header-border-color: #dfdfdf;
+
+              --header-button-font-color: #2d2d2d;
+              --header-title-font-color: #aeaeae;
+              --header-icon-font-color: #b0b0b0;
+
               --aside-title-font-size: 1.2rem;
 
               --toc-root-a-level-1-font-size: 1rem;
@@ -120,14 +104,10 @@ The template comes with built-in support for:
               --header-icon-font-size: 1.5rem;
               --header-icon-padding: 10px;
 
+              --article-font-color: #2d2d2d;
+
               --article-font-size: 1rem;
               /* --article-p-margin-top: 1.5rem; */
-          ```
-          .text
-          + "\n"
-          + theme-css
-          + "\n"
-          + ```css
           }
 
           .lil-gui.root {
@@ -140,22 +120,22 @@ The template comes with built-in support for:
           }
 
           .lil-gui {
-              --background-color: var(--color-page-bg);
-              --title-background-color: var(--color-aside-title-bg);
-              --title-text-color: var(--color-text);
-              --widget-color: var(--color-button-bg);
-              --hover-color: var(--color-hover-bg);
-              --text-color: var(--color-text);
-              --string-color: var(--color-code-string);
-              --number-color: var(--color-text);
+              --background-color: #dddddd;
+              --title-background-color: #cccccc;
+              --title-text-color: #000000;
+              --widget-color: #cccccc;
+              --hover-color: #bbbbbb;
+              --text-color: #000000;
+              --string-color: #017005;
+              --number-color: #090909;
           }
 
           .lil-gui .title {
-              background-color: var(--color-aside-title-bg);
+              background-color: #cccccc;
           }
 
           .lil-gui .controller {
-              background-color: var(--color-page-bg);
+              background-color: #dddddd;
           }
 
           @media screen and (max-width: 700px) {
@@ -190,7 +170,7 @@ The template comes with built-in support for:
               position: relative;
               width: var(--aside-width);
               height: 100vh;
-              background-color: var(--color-aside-bg);
+              background-color: var(--aside-bag);
               overflow: hidden;
               transition: width 0.3s ease;
           }
@@ -210,8 +190,8 @@ The template comes with built-in support for:
               line-height: var(--aside-title-height);
               padding-left: 20px;
               text-align: left;
-              background-color: var(--color-aside-title-bg);
-              color: var(--color-aside-title);
+              background-color: var(--aside-title-bag);
+              color: var(--aside-title-font-color);
               font-size: var(--aside-title-font-size);
               font-weight: 500;
               overflow: hidden;
@@ -222,7 +202,7 @@ The template comes with built-in support for:
           @media (hover: hover) {
               .aside-title-large-screen:hover,
               .aside-title-small-screen:hover {
-                  background-color: var(--color-hover-bg);
+                  background-color: var(--aside-title-hover-bag);
               }
           }
 
@@ -242,13 +222,13 @@ The template comes with built-in support for:
 
           @media (hover: hover) {
               #resize-handle:hover {
-                  background-color: var(--color-accent);
+                  background-color: var(--resize-handle-hover-bag);
                   cursor: col-resize;
               }
           }
 
           #resize-handle.resizing {
-              background-color: var(--color-accent);
+              background-color: var(--resize-handle-hover-bag);
               cursor: col-resize;
           }
 
@@ -288,7 +268,7 @@ The template comes with built-in support for:
               align-items: center;
               gap: 10px;
               flex-wrap: nowrap;
-              color: var(--color-nav-fg);
+              color: var(--toc-root-a-font-color);
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
@@ -310,12 +290,13 @@ The template comes with built-in support for:
 
           @media (hover: hover) {
               #toc-root li a:hover {
-                  background-color: var(--color-hover-bg);
+                  background-color: var(--toc-root-a-hover-bag);
               }
           }
 
           aside a {
               text-decoration: none;
+              /* color: var(--aside-normal-font-color); */
           }
 
           #toc-root li ol {
@@ -347,7 +328,7 @@ The template comes with built-in support for:
               z-index: 5;
               width: calc(100vw - var(--aside-width));
               height: 100vh;
-              background-color: var(--color-page-bg);
+              background-color: var(--main-bag);
               overflow-y: auto;
               overflow-x: hidden;
               transition: width 0.3s ease;
@@ -367,8 +348,8 @@ The template comes with built-in support for:
               top: 0;
               width: 100%;
               height: var(--header-height);
-              background-color: var(--color-page-bg);
-              border-bottom: 1px solid var(--color-border);
+              background-color: var(--header-bag);
+              border-bottom: 1px solid var(--header-border-color);
               display: flex;
               justify-content: space-between;
               align-items: center;
@@ -385,7 +366,7 @@ The template comes with built-in support for:
               text-align: center;
               font-size: var(--header-title-font-size);
               font-weight: 500;
-              color: var(--color-muted-fg);
+              color: var(--header-title-font-color);
               overflow: hidden;
           }
 
@@ -397,22 +378,21 @@ The template comes with built-in support for:
               gap: 30px;
               overflow: hidden;
               background-color: transparent;
-              color: var(--color-muted-fg);
+              color: var(--header-icon-font-color);
               font-size: var(--header-icon-font-size);
           }
 
           .icon-Aside {
               font-size: var(--header-button-font-size);
               padding: var(--header-button-padding);
-              background-color: var(--color-button-bg);
-              color: var(--color-button-fg);
+              background-color: var(--header-button-bag);
+              color: var(--header-button-font-color);
               border-radius: var(--header-button-border-radius);
           }
 
           @media (hover: hover) {
               .icon-Aside:hover {
-                  background-color: var(--color-accent);
-                  color: var(--color-accent-fg);
+                  background-color: var(--header-button-hover-bag);
                   transform: translateY(-5px);
                   transition: transform 0.3s ease;
                   cursor: pointer;
@@ -421,7 +401,7 @@ The template comes with built-in support for:
 
           header a {
               text-decoration: none;
-              color: var(--color-muted-fg);
+              color: var(--header-icon-font-color);
           }
 
           article {
@@ -432,7 +412,6 @@ The template comes with built-in support for:
               padding: 20px 20px 150px 20px;
               overflow-x: hidden;
               overflow-y: auto;
-              color: var(--color-text);
           }
 
           article li {
@@ -442,7 +421,7 @@ The template comes with built-in support for:
           }
 
           article a {
-              color: var(--color-text);
+              color: var(--article-font-color);
           }
 
           @media screen and (max-width: 1000px) {
@@ -487,7 +466,7 @@ The template comes with built-in support for:
                   left: 0;
                   width: 100vw;
                   height: 100vh;
-                  background-color: color-mix(in srgb, var(--color-overlay) 32%, transparent);
+                  background-color: rgba(1, 1, 1, 0.3);
               }
 
               main {
@@ -516,14 +495,14 @@ The template comes with built-in support for:
 
           table {
               width: 90%;
-              border: 1px solid var(--color-border);
+              border: 1px solid;
               border-collapse: collapse;
               overflow-x: auto;
           }
 
           table th,
           table td {
-              border: 1px solid var(--color-border);
+              border: 1px solid;
               padding: 8px;
           }
 
@@ -537,7 +516,7 @@ The template comes with built-in support for:
           }
 
           article a {
-              color: var(--color-text);
+              color: var(--article-font-color);
               text-decoration: none;
           }
 

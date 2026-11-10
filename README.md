@@ -1,10 +1,8 @@
 # itemplate
 
-`itemplate` is a Typst template for generating interactive HTML documents. It compiles Typst markup into a self-contained HTML file with a responsive layout, featuring a sidebar table of contents, a header with navigation actions, and a main article area.
+`itemplate` is a Typst template for generating interactive HTML documents. It compiles Typst markup into a self-contained HTML file with a responsive layout, featuring a sidebar table of contents.
 
 The template comes with built-in support for:
-
-- **Interactive UI** such as title numbering, expand/collapse of sections, and home / GitHub / print / paintbrush shortcuts.
 - **Three.js** for embedding 3D scenes (e.g. the orbital cube demo).
 
 > This is an amateur project, please use with caution.
@@ -12,9 +10,9 @@ The template comes with built-in support for:
 # Usage
 
 ```typst
-// example.typ
+// test.typ
 #import "@preview/itemplate:0.7.0": *
-#show: itemplate.with(doc-title: "example")
+#show: itemplate.with(doc-title: "test")
 
 = #lorem(3)
 
@@ -53,25 +51,25 @@ The template comes with built-in support for:
 ```
 "tinymist.typstExtraArgs": ["--features=html", "--features=bundle"],
 ```
-- The exported HTML file will be placed in the same directory as the example.typ file
+- The exported HTML file will be placed in the same directory as the test.typ file
 
 ## use typst cli
 
 - install typst cli on your computer
-- compile the example.typ to html in the command line:
+- compile the test.typ to html in the command line:
 
 ```powershell
-cd path/to/your/example.typ
-typst compile example.typ --features html --format html
+cd path/to/your/test.typ
+typst compile test.typ --features html --format html
 ```
 
-- or watch example.typ and auto-compile it to HTML in the command line:
+- or watch test.typ and auto-compile it to HTML in the command line:
 
 ```powershell
-cd path/to/your/example.typ
-typst watch example.typ --features html --format html
+cd path/to/your/test.typ
+typst watch test.typ --features html --format html
 ```
 
-- The exported HTML file will be placed in the same directory as the example.typ file
+- The exported HTML file will be placed in the same directory as the test.typ file
 
-<img src="./assets/example.png" alt="output of the above code" width="900" />
+<img src="./assets/test.png" alt="output of the above code" width="900" />

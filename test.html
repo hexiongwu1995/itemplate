@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>JS 重构测试</title><link rel="stylesheet" blocking="blocking" href="https://cdn.jsdelivr.net/npm/@hexiongwu1995/itemplate/icon_font/iconfont.css"><script type="importmap">{
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>test</title><link rel="stylesheet" blocking="blocking" href="https://cdn.jsdelivr.net/npm/@hexiongwu1995/itemplate/icon_font/iconfont.css"><script type="importmap">{
   "imports": {
     "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
     "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/",
@@ -22,29 +22,6 @@
     --toc-root-level-2-padding: 10px 20px 10px 30px;
     --toc-root-level-3-padding: 10px 20px 10px 40px;
 
-    --aside-bag: #f5f2ed;
-    --aside-title-bag: #ede8dffb;
-
-    --aside-title-hover-bag: #eee5d3;
-    --toc-root-a-hover-bag: #eee5d3;
-    --resize-handle-hover-bag: #dfb663;
-
-    --aside-title-font-color: #924d0ca9;
-    --toc-root-a-font-color: #542d06;
-
-    --main-bag: #fffefc;
-    --header-bag: #fffefc;
-    --header-button-bag: #ebe5d9;
-    --header-icon-bag: transparent;
-
-    --header-button-hover-bag: #dfb663;
-
-    --header-border-color: #dfdfdf;
-
-    --header-button-font-color: #2d2d2d;
-    --header-title-font-color: #aeaeae;
-    --header-icon-font-color: #b0b0b0;
-
     --aside-title-font-size: 1.2rem;
 
     --toc-root-a-level-1-font-size: 1rem;
@@ -58,10 +35,23 @@
     --header-icon-font-size: 1.5rem;
     --header-icon-padding: 10px;
 
-    --article-font-color: #2d2d2d;
-
     --article-font-size: 1rem;
     /* --article-p-margin-top: 1.5rem; */
+  --color-page-bg: #fbf8f1;
+  --color-aside-bg: #f1ece0;
+  --color-aside-title-bg: #e8e2cffb;
+  --color-aside-title: #383838e2;
+  --color-hover-bg: #e5ddca;
+  --color-accent: #6d6558;
+  --color-accent-fg: #fbf8f1;
+  --color-nav-fg: #403a31;
+  --color-button-bg: #e9e2d2;
+  --color-button-fg: #403a31;
+  --color-muted-fg: #8c8c8cb4;
+  --color-border: #d9d0bc;
+  --color-text: #2c261e;
+  --color-overlay: #57534b;
+  --color-code-string: #5d564a;
 }
 
 .lil-gui.root {
@@ -74,22 +64,22 @@
 }
 
 .lil-gui {
-    --background-color: #dddddd;
-    --title-background-color: #cccccc;
-    --title-text-color: #000000;
-    --widget-color: #cccccc;
-    --hover-color: #bbbbbb;
-    --text-color: #000000;
-    --string-color: #017005;
-    --number-color: #090909;
+    --background-color: var(--color-page-bg);
+    --title-background-color: var(--color-aside-title-bg);
+    --title-text-color: var(--color-text);
+    --widget-color: var(--color-button-bg);
+    --hover-color: var(--color-hover-bg);
+    --text-color: var(--color-text);
+    --string-color: var(--color-code-string);
+    --number-color: var(--color-text);
 }
 
 .lil-gui .title {
-    background-color: #cccccc;
+    background-color: var(--color-aside-title-bg);
 }
 
 .lil-gui .controller {
-    background-color: #dddddd;
+    background-color: var(--color-page-bg);
 }
 
 @media screen and (max-width: 700px) {
@@ -124,7 +114,7 @@ aside {
     position: relative;
     width: var(--aside-width);
     height: 100vh;
-    background-color: var(--aside-bag);
+    background-color: var(--color-aside-bg);
     overflow: hidden;
     transition: width 0.3s ease;
 }
@@ -144,8 +134,8 @@ aside.hidden {
     line-height: var(--aside-title-height);
     padding-left: 20px;
     text-align: left;
-    background-color: var(--aside-title-bag);
-    color: var(--aside-title-font-color);
+    background-color: var(--color-aside-title-bg);
+    color: var(--color-aside-title);
     font-size: var(--aside-title-font-size);
     font-weight: 500;
     overflow: hidden;
@@ -156,7 +146,7 @@ aside.hidden {
 @media (hover: hover) {
     .aside-title-large-screen:hover,
     .aside-title-small-screen:hover {
-        background-color: var(--aside-title-hover-bag);
+        background-color: var(--color-hover-bg);
     }
 }
 
@@ -176,13 +166,13 @@ aside.hidden {
 
 @media (hover: hover) {
     #resize-handle:hover {
-        background-color: var(--resize-handle-hover-bag);
+        background-color: var(--color-accent);
         cursor: col-resize;
     }
 }
 
 #resize-handle.resizing {
-    background-color: var(--resize-handle-hover-bag);
+    background-color: var(--color-accent);
     cursor: col-resize;
 }
 
@@ -222,7 +212,7 @@ nav::-webkit-scrollbar {
     align-items: center;
     gap: 10px;
     flex-wrap: nowrap;
-    color: var(--toc-root-a-font-color);
+    color: var(--color-nav-fg);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -244,13 +234,12 @@ nav::-webkit-scrollbar {
 
 @media (hover: hover) {
     #toc-root li a:hover {
-        background-color: var(--toc-root-a-hover-bag);
+        background-color: var(--color-hover-bg);
     }
 }
 
 aside a {
     text-decoration: none;
-    /* color: var(--aside-normal-font-color); */
 }
 
 #toc-root li ol {
@@ -282,7 +271,7 @@ main {
     z-index: 5;
     width: calc(100vw - var(--aside-width));
     height: 100vh;
-    background-color: var(--main-bag);
+    background-color: var(--color-page-bg);
     overflow-y: auto;
     overflow-x: hidden;
     transition: width 0.3s ease;
@@ -302,8 +291,8 @@ header {
     top: 0;
     width: 100%;
     height: var(--header-height);
-    background-color: var(--header-bag);
-    border-bottom: 1px solid var(--header-border-color);
+    background-color: var(--color-page-bg);
+    border-bottom: 1px solid var(--color-border);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -320,7 +309,7 @@ header {
     text-align: center;
     font-size: var(--header-title-font-size);
     font-weight: 500;
-    color: var(--header-title-font-color);
+    color: var(--color-muted-fg);
     overflow: hidden;
 }
 
@@ -332,21 +321,22 @@ header {
     gap: 30px;
     overflow: hidden;
     background-color: transparent;
-    color: var(--header-icon-font-color);
+    color: var(--color-muted-fg);
     font-size: var(--header-icon-font-size);
 }
 
 .icon-Aside {
     font-size: var(--header-button-font-size);
     padding: var(--header-button-padding);
-    background-color: var(--header-button-bag);
-    color: var(--header-button-font-color);
+    background-color: var(--color-button-bg);
+    color: var(--color-button-fg);
     border-radius: var(--header-button-border-radius);
 }
 
 @media (hover: hover) {
     .icon-Aside:hover {
-        background-color: var(--header-button-hover-bag);
+        background-color: var(--color-accent);
+        color: var(--color-accent-fg);
         transform: translateY(-5px);
         transition: transform 0.3s ease;
         cursor: pointer;
@@ -355,7 +345,7 @@ header {
 
 header a {
     text-decoration: none;
-    color: var(--header-icon-font-color);
+    color: var(--color-muted-fg);
 }
 
 article {
@@ -366,6 +356,7 @@ article {
     padding: 20px 20px 150px 20px;
     overflow-x: hidden;
     overflow-y: auto;
+    color: var(--color-text);
 }
 
 article li {
@@ -375,7 +366,7 @@ article li {
 }
 
 article a {
-    color: var(--article-font-color);
+    color: var(--color-text);
 }
 
 @media screen and (max-width: 1000px) {
@@ -420,7 +411,7 @@ article a {
         left: 0;
         width: 100vw;
         height: 100vh;
-        background-color: rgba(1, 1, 1, 0.3);
+        background-color: color-mix(in srgb, var(--color-overlay) 32%, transparent);
     }
 
     main {
@@ -449,14 +440,14 @@ article :is(h1, h2, h3, h4, h5, h6) {
 
 table {
     width: 90%;
-    border: 1px solid;
+    border: 1px solid var(--color-border);
     border-collapse: collapse;
     overflow-x: auto;
 }
 
 table th,
 table td {
-    border: 1px solid;
+    border: 1px solid var(--color-border);
     padding: 8px;
 }
 
@@ -470,7 +461,7 @@ figure {
 }
 
 article a {
-    color: var(--article-font-color);
+    color: var(--color-text);
     text-decoration: none;
 }
 
@@ -731,79 +722,4 @@ buildToc();
 initTocToggle();
 initAsideToggle();
 initAsideSwipe();
-initAsideResize();</script><style>/* Alignment */
-mtable.right-align mtd,
-mtable mtd.right-align,
-mtable.left-align mtd.right-align,
-mtable.aligned mtd:nth-child(odd) {
-  justify-items: end;
-  text-align: right;
-}
-mtable.cases mtd,
-mtable.left-align mtd,
-mtable mtd.left-align,
-mtable.aligned mtd:nth-child(even),
-math:is(:not([display])) > mtable.multiline-equation mtd {
-  justify-items: start;
-  text-align: left;
-}
-mtable.cases mtd,
-mtable.aligned mtd,
-mtable mtd.flushed,
-mtable mtd.left-flush {
-  padding-left: 0;
-}
-mtable.cases mtd,
-mtable.aligned mtd,
-mtable mtd.flushed,
-mtable mtd.right-flush {
-  padding-right: 0;
-}
-
-/* Tables */
-mtable {
-  math-style: inherit;
-}
-mtd {
-  math-depth: auto-add;
-  math-style: compact;
-  math-shift: compact;
-}
-
-/* Equations */
-mtable.multiline-equation mtd {
-  math-depth: inherit;
-  math-style: inherit;
-  math-shift: inherit;
-  padding: 0;
-}
-math > mtable.multiline-equation mtr:not(:last-child) mtd {
-  padding-bottom: 0.5em;
-}
-
-/* Fractions */
-mfrac {
-  padding-inline: 0;
-  margin-inline: 0.1em;
-}
-
-/* Accents */
-mover[accent="true" i] > :first-child {
-  font-feature-settings: "dtls";
-}
-mover.dotted[accent="true" i] > :first-child {
-  font-feature-settings: "dtls" 0;
-}
-
-/* Other rules for scriptlevel, displaystyle and math-shift */
-munder > :nth-child(2),
-munderover > :nth-child(2) {
-  math-shift: compact
-}
-munder[accentunder="true" i] > :not(:first-child),
-mover[accent="true" i] > :not(:first-child) {
-  math-depth: inherit;
-  math-style: inherit;
-  math-shift: inherit;
-}</style></head><body><div class="container"><aside><span class="aside-title-large-screen">Table of Contents</span><span class="aside-title-small-screen">JS 重构测试</span><nav><ol id="toc-root"></ol></nav><div id="resize-handle"></div></aside><div class="overlay"></div><main><header><span class="header-left"><span class="iconfont icon-Aside"></span></span><span class="header-middle">JS 重构测试</span><span class="header-right"></span></header><article><h2>第一章：标题编号</h2><h3>小节 1.1</h3><h4>子小节 1.1.1</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim aeque doleamus animo, cum corpore dolemus, fieri tamen permagna accessio potest, si aliquod aeternum et infinitum impendere malum nobis opinemur. Quod idem licet transferre in voluptatem, ut postea variari voluptas distinguique possit, augeri amplificarique non possit. At.</p><h4>子小节 1.1.2</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim aeque doleamus animo, cum corpore dolemus, fieri tamen permagna accessio potest, si aliquod aeternum et infinitum impendere.</p><h3>小节 1.2</h3><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim aeque doleamus animo, cum corpore dolemus, fieri tamen permagna accessio potest, si aliquod aeternum et infinitum impendere malum nobis opinemur. Quod idem licet transferre in voluptatem, ut.</p><h2>第二章：目录层级</h2><h3>小节 2.1</h3><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim aeque doleamus animo, cum corpore dolemus, fieri tamen permagna accessio potest, si aliquod aeternum et infinitum impendere malum nobis opinemur. Quod idem licet transferre in voluptatem, ut.</p><h4>子小节 2.1.1</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim aeque doleamus animo, cum corpore dolemus, fieri tamen permagna accessio potest, si aliquod aeternum et infinitum impendere.</p><h4>子小节 2.1.2</h4><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim aeque doleamus animo, cum corpore dolemus, fieri tamen permagna accessio potest, si aliquod aeternum et infinitum impendere.</p><h3>小节 2.2</h3><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim aeque doleamus animo, cum corpore dolemus, fieri tamen permagna accessio potest, si aliquod aeternum et infinitum impendere malum nobis opinemur. Quod idem licet transferre in voluptatem, ut.</p><h2>第三章：滚动与公式</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim aeque doleamus animo, cum corpore dolemus, fieri tamen permagna accessio potest, si aliquod aeternum et infinitum impendere malum nobis opinemur. Quod idem licet transferre in voluptatem, ut postea variari voluptas distinguique possit, augeri amplificarique non possit. At etiam Athenis, ut e patre audiebam facete et urbane Stoicos irridente, statua est in quo a nobis philosophia defensa et.</p><pre><code data-lang="js"><span style="color: #d73948">const</span> message <span style="color: #d73948">=</span> <span style="color: #198810">"</span><span style="color: #198810">这是一段很长的代码行，用于验证可横向滚动的容器内触摸手势不会被侧边栏滑动逻辑接管</span><span style="color: #198810">"</span>;
-<span style="color: #4b69c6">console</span>.<span style="color: #4b69c6">log</span>(message);</code></pre><math display="block"><msubsup><mo lspace="0em">∫</mo><mn>0</mn><mi>∞</mi></msubsup><msup><mi>𝑒</mi><mrow><mo>−</mo><msup><mi>𝑥</mi><mn>2</mn></msup></mrow></msup><mspace width="0.1667em"/><mo form="prefix" lspace="0em" rspace="0em">d</mo><mi>𝑥</mi><mo>=</mo><mfrac><msqrt><mi>𝜋</mi></msqrt><mn>2</mn></mfrac></math><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim aeque doleamus animo, cum corpore dolemus, fieri tamen permagna accessio potest, si aliquod aeternum et infinitum impendere malum nobis opinemur. Quod idem licet transferre in voluptatem, ut postea variari voluptas distinguique possit, augeri amplificarique non possit. At etiam Athenis, ut e patre audiebam facete et urbane Stoicos irridente, statua est in quo a nobis philosophia defensa et collaudata est, cum id, quod maxime placeat, facere possimus, omnis voluptas assumenda est, omnis dolor repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum necessitatibus saepe eveniet, ut et voluptates repudiandae sint et molestiae non recusandae. Itaque earum rerum.</p></article></main></div></body></html>
+initAsideResize();</script></head><body><div class="container"><aside><span class="aside-title-large-screen">Table of Contents</span><span class="aside-title-small-screen">test</span><nav><ol id="toc-root"></ol></nav><div id="resize-handle"></div></aside><div class="overlay"></div><main><header><span class="header-left"><span class="iconfont icon-Aside"></span></span><span class="header-middle">test</span><span class="header-right"></span></header><article><h2>Lorem ipsum dolor.</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat.</p><h3>Lorem ipsum dolor.</h3><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat.</p><h2>Lorem ipsum dolor.</h2><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat.</p><h3>Lorem ipsum dolor.</h3><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magnam aliquam quaerat.</p><div style="background: white; margin-top: 50px; width: 100%; height: 30vh" id="three-orbital-cube"></div><script type="module" src="https://unpkg.com/@hexiongwu1995/itemplate/examples/itemplate/three-orbital-cube.js"></script></article></main></div></body></html>

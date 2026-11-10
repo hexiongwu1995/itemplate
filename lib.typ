@@ -13,7 +13,7 @@ The template comes with built-in support for:
   // 主内容区、顶部栏以及 lil-gui 面板的背景色（纸面本色）
   color-aside-bg: rgb("f1ece0"),
   // 左侧目录侧栏的背景色（略深一档的纸色）
-  color-aside-title-bg: rgb("#e8ddcafb"),
+  color-aside-title-bg: rgb("#e8e2cffb"),
   // 侧栏顶部标题条、lil-gui 标题栏的背景色
   color-aside-title: rgb("#383838e2"),
   // 侧栏顶部标题的文字颜色（淡墨）

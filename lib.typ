@@ -92,6 +92,8 @@ The template comes with built-in support for:
           ```.text,
         )
 
+        html.style(theme-to-css(resolved-theme))
+
         html.style(
           ```css
             :root {
@@ -596,8 +598,6 @@ The template comes with built-in support for:
           }
           ```.text,
         )
-
-        html.style(theme-to-css(resolved-theme))
 
         html.link(rel: "stylesheet", href: "https://fred-wang.github.io/MathFonts/NewComputerModern/mathfonts.css")
         // html.link(rel: "stylesheet", href: "https://fred-wang.github.io/MathFonts/LatinModern/mathfonts.css")

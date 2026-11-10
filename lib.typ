@@ -7,15 +7,58 @@ The template comes with built-in support for:
 - **Three.js** for embedding 3D scenes (e.g. the orbital cube demo).
 */
 
-#import "@preview/typewind:0.2.0"
+// 默认主题：集中定义界面配色，可通过 itemplate(theme: (...)) 覆盖其中任意一项。
+#let default-theme = (
+  aside-bag: rgb("#f5f2ed"),
+  aside-title-bag: rgb("#ede8dffb"),
+  aside-title-hover-bag: rgb("#eee5d3"),
+  toc-root-a-hover-bag: rgb("#eee5d3"),
+  resize-handle-hover-bag: rgb("#dfb663"),
+  aside-title-font-color: rgb("#924d0ca9"),
+  toc-root-a-font-color: rgb("#542d06"),
+  main-bag: rgb("#fffefc"),
+  header-bag: rgb("#fffefc"),
+  header-button-bag: rgb("#ebe5d9"),
+  header-icon-bag: "transparent",
+  header-button-hover-bag: rgb("#dfb663"),
+  header-border-color: rgb("#dfdfdf"),
+  header-button-font-color: rgb("#2d2d2d"),
+  header-title-font-color: rgb("#aeaeae"),
+  header-icon-font-color: rgb("#b0b0b0"),
+  article-font-color: rgb("#2d2d2d"),
+  // lil-gui 调试面板
+  lil-gui-bag: rgb("#dddddd"),
+  lil-gui-title-bag: rgb("#cccccc"),
+  lil-gui-title-font-color: rgb("#000000"),
+  lil-gui-widget-bag: rgb("#cccccc"),
+  lil-gui-hover-bag: rgb("#bbbbbb"),
+  lil-gui-font-color: rgb("#000000"),
+  lil-gui-string-font-color: rgb("#017005"),
+  lil-gui-number-font-color: rgb("#090909"),
+  // 小屏展开侧栏时的遮罩
+  overlay-bag: rgb(1, 1, 1, 30%),
+)
+
+// 将主题字典转换为 :root 中的 CSS 变量声明。
+#let theme-to-css(theme) = {
+  let declarations = theme
+    .pairs()
+    .map(((name, value)) => {
+      let css-value = if type(value) == color { value.to-hex() } else { str(value) }
+      "  --" + name + ": " + css-value + ";"
+    })
+  ":root {\n" + declarations.join("\n") + "\n}"
+}
 
 #let itemplate(
   doc-title: "Document",
   doc-author: "Author",
   lang: "en",
+  theme: (:),
   body,
 ) = {
   context if target() == "html" {
+    let resolved-theme = default-theme + theme
     html.html(lang: lang, {
       html.head({
         html.meta(
@@ -68,29 +111,6 @@ The template comes with built-in support for:
               --toc-root-level-2-padding: 10px 20px 10px 30px;
               --toc-root-level-3-padding: 10px 20px 10px 40px;
 
-              --aside-bag: #f5f2ed;
-              --aside-title-bag: #ede8dffb;
-
-              --aside-title-hover-bag: #eee5d3;
-              --toc-root-a-hover-bag: #eee5d3;
-              --resize-handle-hover-bag: #dfb663;
-
-              --aside-title-font-color: #924d0ca9;
-              --toc-root-a-font-color: #542d06;
-
-              --main-bag: #fffefc;
-              --header-bag: #fffefc;
-              --header-button-bag: #ebe5d9;
-              --header-icon-bag: transparent;
-
-              --header-button-hover-bag: #dfb663;
-
-              --header-border-color: #dfdfdf;
-
-              --header-button-font-color: #2d2d2d;
-              --header-title-font-color: #aeaeae;
-              --header-icon-font-color: #b0b0b0;
-
               --aside-title-font-size: 1.2rem;
 
               --toc-root-a-level-1-font-size: 1rem;
@@ -103,8 +123,6 @@ The template comes with built-in support for:
               --header-title-font-size: 1.5rem;
               --header-icon-font-size: 1.5rem;
               --header-icon-padding: 10px;
-
-              --article-font-color: #2d2d2d;
 
               --article-font-size: 1rem;
               /* --article-p-margin-top: 1.5rem; */
@@ -120,22 +138,22 @@ The template comes with built-in support for:
           }
 
           .lil-gui {
-              --background-color: #dddddd;
-              --title-background-color: #cccccc;
-              --title-text-color: #000000;
-              --widget-color: #cccccc;
-              --hover-color: #bbbbbb;
-              --text-color: #000000;
-              --string-color: #017005;
-              --number-color: #090909;
+              --background-color: var(--lil-gui-bag);
+              --title-background-color: var(--lil-gui-title-bag);
+              --title-text-color: var(--lil-gui-title-font-color);
+              --widget-color: var(--lil-gui-widget-bag);
+              --hover-color: var(--lil-gui-hover-bag);
+              --text-color: var(--lil-gui-font-color);
+              --string-color: var(--lil-gui-string-font-color);
+              --number-color: var(--lil-gui-number-font-color);
           }
 
           .lil-gui .title {
-              background-color: #cccccc;
+              background-color: var(--lil-gui-title-bag);
           }
 
           .lil-gui .controller {
-              background-color: #dddddd;
+              background-color: var(--lil-gui-bag);
           }
 
           @media screen and (max-width: 700px) {
@@ -466,7 +484,7 @@ The template comes with built-in support for:
                   left: 0;
                   width: 100vw;
                   height: 100vh;
-                  background-color: rgba(1, 1, 1, 0.3);
+                  background-color: var(--overlay-bag);
               }
 
               main {
@@ -578,6 +596,8 @@ The template comes with built-in support for:
           }
           ```.text,
         )
+
+        html.style(theme-to-css(resolved-theme))
 
         html.link(rel: "stylesheet", href: "https://fred-wang.github.io/MathFonts/NewComputerModern/mathfonts.css")
         // html.link(rel: "stylesheet", href: "https://fred-wang.github.io/MathFonts/LatinModern/mathfonts.css")

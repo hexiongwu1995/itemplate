@@ -4,6 +4,7 @@
 
 The template comes with built-in support for:
 - **Three.js** for embedding 3D scenes (e.g. the orbital cube demo).
+- **Plotly.js** for embedding interactive plots.
 
 > This is an amateur project, please use with caution.
 
@@ -11,7 +12,7 @@ The template comes with built-in support for:
 
 ```typst
 // test.typ
-#import "@preview/itemplate:0.7.0": *
+#import "@preview/itemplate:0.8.0": *
 #show: itemplate.with(doc-title: "test")
 
 = #lorem(3)

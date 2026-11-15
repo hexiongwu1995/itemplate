@@ -115,20 +115,6 @@ $ integral_0^infinity e^(-x) dif x = 1 $
 
 = 交互组件
 
-== Three.js 场景
-
-#context if (target() == "html") {
-  html.elem("div", attrs: (
-    style: "background: white; margin-top: 50px; width: 100%; height: 30vh",
-    id: "three-orbital-cube",
-  ))[]
-
-  html.script(
-    type: "module",
-    src: "https://unpkg.com/@hexiongwu1995/itemplate/examples/itemplate/three-orbital-cube.js",
-  )
-}
-
 == ECharts 三维曲面
 
 #context if (target() == "html") {
@@ -137,14 +123,16 @@ $ integral_0^infinity e^(-x) dif x = 1 $
     style: "width: 100%; height: 420px; margin-top: 12px;",
   ))[]
 
-  html.script(src: "https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js")
-  html.script(src: "https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js")
   html.script(
+    type: "module",
     ```js
-    (() => {
-      const el = document.getElementById("echarts-surface");
-      if (!el || !window.echarts) return;
+    import * as echarts from "echarts";
+    // echarts-gl 的 UMD 构建从 window.echarts 读取主库
+    window.echarts = echarts;
+    await import("echarts-gl");
 
+    const el = document.getElementById("echarts-surface");
+    if (el) {
       const range = 8;
       const step = 0.25;
       const data = [];
@@ -154,15 +142,11 @@ $ integral_0^infinity e^(-x) dif x = 1 $
         }
       }
 
-      const css = getComputedStyle(document.documentElement);
-      const accent = css.getPropertyValue("--accent").trim() || "#d97757";
-      const surface = css.getPropertyValue("--surface").trim() || "#f5f4ed";
-      const ink = css.getPropertyValue("--ink-muted").trim() || "#73726c";
-      const line = css.getPropertyValue("--line-strong").trim() || "rgba(31, 30, 29, 0.22)";
+      const ink = "#8a8a86";
       const axis = {
-        axisLabel: { textStyle: { color: ink } },
-        axisLine: { lineStyle: { color: line } },
-        splitLine: { lineStyle: { color: line } },
+        axisLabel: { color: ink },
+        axisLine: { lineStyle: { color: ink } },
+        splitLine: { lineStyle: { color: ink, opacity: 0.35 } },
         nameTextStyle: { color: ink },
       };
 
@@ -174,22 +158,26 @@ $ integral_0^infinity e^(-x) dif x = 1 $
           dimension: 2,
           min: -1,
           max: 1,
-          inRange: { color: [surface, accent] },
+          inRange: { color: ["#f2f2f2", "#bdbdbd", "#737373", "#3b3b39"] },
         },
-        xAxis3D: { type: "value", name: "x", ...axis },
-        yAxis3D: { type: "value", name: "y", ...axis },
-        zAxis3D: { type: "value", name: "z", ...axis },
+        xAxis3D: { type: "value", name: "x", min: -range, max: range, interval: range, ...axis },
+        yAxis3D: { type: "value", name: "y", min: -range, max: range, interval: range, ...axis },
+        zAxis3D: { type: "value", name: "z", min: -1, max: 1, interval: 1, ...axis },
         grid3D: {
           boxWidth: 100,
           boxDepth: 100,
           boxHeight: 45,
-          viewControl: { distance: 190, alpha: 28, beta: 35 },
+          viewControl: { projection: "orthographic", distance: 190, alpha: 28, beta: 35 },
           light: { main: { intensity: 1.15 }, ambient: { intensity: 0.35 } },
         },
-        series: [{ type: "surface", data }],
+        series: [{
+          type: "surface",
+          data,
+          wireframe: { show: true, lineStyle: { color: ink, width: 0.5 } },
+        }],
       });
       window.addEventListener("resize", () => chart.resize());
-    })();
+    }
     ```.text,
   )
 }

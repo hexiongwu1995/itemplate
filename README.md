@@ -2,8 +2,6 @@
 
 `itemplate` turns Typst markup into a documentation site with a modern academic look: a numbered, collapsible sidebar table of contents, a responsive article column, horizontally scrolling tables with a fullscreen view, light and dark themes, and a built-in import map for `echarts`, `echarts-gl`, and `plotly`.
 
-The palette, serif headings, hairline rules, and terracotta accent are adapted from the [Claudette Typora theme](https://github.com/CookPiu/typora-theme-claudette) by CookPiu (MIT).
-
 ## Usage
 
 ````typst

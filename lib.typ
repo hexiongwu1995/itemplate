@@ -87,7 +87,9 @@ The template comes with built-in support for:
               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/",
               "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js",
               "fundamental-physical-constants": "https://unpkg.com/fundamental-physical-constants/FundamentalPhysicalConstants.js",
-              "plotly": "https://cdn.jsdelivr.net/npm/plotly.js-dist-min@4.3.0/+esm"
+              "plotly": "https://cdn.jsdelivr.net/npm/plotly.js-dist-min@4.3.0/+esm",
+              "echarts": "https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.esm.min.js",
+              "echarts-gl": "https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js"
             }
           }
           ```.text,

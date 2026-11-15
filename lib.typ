@@ -27,7 +27,7 @@
   "font-ui": "\"Inter\", \"Source Sans 3\", \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans SC\", system-ui, sans-serif",
   "font-serif": "\"Source Serif 4\", \"Source Serif Pro\", Charter, Georgia, \"Noto Serif SC\", \"Source Han Serif SC\", \"Songti SC\", serif",
   "font-mono": "\"JetBrains Mono\", \"Maple Mono NF CN\", \"Cascadia Code\", \"SF Mono\", Consolas, monospace",
-  "font-math": "\"NewComputerModernMath\", \"Latin Modern Math\", \"STIX Two Math\", math",
+  "font-math": "\"STIX Two Math\", \"NewComputerModernMath\", \"Latin Modern Math\", math",
 )
 
 // Light green theme. Same structure as the default light theme, with a
@@ -260,11 +260,15 @@
           ```.text,
         )
 
-        html.link(rel: "preconnect", href: "https://fred-wang.github.io")
+        // Math web font: STIX Two Math (OFL 1.1, Tiro Typeworks / STI Pub),
+        // served by the official Google Fonts CDN instead of GitHub Pages.
+        // If Google Fonts is unreachable, `--font-math` falls back to locally
+        // installed New Computer Modern Math / Latin Modern Math.
+        html.link(rel: "preconnect", href: "https://fonts.googleapis.com")
+        html.link(rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous")
         html.link(
           rel: "stylesheet",
-          blocking: "blocking",
-          href: "https://fred-wang.github.io/MathFonts/LatinModern/mathfonts.css",
+          href: "https://fonts.googleapis.com/css2?family=STIX+Two+Math&display=swap",
         )
 
         html.script(

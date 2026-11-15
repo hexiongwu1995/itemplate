@@ -30,6 +30,27 @@
   "font-math": "\"NewComputerModernMath\", \"Latin Modern Math\", \"STIX Two Math\", math",
 )
 
+// Light green theme. Same structure as the default light theme, with a
+// sage-green accent and a slightly green-tinted paper.
+#let default-green-theme = (
+  bg: "#f6f9f3",
+  surface: "#eef4ea",
+  "surface-strong": "#e1ebdb",
+  ink: "#17241a",
+  "ink-muted": "#66735f",
+  "ink-faint": "#aab6a3",
+  line: "rgba(23, 36, 26, 0.12)",
+  "line-strong": "rgba(23, 36, 26, 0.22)",
+  accent: "#4d8f5f",
+  "accent-soft": "rgba(77, 143, 95, 0.10)",
+  "accent-ink": "#3d7550",
+  "sidebar-bg": "#eff5ea",
+  "header-bg": "rgba(246, 249, 243, 0.86)",
+  "code-bg": "#eef4ea",
+  selection: "rgba(178, 214, 182, 0.55)",
+  overlay: "rgba(18, 30, 22, 0.32)",
+)
+
 // Dark theme tokens from Claudette Dark.
 #let default-dark-theme = (
   bg: "#262625",
@@ -134,6 +155,7 @@
 ) = {
   context if target() == "html" {
     let resolved-theme = default-theme + theme
+    let resolved-green-theme = default-theme + default-green-theme
     let resolved-dark-theme = default-theme + default-dark-theme + dark-theme
 
     // 侧边栏标题跟随文档语言：中文显示“目录”，其余（默认英文）显示 “CONTENTS”
@@ -222,12 +244,17 @@
         }
         html.title(doc-title)
 
-        // Apply the saved sidebar state before first paint to avoid a flash.
+        // Apply the saved sidebar state and theme before first paint to
+        // avoid a flash.
         html.script(
           ```js
           try {
             if (localStorage.getItem("itemplate:sidebar-open") === "0") {
               document.documentElement.classList.add("sidebar-preclosed");
+            }
+            var savedTheme = localStorage.getItem("itemplate:theme");
+            if (savedTheme === "light" || savedTheme === "dark" || savedTheme === "green") {
+              document.documentElement.dataset.theme = savedTheme;
             }
           } catch (error) {}
           ```.text,
@@ -258,9 +285,11 @@
         )
 
         html.style(theme-to-css(resolved-theme))
+        html.style(theme-to-css(resolved-green-theme, selector: ":root[data-theme='green']"))
+        html.style(theme-to-css(resolved-dark-theme, selector: ":root[data-theme='dark']"))
         html.style(
           "@media (prefers-color-scheme: dark) {\n"
-          + theme-to-css(resolved-dark-theme)
+          + theme-to-css(resolved-dark-theme, selector: ":root:not([data-theme])")
           + "\n}",
         )
 
@@ -277,6 +306,10 @@
             --dur: .28s;
             color-scheme: light dark;
           }
+
+          :root[data-theme="light"],
+          :root[data-theme="green"] { color-scheme: light; }
+          :root[data-theme="dark"] { color-scheme: dark; }
 
           @supports (height: 100dvh) {
             :root { --app-h: 100dvh; }
@@ -514,6 +547,7 @@
             -webkit-backdrop-filter: blur(14px);
           }
           .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+          .topbar-right { display: flex; align-items: center; gap: 8px; }
 
           /* 文档标题在 header 内水平居中，左右留出按钮与安全间距 */
           .doc-heading {
@@ -569,6 +603,24 @@
           }
           .icon-menu::before { top: -5px; }
           .icon-menu::after { top: 5px; }
+
+          .icon-theme {
+            position: relative;
+            width: 16px;
+            height: 16px;
+            overflow: hidden;
+            border: 1.5px solid currentColor;
+            border-radius: 50%;
+          }
+          .icon-theme::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 50%;
+            background: currentColor;
+          }
 
           .icon-close { position: relative; width: 14px; height: 14px; }
           .icon-close::before,
@@ -1035,6 +1087,36 @@
           function read(key) {
             try { return localStorage.getItem(key); } catch (error) { return null; }
           }
+
+          /* Theme switching: light → dark → green */
+
+          const themeToggle = document.getElementById("theme-toggle");
+          const themeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+          const themeOrder = ["light", "dark", "green"];
+          const themeNames = { light: "浅色", dark: "深色", green: "浅绿" };
+
+          function effectiveTheme() {
+            return docEl.dataset.theme || (themeQuery.matches ? "dark" : "light");
+          }
+
+          function syncThemeButton() {
+            if (!themeToggle) return;
+            const label = "切换主题（当前：" + (themeNames[effectiveTheme()] || "浅色") + "）";
+            themeToggle.setAttribute("aria-label", label);
+            themeToggle.setAttribute("title", label);
+          }
+
+          if (themeToggle) {
+            themeToggle.addEventListener("click", () => {
+              const next = themeOrder[(themeOrder.indexOf(effectiveTheme()) + 1) % themeOrder.length];
+              docEl.dataset.theme = next;
+              store("itemplate:theme", next);
+              syncThemeButton();
+            });
+            syncThemeButton();
+          }
+
+          themeQuery.addEventListener("change", syncThemeButton);
 
           function sidebarIsOpen() {
             if (!shell) return false;
@@ -1624,6 +1706,18 @@
 
                 html.elem("div", attrs: (class: "doc-heading"), {
                   html.elem("h1", attrs: (class: "doc-title"), doc-title)
+                })
+              })
+
+              html.elem("div", attrs: (class: "topbar-right"), {
+                html.elem("button", attrs: (
+                  id: "theme-toggle",
+                  class: "icon-btn",
+                  type: "button",
+                  title: "切换主题",
+                  "aria-label": "切换主题",
+                ), {
+                  html.elem("span", attrs: (class: "icon-theme"))
                 })
               })
             })

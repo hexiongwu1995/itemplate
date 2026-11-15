@@ -1,78 +1,68 @@
 # itemplate
 
-`itemplate` is a Typst template for generating interactive HTML documents. It compiles Typst markup into a self-contained HTML file with a responsive layout, featuring a sidebar table of contents.
+`itemplate` turns Typst markup into a documentation site with a modern academic look. It exports a single HTML file containing a fixed top bar, a numbered and collapsible table of contents, and a responsive article column.
 
-The template comes with built-in support for:
-- **Three.js** for embedding 3D scenes (e.g. the orbital cube demo).
-- **Plotly.js** for embedding interactive plots.
+## Features
 
-> This is an amateur project, please use with caution.
+- **Numbered sidebar TOC** generated at compile time from `heading`, with nested levels, per-section collapse, and scroll-spy highlighting.
+- **Responsive app shell** built on `100dvh` and safe-area insets, so browser toolbars and notches are handled correctly.
+- **Mobile drawer** with edge-swipe to open and swipe-left to close, plus an overlay, focus management, and `inert` support.
+- **Wide tables** scroll horizontally inside their own container with hidden scrollbars, a soft edge fade, and a fullscreen button on touch layouts. Fullscreen uses the Fullscreen API with a CSS-rotate fallback for iOS.
+- **Light and dark themes** driven by `prefers-color-scheme`, with a cool neutral palette and a teal accent.
+- **Desktop sidebar resizing** by dragging the divider; width and open state persist in `localStorage`.
+- **Print styles**, reduced-motion support, and keyboard-accessible controls.
 
-# Usage
+## Usage
 
 ```typst
-// test.typ
 #import "@preview/itemplate:0.8.0": *
-#show: itemplate.with(doc-title: "test")
 
-= #lorem(3)
+#show: itemplate.with(
+  doc-title: "My Document",
+  doc-author: "Author Name",
+  lang: "en",
+)
 
-#lorem(20)
+= Introduction
 
-== #lorem(3)
+#lorem(40)
 
-#lorem(20)
+== Background
 
-= #lorem(3)
-
-#lorem(20)
-
-== #lorem(3)
-
-#lorem(20)
-
-#context if (target() == "html") {
-  html.elem("div", attrs: (
-    style: "background: white; margin-top: 50px; width: 100%; height: 30vh",
-    id: "three-orbital-cube",
-  ))[]
-
-  html.script(
-    type: "module",
-    src: "https://unpkg.com/@hexiongwu1995/itemplate/examples/itemplate/three-orbital-cube.js",
-  )
-}
+#lorem(40)
 ```
 
-# Compile to HTML
+`doc-title` is shown in the top bar and in the sidebar footer. `doc-author` is optional.
 
-## use Tinymist Typst plugin in VS Code
+## Theme
 
-- install Tinymist Typst plugin in VS Code
-- append the following settings to your `.vscode/settings.json` file:
+All design tokens can be overridden. Values may be Typst colors or raw CSS color strings.
 
+```typst
+#show: itemplate.with(
+  doc-title: "My Document",
+  theme: (
+    accent: "#0f766e",
+    bg: "#ffffff",
+  ),
+  dark-theme: (
+    accent: "#5eead4",
+  ),
+)
 ```
-"tinymist.typstExtraArgs": ["--features=html", "--features=bundle"],
-```
-- The exported HTML file will be placed in the same directory as the test.typ file
 
-## use typst cli
+The full token list lives in `default-theme` at the top of `lib.typ`: `bg`, `surface`, `surface-strong`, `ink`, `ink-muted`, `line`, `accent`, `accent-soft`, `accent-ink`, `sidebar-bg`, `header-bg`, `code-bg`, `overlay`, `font-ui`, `font-serif`, `font-mono`, `font-math`.
 
-- install typst cli on your computer
-- compile the test.typ to html in the command line:
+## Compile
 
 ```powershell
-cd path/to/your/test.typ
 typst compile test.typ --features html --format html
 ```
 
-- or watch test.typ and auto-compile it to HTML in the command line:
+The HTML export of Typst is still under active development, so the emitted markup may change between Typst releases. `bundle` export is not supported by this template; a PDF target renders the body without the HTML shell.
 
-```powershell
-cd path/to/your/test.typ
-typst watch test.typ --features html --format html
-```
+Math rendering loads the Latin Modern web fonts from `fred-wang.github.io`. The optional import map for `three`, `plotly`, and `echarts` is included for documents that embed those libraries; remove it if you do not need them.
 
-- The exported HTML file will be placed in the same directory as the test.typ file
+## Examples
 
-<img src="./assets/test.png" alt="output of the above code" width="900" />
+`test.typ` exercises headings of every level, wide and regular tables, code, math, figures, lists, and a Three.js scene. Open the generated `test.html` in a browser to inspect the layout.

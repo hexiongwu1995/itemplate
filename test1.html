@@ -2,6 +2,10 @@
   if (localStorage.getItem("itemplate:sidebar-open") === "0") {
     document.documentElement.classList.add("sidebar-preclosed");
   }
+  var savedTheme = localStorage.getItem("itemplate:theme");
+  if (savedTheme === "light" || savedTheme === "dark" || savedTheme === "green") {
+    document.documentElement.dataset.theme = savedTheme;
+  }
 } catch (error) {}</script><link rel="preconnect" href="https://fred-wang.github.io"><link rel="stylesheet" blocking="blocking" href="https://fred-wang.github.io/MathFonts/LatinModern/mathfonts.css"><script type="importmap">{
   "imports": {
     "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
@@ -33,8 +37,50 @@
   --font-serif: "Source Serif 4", "Source Serif Pro", Charter, Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
   --font-mono: "JetBrains Mono", "Maple Mono NF CN", "Cascadia Code", "SF Mono", Consolas, monospace;
   --font-math: "NewComputerModernMath", "Latin Modern Math", "STIX Two Math", math;
+}</style><style>:root[data-theme='green'] {
+  --bg: #f6f9f3;
+  --surface: #eef4ea;
+  --surface-strong: #e1ebdb;
+  --ink: #17241a;
+  --ink-muted: #66735f;
+  --ink-faint: #aab6a3;
+  --line: rgba(23, 36, 26, 0.12);
+  --line-strong: rgba(23, 36, 26, 0.22);
+  --accent: #4d8f5f;
+  --accent-soft: rgba(77, 143, 95, 0.10);
+  --accent-ink: #3d7550;
+  --sidebar-bg: #eff5ea;
+  --header-bg: rgba(246, 249, 243, 0.86);
+  --code-bg: #eef4ea;
+  --selection: rgba(178, 214, 182, 0.55);
+  --overlay: rgba(18, 30, 22, 0.32);
+  --font-ui: "Inter", "Source Sans 3", "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  --font-serif: "Source Serif 4", "Source Serif Pro", Charter, Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+  --font-mono: "JetBrains Mono", "Maple Mono NF CN", "Cascadia Code", "SF Mono", Consolas, monospace;
+  --font-math: "NewComputerModernMath", "Latin Modern Math", "STIX Two Math", math;
+}</style><style>:root[data-theme='dark'] {
+  --bg: #262625;
+  --surface: #2c2c2a;
+  --surface-strong: #34332e;
+  --ink: #f2f0e9;
+  --ink-muted: #b8b6a9;
+  --ink-faint: #8b8a80;
+  --line: rgba(255, 255, 255, 0.10);
+  --line-strong: rgba(255, 255, 255, 0.20);
+  --accent: #d97757;
+  --accent-soft: rgba(217, 119, 87, 0.14);
+  --accent-ink: #e6906f;
+  --sidebar-bg: #1f1f1e;
+  --header-bg: rgba(38, 38, 37, 0.86);
+  --code-bg: #2c2c2a;
+  --selection: rgba(217, 119, 87, 0.35);
+  --overlay: rgba(0, 0, 0, 0.56);
+  --font-ui: "Inter", "Source Sans 3", "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  --font-serif: "Source Serif 4", "Source Serif Pro", Charter, Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+  --font-mono: "JetBrains Mono", "Maple Mono NF CN", "Cascadia Code", "SF Mono", Consolas, monospace;
+  --font-math: "NewComputerModernMath", "Latin Modern Math", "STIX Two Math", math;
 }</style><style>@media (prefers-color-scheme: dark) {
-:root {
+:root:not([data-theme]) {
   --bg: #262625;
   --surface: #2c2c2a;
   --surface-strong: #34332e;
@@ -67,6 +113,10 @@
   --dur: .28s;
   color-scheme: light dark;
 }
+
+:root[data-theme="light"],
+:root[data-theme="green"] { color-scheme: light; }
+:root[data-theme="dark"] { color-scheme: dark; }
 
 @supports (height: 100dvh) {
   :root { --app-h: 100dvh; }
@@ -304,6 +354,7 @@ html.sidebar-preclosed .sidebar { border-right-color: transparent; }
   -webkit-backdrop-filter: blur(14px);
 }
 .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.topbar-right { display: flex; align-items: center; gap: 8px; }
 
 /* 文档标题在 header 内水平居中，左右留出按钮与安全间距 */
 .doc-heading {
@@ -360,6 +411,24 @@ html.sidebar-preclosed .sidebar { border-right-color: transparent; }
 .icon-menu::before { top: -5px; }
 .icon-menu::after { top: 5px; }
 
+.icon-theme {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  overflow: hidden;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+.icon-theme::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  background: currentColor;
+}
+
 .icon-close { position: relative; width: 14px; height: 14px; }
 .icon-close::before,
 .icon-close::after {
@@ -397,7 +466,7 @@ html.sidebar-preclosed .sidebar { border-right-color: transparent; }
 }
 
 .article {
-  width: min(100%, 780px);
+  width: min(100%, 1000px);
   margin: 0 auto;
   padding: 56px 32px 140px;
 }
@@ -818,6 +887,36 @@ function store(key, value) {
 function read(key) {
   try { return localStorage.getItem(key); } catch (error) { return null; }
 }
+
+/* Theme switching: light → dark → green */
+
+const themeToggle = document.getElementById("theme-toggle");
+const themeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+const themeOrder = ["light", "dark", "green"];
+const themeNames = { light: "浅色", dark: "深色", green: "浅绿" };
+
+function effectiveTheme() {
+  return docEl.dataset.theme || (themeQuery.matches ? "dark" : "light");
+}
+
+function syncThemeButton() {
+  if (!themeToggle) return;
+  const label = "切换主题（当前：" + (themeNames[effectiveTheme()] || "浅色") + "）";
+  themeToggle.setAttribute("aria-label", label);
+  themeToggle.setAttribute("title", label);
+}
+
+if (themeToggle) {
+  themeToggle.addEventListener("click", () => {
+    const next = themeOrder[(themeOrder.indexOf(effectiveTheme()) + 1) % themeOrder.length];
+    docEl.dataset.theme = next;
+    store("itemplate:theme", next);
+    syncThemeButton();
+  });
+  syncThemeButton();
+}
+
+themeQuery.addEventListener("change", syncThemeButton);
 
 function sidebarIsOpen() {
   if (!shell) return false;
@@ -1417,4 +1516,4 @@ mover[accent="true" i] > :not(:first-child) {
   math-depth: inherit;
   math-style: inherit;
   math-shift: inherit;
-}</style></head><body><a class="skip-link" href="#content">跳到正文</a><div class="shell"><aside id="sidebar" class="sidebar" aria-label="文档目录"><div class="sidebar-head"><div class="sidebar-heading"><span class="sidebar-title">CONTENTS</span></div><button id="sidebar-close" class="icon-btn mobile-only" type="button" aria-label="关闭目录"><span class="icon-close"></span></button></div><nav class="toc-nav" aria-label="目录"><p class="toc-empty">暂无目录</p></nav><div class="sidebar-foot"><span class="sidebar-foot-title">Table Demo</span><span class="sidebar-foot-author">Hexiong Wu</span></div><div class="resize-handle" role="separator" aria-orientation="vertical" aria-label="调整目录宽度" tabindex="0"></div></aside><div class="overlay" aria-hidden="true"></div><div class="main"><header class="topbar"><div class="topbar-left"><button id="sidebar-toggle" class="icon-btn" type="button" aria-label="收起目录" aria-controls="sidebar" aria-expanded="true"><span class="icon-menu"></span></button><div class="doc-heading"><h1 class="doc-title">Table Demo</h1></div></div></header><main id="content" class="content" tabindex="-1"><article class="article"><div class="table-block"><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><tr><td>时刻</td><td>在此时刻通过图中电流表的电流方向</td><td>电流表中的电流正在增大还是减小</td><td>开关 S 当前正在接通 1 还是接通 2</td><td>电容器两端的电压正在增大还是减小</td><td>整个电路中的能量正在怎样转化</td><td>这个时候电容器是在充电还是在放电</td></tr><tr><td><math><msub><mi>𝑡</mi><mn>1</mn></msub></math></td><td>向左</td><td>减小</td><td>接通2</td><td>减小</td><td>电容器中的电能在电流经过电阻时被全部转化为热能？</td><td>放电</td></tr><tr><td><math><msub><mi>𝑡</mi><mn>2</mn></msub></math></td><td>向右</td><td>减小</td><td>接通1</td><td>增大</td><td>电池的电能一部分转化为电容器中的电能，还有一部分在经过电阻时被转化为热能？</td><td>充电</td></tr></table></div><button class="table-expand" type="button" aria-label="全屏查看表格"><span class="icon-expand"></span></button><button class="table-exit" type="button" aria-label="退出全屏">×</button></div></article></main></div></div></body></html>
+}</style></head><body><a class="skip-link" href="#content">跳到正文</a><div class="shell"><aside id="sidebar" class="sidebar" aria-label="文档目录"><div class="sidebar-head"><div class="sidebar-heading"><span class="sidebar-title">CONTENTS</span></div><button id="sidebar-close" class="icon-btn mobile-only" type="button" aria-label="关闭目录"><span class="icon-close"></span></button></div><nav class="toc-nav" aria-label="目录"><p class="toc-empty">暂无目录</p></nav><div class="sidebar-foot"><span class="sidebar-foot-title">Table Demo</span><span class="sidebar-foot-author">Hexiong Wu</span></div><div class="resize-handle" role="separator" aria-orientation="vertical" aria-label="调整目录宽度" tabindex="0"></div></aside><div class="overlay" aria-hidden="true"></div><div class="main"><header class="topbar"><div class="topbar-left"><button id="sidebar-toggle" class="icon-btn" type="button" aria-label="收起目录" aria-controls="sidebar" aria-expanded="true"><span class="icon-menu"></span></button><div class="doc-heading"><h1 class="doc-title">Table Demo</h1></div></div><div class="topbar-right"><button id="theme-toggle" class="icon-btn" type="button" title="切换主题" aria-label="切换主题"><span class="icon-theme"></span></button></div></header><main id="content" class="content" tabindex="-1"><article class="article"><div class="table-block"><div class="table-scroll" tabindex="0" role="region" aria-label="表格，可横向滚动"><table><tr><td>时刻</td><td>在此时刻通过图中电流表的电流方向</td><td>电流表中的电流正在增大还是减小</td><td>开关 S 当前正在接通 1 还是接通 2</td><td>电容器两端的电压正在增大还是减小</td><td>整个电路中的能量正在怎样转化</td><td>这个时候电容器是在充电还是在放电</td></tr><tr><td><math><msub><mi>𝑡</mi><mn>1</mn></msub></math></td><td>向左</td><td>减小</td><td>接通2</td><td>减小</td><td>电容器中的电能在电流经过电阻时被全部转化为热能？</td><td>放电</td></tr><tr><td><math><msub><mi>𝑡</mi><mn>2</mn></msub></math></td><td>向右</td><td>减小</td><td>接通1</td><td>增大</td><td>电池的电能一部分转化为电容器中的电能，还有一部分在经过电阻时被转化为热能？</td><td>充电</td></tr></table></div><button class="table-expand" type="button" aria-label="全屏查看表格"><span class="icon-expand"></span></button><button class="table-exit" type="button" aria-label="退出全屏">×</button></div></article></main></div></div></body></html>

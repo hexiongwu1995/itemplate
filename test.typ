@@ -1,4 +1,5 @@
 #import "lib.typ": *
+#set heading(numbering:"1.1")
 
 #show: itemplate.with(
   doc-title: "iTemplate Demo",

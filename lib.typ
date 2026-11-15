@@ -659,7 +659,7 @@
           }
 
           .article {
-            width: min(100%, 780px);
+            width: min(100%, 1000px);
             margin: 0 auto;
             padding: 56px 32px 140px;
           }

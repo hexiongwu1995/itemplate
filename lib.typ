@@ -971,6 +971,9 @@
             --string-color: var(--accent-ink);
             --number-color: var(--ink);
           }
+          @media (max-width: 1000px) {
+            .lil-gui.root { display: none; }
+          }
 
           /* -----------------------------------------------------------------
              Print & motion
@@ -1404,7 +1407,7 @@
             }
           });
 
-          /* Touch drawer: edge swipe to open, swipe left to close */
+          /* Touch drawer: swipe right to open, swipe left to close */
 
           function isInScrollableArea(target) {
             let element = target instanceof Element ? target : null;
@@ -1432,7 +1435,6 @@
             const touch = event.touches[0];
             const open = shell.dataset.drawer === "open";
 
-            if (!open && touch.clientX > 24) return;
             if (open) {
               const target = event.target;
               if (!(target instanceof Element) || !(target.closest(".sidebar") || target.closest(".overlay"))) {
@@ -1461,7 +1463,8 @@
 
             if (!touchState.dragging) {
               if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
-              if (Math.abs(dy) >= Math.abs(dx)) {
+              // 竖向滚动、或收起状态下向左滑：交给页面自身处理
+              if (Math.abs(dy) >= Math.abs(dx) || (!touchState.open && dx < 0)) {
                 touchState = null;
                 return;
               }

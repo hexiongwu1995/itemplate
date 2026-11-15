@@ -742,8 +742,7 @@
           }
 
           .table-scroll table {
-            width: max-content;
-            min-width: 100%;
+            width: 100%;
             margin: 0;
             border-collapse: collapse;
             font-size: .9375rem;
@@ -762,7 +761,7 @@
             font-weight: 600;
             white-space: nowrap;
           }
-          .table-scroll td { min-width: 6em; white-space: normal; }
+          .table-scroll td { min-width: 6em; white-space: normal; overflow-wrap: break-word; }
           .table-scroll tr:last-child td { border-bottom: 0; }
 
           .table-block::after {

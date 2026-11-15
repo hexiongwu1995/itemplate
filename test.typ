@@ -1,121 +1,39 @@
 #import "lib.typ": *
 #show: itemplate.with(
-  doc-title: "iTemplate 重构验证文档",
+  doc-title: "iTemplate Refactor Verification Document",
   doc-author: "Hexiong Wu",
-  lang: "zh",
+  lang: "en",
 )
 
-= 引言
+= Introduction
 
-本文档用于验证 `itemplate` 重构后的排版、目录、表格与交互行为。它包含足够长的段落、深层标题、宽表格、代码块、公式、图片与列表，以便在桌面端和移动端同时检查布局。
+This document verifies the layout, table of contents, tables, and interactive behavior of the refactored `itemplate`. It contains sufficiently long paragraphs, deep headings, wide tables, code blocks, math, images, and lists so that the layout can be checked on both desktop and mobile.
 
-#lorem(60)
+Long-form reading is the primary use case, so the body text here is deliberately verbose. A well-set document should keep a comfortable measure, consistent line height, and clear vertical rhythm even when paragraphs run for many lines. The refactor should not change any of those qualities; it should only make the structure more robust and the interactive parts more predictable.
 
-== 研究背景
+== Research Background
 
-#lorem(40)
+The template was originally written as a single monolithic file. Over time, the sidebar table of contents, table wrappers, and mobile drawer logic were added incrementally, which made the source hard to follow and easy to break. The refactor splits these concerns into clearly separated sections while preserving the visual result.
 
-=== 更细的层级
+=== Finer Hierarchy
 
-#lorem(30)
+Deeper heading levels are included to verify numbering and indentation in the sidebar table of contents. Each level should be visually distinguishable and the numbering should remain stable.
 
-==== 第四级标题
+==== Fourth-Level Heading
 
-#lorem(20)
+Fourth-level headings should still render correctly even if they are not shown in the sidebar by default.
 
-== 本文贡献
+== Contributions
 
-+ 编译期生成带编号的侧边栏目录。
-+ 表格支持隐藏滚动条的横向滚动与全屏查看。
-+ 移动端抽屉支持边缘滑动手势。
++ A numbered sidebar table of contents is generated at compile time.
++ Tables support horizontal scrolling with hidden scrollbars and a fullscreen view.
++ The mobile drawer supports edge-swipe gestures.
 
-= 排版元素
 
-== 段落与强调
 
-这是一段普通正文，包含 *加粗强调*、_斜体强调_、`行内代码` 以及一个 #link("https://typst.app")[外部链接]。正文的行高与字距应当适合长文阅读。
+= Interactive Components
 
-#quote(block: true)[引用块用于承载摘录或旁注。左侧的强调色边线应当与整体风格一致，但不应过于抢眼。]
-
-== 列表
-
-- 第一项
-- 第二项
-  - 嵌套项
-  - 另一个嵌套项
-- 第三项
-
-+ 有序第一项
-+ 有序第二项
-+ 有序第三项
-
-== 代码
-
-```typst
-#let itemplate(doc-title: "Document", body) = {
-  set heading(numbering: "1.1.1")
-  body
-}
-```
-
-下面是一段很长的单行代码，用于验证横向滚动不会撑破页面：
-
-```js
-const extremelyLongVariableName = someFunctionCall(argumentOne, argumentTwo, argumentThree, argumentFour, argumentFive, argumentSix, argumentSeven);
-```
-
-== 数学
-
-行内公式 $a^2 + b^2 = c^2$，以及独立公式：
-
-$ integral_0^infinity e^(-x) dif x = 1 $
-
-= 表格
-
-== 常规表格
-
-#table(
-  columns: 3,
-  [*项目*], [*说明*], [*状态*],
-  [侧边栏], [带编号、可折叠、可拖拽调宽], [完成],
-  [表格], [横向滚动、隐藏滚动条、全屏], [完成],
-  [手势], [移动端边缘滑动开合], [完成],
-)
-
-== 宽表格
-
-当表格列数较多时，它应当在自身容器内横向滚动，而不是撑宽整个页面。
-
-#table(
-  columns: 9,
-  [*序号*], [*名称*], [*类型*], [*长度*], [*宽度*], [*高度*], [*重量*], [*备注*], [*操作*],
-  [1], [铝合金外壳], [结构件], [120.5], [80.0], [12.0], [340], [阳极氧化], [查看],
-  [2], [控制主板], [电子件], [95.0], [60.0], [1.6], [45], [四层板], [查看],
-  [3], [锂聚合物电池], [电源], [110.0], [70.0], [8.0], [180], [带保护板], [查看],
-  [4], [显示屏组件], [光学件], [130.0], [85.0], [3.2], [95], [全贴合], [查看],
-)
-
-== 空单元格与对齐
-
-#table(
-  columns: (auto, 1fr, auto),
-  align: (left, left, right),
-  [*参数*], [*描述*], [*数值*],
-  [工作电压], [直流输入范围], [5 V],
-  [待机电流], [], [12 mA],
-  [工作温度], [工业级], [-20 -- 70 °C],
-)
-
-= 图片
-
-#figure(
-  image("assets/test.png", width: 100%),
-  caption: [旧版模板的界面截图，用作图片样式回归测试。],
-)
-
-= 交互组件
-
-== ECharts 三维曲面
+== ECharts 3D Surface
 
 #context if (target() == "html") {
   html.elem("div", attrs: (
@@ -127,7 +45,7 @@ $ integral_0^infinity e^(-x) dif x = 1 $
     type: "module",
     ```js
     import * as echarts from "echarts";
-    // echarts-gl 的 UMD 构建从 window.echarts 读取主库
+    // The UMD build of echarts-gl reads the main library from window.echarts
     window.echarts = echarts;
     await import("echarts-gl");
 
@@ -182,6 +100,96 @@ $ integral_0^infinity e^(-x) dif x = 1 $
   )
 }
 
-= 结语
 
-#lorem(30)
+
+
+= Typography
+
+== Paragraphs and Emphasis
+
+This is a regular paragraph containing *bold emphasis*, _italic emphasis_, `inline code`, and an #link("https://typst.app")[external link]. Line height and letter spacing should suit long-form reading.
+
+#quote(
+  block: true,
+)[Block quotes carry excerpts or side notes. The accent-colored rule on the left should match the overall style without becoming too loud.]
+
+== Lists
+
+- First item
+- Second item
+  - Nested item
+  - Another nested item
+- Third item
+
++ First ordered item
++ Second ordered item
++ Third ordered item
+
+== Code
+
+```typst
+#let itemplate(doc-title: "Document", body) = {
+  set heading(numbering: "1.1.1")
+  body
+}
+```
+
+Below is a long single-line code snippet, used to verify that horizontal scrolling does not break the page:
+
+```js
+const extremelyLongVariableName = someFunctionCall(argumentOne, argumentTwo, argumentThree, argumentFour, argumentFive, argumentSix, argumentSeven);
+```
+
+== Math
+
+An inline formula $a^2 + b^2 = c^2$, and a display formula:
+
+$ integral_0^infinity e^(-x) dif x = 1 $
+
+= Tables
+
+== Regular Table
+
+#table(
+  columns: 3,
+  [*Item*], [*Description*], [*Status*],
+  [Sidebar], [Numbered, collapsible, drag-to-resize], [Done],
+  [Tables], [Horizontal scroll, hidden scrollbar, fullscreen], [Done],
+  [Gestures], [Edge-swipe to open and close on mobile], [Done],
+)
+
+== Wide Table
+
+When a table has many columns, it should scroll horizontally inside its own container rather than stretching the whole page.
+
+#table(
+  columns: 9,
+  [*No.*], [*Name*], [*Type*], [*Length*], [*Width*], [*Height*], [*Weight*], [*Remarks*], [*Action*],
+  [1], [Aluminum enclosure], [Structural], [120.5], [80.0], [12.0], [340], [Anodized], [View],
+  [2], [Control board], [Electronic], [95.0], [60.0], [1.6], [45], [Four-layer PCB], [View],
+  [3], [Li-polymer battery], [Power], [110.0], [70.0], [8.0], [180], [With protection board], [View],
+  [4], [Display assembly], [Optical], [130.0], [85.0], [3.2], [95], [Fully laminated], [View],
+)
+
+== Empty Cells and Alignment
+
+#table(
+  columns: (auto, 1fr, auto),
+  align: (left, left, right),
+  [*Parameter*], [*Description*], [*Value*],
+  [Operating voltage], [DC input range], [5 V],
+  [Standby current], [], [12 mA],
+  [Operating temperature], [Industrial grade], [-20 -- 70 °C],
+)
+
+
+= Images
+
+#figure(
+  image("assets/test.png", width: 100%),
+  caption: [Screenshot of the previous template's interface, used as a visual regression test.],
+)
+
+= Conclusion
+
+The sections above cover the full range of elements the template is expected to support. If every element renders correctly on both desktop and mobile, the refactor can be considered behavior-preserving.

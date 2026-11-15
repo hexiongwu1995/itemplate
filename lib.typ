@@ -262,13 +262,15 @@
 
         // Math web font: STIX Two Math (OFL 1.1, Tiro Typeworks / STI Pub),
         // served by the official Google Fonts CDN instead of GitHub Pages.
+        // The `.cn` endpoints are Google's China-accessible domains; the
+        // returned CSS references font files on fonts.gstatic.cn.
         // If Google Fonts is unreachable, `--font-math` falls back to locally
         // installed New Computer Modern Math / Latin Modern Math.
-        html.link(rel: "preconnect", href: "https://fonts.googleapis.com")
-        html.link(rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "anonymous")
+        html.link(rel: "preconnect", href: "https://fonts.googleapis.cn")
+        html.link(rel: "preconnect", href: "https://fonts.gstatic.cn", crossorigin: "anonymous")
         html.link(
           rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=STIX+Two+Math&display=swap",
+          href: "https://fonts.googleapis.cn/css2?family=STIX+Two+Math&display=swap",
         )
 
         html.script(

@@ -925,7 +925,6 @@
               width: min(84vw, 320px);
               height: var(--app-h);
               border-right: 1px solid var(--line);
-              box-shadow: 0 24px 64px rgb(0 0 0 / 20%);
               transform: translateX(var(--drawer-x, -100%));
               transition: transform var(--dur) var(--ease);
             }

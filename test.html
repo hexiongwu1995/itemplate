@@ -715,7 +715,6 @@ html.drawer-open body { overflow: hidden; }
     width: min(84vw, 320px);
     height: var(--app-h);
     border-right: 1px solid var(--line);
-    box-shadow: 0 24px 64px rgb(0 0 0 / 20%);
     transform: translateX(var(--drawer-x, -100%));
     transition: transform var(--dur) var(--ease);
   }
@@ -1442,7 +1441,7 @@ if (el) {
 
   const chart = echarts.init(el);
   chart.setOption({
-    tooltip: {},
+    tooltip: { show: false },
     visualMap: {
       show: false,
       dimension: 2,
@@ -1459,6 +1458,7 @@ if (el) {
       boxHeight: 45,
       viewControl: { projection: "orthographic", distance: 190, alpha: 28, beta: 35 },
       light: { main: { intensity: 1.15 }, ambient: { intensity: 0.35 } },
+      axisPointer: { show: false },
     },
     series: [{
       type: "surface",

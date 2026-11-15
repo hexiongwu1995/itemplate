@@ -70,7 +70,7 @@ Fourth-level headings should still render correctly even if they are not shown i
 
       const chart = echarts.init(el);
       chart.setOption({
-        tooltip: {},
+        tooltip: { show: false },
         visualMap: {
           show: false,
           dimension: 2,
@@ -87,6 +87,7 @@ Fourth-level headings should still render correctly even if they are not shown i
           boxHeight: 45,
           viewControl: { projection: "orthographic", distance: 190, alpha: 28, beta: 35 },
           light: { main: { intensity: 1.15 }, ambient: { intensity: 0.35 } },
+          axisPointer: { show: false },
         },
         series: [{
           type: "surface",

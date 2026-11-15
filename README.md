@@ -140,4 +140,4 @@ typst compile test.typ --features html --format html
 
 ![iTemplate demo page in light theme: a numbered sidebar table of contents, a Typst code sample, an interactive ECharts 3D surface chart, and a table](assets/test.png)
 
-HTML export is under active development, so the emitted markup may change between Typst releases. `bundle` export is unsupported; a PDF target renders the body without the HTML shell. Math fonts load from `fred-wang.github.io`, and unused import-map entries can be removed.
+HTML export is under active development, so the emitted markup may change between Typst releases. `bundle` export is unsupported; a PDF target renders the body without the HTML shell.

@@ -35,7 +35,7 @@
 
 这是一段普通正文，包含 *加粗强调*、_斜体强调_、`行内代码` 以及一个 #link("https://typst.app")[外部链接]。正文的行高与字距应当适合长文阅读。
 
-> 引用块用于承载摘录或旁注。左侧的发丝线应当与强调色一致，但不应过于抢眼。
+#quote(block: true)[引用块用于承载摘录或旁注。左侧的强调色边线应当与整体风格一致，但不应过于抢眼。]
 
 == 列表
 
@@ -126,6 +126,71 @@ $ integral_0^infinity e^(-x) dif x = 1 $
   html.script(
     type: "module",
     src: "https://unpkg.com/@hexiongwu1995/itemplate/examples/itemplate/three-orbital-cube.js",
+  )
+}
+
+== ECharts 三维曲面
+
+#context if (target() == "html") {
+  html.elem("div", attrs: (
+    id: "echarts-surface",
+    style: "width: 100%; height: 420px; margin-top: 12px;",
+  ))[]
+
+  html.script(src: "https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js")
+  html.script(src: "https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js")
+  html.script(
+    ```js
+    (() => {
+      const el = document.getElementById("echarts-surface");
+      if (!el || !window.echarts) return;
+
+      const range = 8;
+      const step = 0.25;
+      const data = [];
+      for (let x = -range; x <= range + 1e-6; x += step) {
+        for (let y = -range; y <= range + 1e-6; y += step) {
+          data.push([x, y, Math.sin(Math.sqrt(x * x + y * y))]);
+        }
+      }
+
+      const css = getComputedStyle(document.documentElement);
+      const accent = css.getPropertyValue("--accent").trim() || "#d97757";
+      const surface = css.getPropertyValue("--surface").trim() || "#f5f4ed";
+      const ink = css.getPropertyValue("--ink-muted").trim() || "#73726c";
+      const line = css.getPropertyValue("--line-strong").trim() || "rgba(31, 30, 29, 0.22)";
+      const axis = {
+        axisLabel: { textStyle: { color: ink } },
+        axisLine: { lineStyle: { color: line } },
+        splitLine: { lineStyle: { color: line } },
+        nameTextStyle: { color: ink },
+      };
+
+      const chart = echarts.init(el);
+      chart.setOption({
+        tooltip: {},
+        visualMap: {
+          show: false,
+          dimension: 2,
+          min: -1,
+          max: 1,
+          inRange: { color: [surface, accent] },
+        },
+        xAxis3D: { type: "value", name: "x", ...axis },
+        yAxis3D: { type: "value", name: "y", ...axis },
+        zAxis3D: { type: "value", name: "z", ...axis },
+        grid3D: {
+          boxWidth: 100,
+          boxDepth: 100,
+          boxHeight: 45,
+          viewControl: { distance: 190, alpha: 28, beta: 35 },
+          light: { main: { intensity: 1.15 }, ambient: { intensity: 0.35 } },
+        },
+        series: [{ type: "surface", data }],
+      });
+      window.addEventListener("resize", () => chart.resize());
+    })();
+    ```.text,
   )
 }
 

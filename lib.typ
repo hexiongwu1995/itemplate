@@ -5,41 +5,48 @@
 // Theme
 // ---------------------------------------------------------------------------
 
-// Light theme. Override any entry via itemplate(theme: (...)).
+// Light theme. Palette and typography follow the Claudette Typora theme:
+// warm paper, a single terracotta accent, serif headings, hairline rules.
 #let default-theme = (
-  bg: "#fcfcfd",
-  surface: "#f4f4f6",
-  "surface-strong": "#ebebef",
-  ink: "#17171b",
-  "ink-muted": "#6b6b76",
-  line: "rgba(23, 23, 27, 0.09)",
-  accent: "#0f766e",
-  "accent-soft": "#e6f4f1",
-  "accent-ink": "#0b4f4a",
-  "sidebar-bg": "#f7f7f9",
-  "header-bg": "rgba(252, 252, 253, 0.86)",
-  "code-bg": "#f4f4f6",
-  overlay: "rgba(17, 17, 20, 0.32)",
-  "font-ui": "\"Source Han Sans SC\", \"Noto Sans SC\", \"PingFang SC\", \"Microsoft YaHei\", system-ui, -apple-system, \"Segoe UI\", sans-serif",
-  "font-serif": "\"Source Han Serif SC\", \"Noto Serif SC\", \"Songti SC\", Georgia, serif",
-  "font-mono": "\"JetBrains Mono\", \"Cascadia Code\", ui-monospace, \"SF Mono\", Menlo, Consolas, monospace",
+  bg: "#faf9f5",
+  surface: "#f5f4ed",
+  "surface-strong": "#ece9df",
+  ink: "#141413",
+  "ink-muted": "#73726c",
+  "ink-faint": "#b0aea5",
+  line: "rgba(31, 30, 29, 0.12)",
+  "line-strong": "rgba(31, 30, 29, 0.22)",
+  accent: "#d97757",
+  "accent-soft": "rgba(217, 119, 87, 0.10)",
+  "accent-ink": "#c6613f",
+  "sidebar-bg": "#f2f0e9",
+  "header-bg": "rgba(250, 249, 245, 0.86)",
+  "code-bg": "#f5f4ed",
+  selection: "rgba(235, 201, 183, 0.55)",
+  overlay: "rgba(20, 20, 19, 0.32)",
+  "font-ui": "\"Inter\", \"Source Sans 3\", \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans SC\", system-ui, sans-serif",
+  "font-serif": "\"Source Serif 4\", \"Source Serif Pro\", Charter, Georgia, \"Noto Serif SC\", \"Source Han Serif SC\", \"Songti SC\", serif",
+  "font-mono": "\"JetBrains Mono\", \"Maple Mono NF CN\", \"Cascadia Code\", \"SF Mono\", Consolas, monospace",
   "font-math": "\"NewComputerModernMath\", \"Latin Modern Math\", \"STIX Two Math\", math",
 )
 
-// Dark theme. Only color tokens need overriding; fonts are inherited.
+// Dark theme tokens from Claudette Dark.
 #let default-dark-theme = (
-  bg: "#0d0e11",
-  surface: "#17181c",
-  "surface-strong": "#1f2026",
-  ink: "#e7e7ea",
-  "ink-muted": "#9b9ba4",
-  line: "rgba(231, 231, 234, 0.12)",
-  accent: "#5eead4",
-  "accent-soft": "#10312e",
-  "accent-ink": "#99f6e4",
-  "sidebar-bg": "#111216",
-  "header-bg": "rgba(13, 14, 17, 0.86)",
-  "code-bg": "#17181c",
+  bg: "#262625",
+  surface: "#2c2c2a",
+  "surface-strong": "#34332e",
+  ink: "#f2f0e9",
+  "ink-muted": "#b8b6a9",
+  "ink-faint": "#8b8a80",
+  line: "rgba(255, 255, 255, 0.10)",
+  "line-strong": "rgba(255, 255, 255, 0.20)",
+  accent: "#d97757",
+  "accent-soft": "rgba(217, 119, 87, 0.14)",
+  "accent-ink": "#e6906f",
+  "sidebar-bg": "#1f1f1e",
+  "header-bg": "rgba(38, 38, 37, 0.86)",
+  "code-bg": "#2c2c2a",
+  selection: "rgba(217, 119, 87, 0.35)",
   overlay: "rgba(0, 0, 0, 0.56)",
 )
 
@@ -86,8 +93,8 @@
         html.elem("button", attrs: (
           class: "toc-toggle",
           type: "button",
-          "aria-expanded": "true",
-          "aria-label": "折叠子目录",
+          "aria-expanded": "false",
+          "aria-label": "展开子目录",
         ), {
           html.elem("span", attrs: (class: "chevron"))
         })
@@ -100,6 +107,7 @@
     lis.push(html.elem("li", attrs: (
       class: "toc-item",
       "data-level": str(item.level),
+      ..(if child != none { ("data-collapsed": "true") } else { (:) }),
     ), body))
     i = next-i
   }
@@ -127,6 +135,9 @@
   context if target() == "html" {
     let resolved-theme = default-theme + theme
     let resolved-dark-theme = default-theme + default-dark-theme + dark-theme
+
+    // 侧边栏标题跟随文档语言：中文显示“目录”，其余（默认英文）显示 “CONTENTS”
+    let toc-label = if lang.starts-with("zh") { "目录" } else { "CONTENTS" }
 
     // Compile-time TOC. query(heading) sees the whole document, including
     // headings that appear after this sidebar in the DOM.
@@ -259,9 +270,9 @@
             --sidebar-w: 300px;
             --header-h: 64px;
             --app-h: 100vh;
-            --radius-sm: 6px;
-            --radius: 10px;
-            --radius-lg: 14px;
+            --radius-sm: 4px;
+            --radius: 8px;
+            --radius-lg: 12px;
             --ease: cubic-bezier(.32, .72, 0, 1);
             --dur: .28s;
             color-scheme: light dark;
@@ -282,21 +293,21 @@
             background: var(--bg);
             color: var(--ink);
             font-family: var(--font-ui);
-            font-size: 1rem;
-            line-height: 1.75;
+            font-size: 1.0625rem;
+            line-height: 1.7;
             -webkit-font-smoothing: antialiased;
             text-rendering: optimizeLegibility;
           }
 
-          ::selection { background: var(--accent-soft); color: var(--accent-ink); }
+          ::selection { background: var(--selection); color: inherit; }
 
           a {
-            color: var(--accent-ink);
+            color: inherit;
             text-decoration: none;
-            border-bottom: 1px solid var(--accent-soft);
-            transition: border-color .15s;
+            border-bottom: 1px solid var(--line-strong);
+            transition: color .15s, border-color .15s;
           }
-          a:hover { border-bottom-color: var(--accent); }
+          a:hover { color: var(--accent-ink); border-bottom-color: var(--accent-ink); }
 
           :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
@@ -355,16 +366,10 @@
             border-bottom: 1px solid var(--line);
           }
           .sidebar-heading { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-          .sidebar-kicker {
-            color: var(--ink-muted);
-            font-size: .6875rem;
-            letter-spacing: .14em;
-            text-transform: uppercase;
-          }
           .sidebar-title {
             font-family: var(--font-serif);
             font-size: 1.125rem;
-            font-weight: 600;
+            font-weight: 400;
             line-height: 1.3;
           }
 
@@ -382,6 +387,12 @@
           .toc-sub { margin-left: 13px; padding-left: 9px; border-left: 1px solid var(--line); }
           .toc-item { position: relative; }
           .toc-row { display: flex; align-items: center; gap: 2px; border-radius: var(--radius-sm); }
+          .toc-row:hover { background: var(--surface); }
+          .toc-row.is-active { background: var(--accent-soft); }
+          .toc-row.is-active .toc-link { color: var(--accent-ink); font-weight: 500; }
+          .toc-row.is-active .toc-num { color: var(--accent); }
+          .toc-row.is-active .toc-toggle { color: var(--accent-ink); }
+          .toc-row.is-active .toc-toggle:hover { background: transparent; }
 
           .toc-link {
             display: flex;
@@ -395,14 +406,9 @@
             color: var(--ink-muted);
             font-size: .875rem;
             line-height: 1.5;
-            transition: background .15s, color .15s;
+            transition: color .15s;
           }
-          .toc-link:hover { background: var(--surface); color: var(--ink); }
-          .toc-link.is-active {
-            background: var(--accent-soft);
-            color: var(--accent-ink);
-            font-weight: 500;
-          }
+          .toc-link:hover { color: var(--ink); }
 
           .toc-num {
             flex: none;
@@ -411,7 +417,6 @@
             font-size: .75rem;
             font-variant-numeric: tabular-nums;
           }
-          .toc-link.is-active .toc-num { color: var(--accent); }
           .toc-text { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
           .toc-toggle {
@@ -509,26 +514,32 @@
             -webkit-backdrop-filter: blur(14px);
           }
           .topbar-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
-          .topbar-right { display: flex; align-items: center; gap: 12px; }
 
-          .doc-heading { display: flex; flex-direction: column; gap: 1px; min-width: 0; line-height: 1.2; }
-          .doc-kicker {
-            color: var(--ink-muted);
-            font-size: .625rem;
-            letter-spacing: .16em;
-            text-transform: uppercase;
+          /* 文档标题在 header 内水平居中，左右留出按钮与安全间距 */
+          .doc-heading {
+            position: absolute;
+            top: 50%;
+            right: 70px;
+            left: 70px;
+            display: flex;
+            justify-content: center;
+            min-width: 0;
+            line-height: 1.2;
+            transform: translateY(-50%);
           }
           .doc-title {
+            max-width: 100%;
+            min-width: 0;
             margin: 0;
             overflow: hidden;
             color: var(--ink);
             font-family: var(--font-serif);
-            font-size: 1.0625rem;
-            font-weight: 600;
+            font-size: 1.125rem;
+            font-weight: 400;
+            text-align: center;
             text-overflow: ellipsis;
             white-space: nowrap;
           }
-          .doc-author { color: var(--ink-muted); font-size: .8125rem; white-space: nowrap; }
 
           .icon-btn {
             display: grid;
@@ -606,18 +617,17 @@
           .article h4,
           .article h5,
           .article h6 {
-            margin: 2.6em 0 .7em;
+            margin: 2em 0 .65em;
             color: var(--ink);
             font-family: var(--font-serif);
-            font-weight: 600;
-            line-height: 1.35;
-            scroll-margin-top: calc(var(--header-h) + env(safe-area-inset-top) + 24px);
+            font-weight: 400;
+            line-height: 1.3;
+            letter-spacing: -.005em;
+            scroll-margin-top: 10px;
           }
           .article h2 {
-            padding-bottom: .3em;
-            border-bottom: 1px solid var(--line);
-            font-size: clamp(1.6rem, 1.35rem + 1vw, 1.9rem);
-            letter-spacing: -.01em;
+            font-size: clamp(1.5rem, 1.3rem + .8vw, 1.75rem);
+            line-height: 1.2;
           }
           .article h3 { font-size: 1.375rem; }
           .article h4 { font-size: 1.125rem; }
@@ -627,14 +637,14 @@
 
           .article .h-num {
             display: inline-block;
-            margin-right: .55em;
-            color: var(--accent);
-            font-family: var(--font-ui);
-            font-size: .62em;
-            font-weight: 600;
+            margin-right: .5em;
+            color: var(--ink-faint);
+            font-family: var(--font-serif);
+            font-size: .58em;
+            font-weight: 400;
             font-variant-numeric: tabular-nums;
-            letter-spacing: .02em;
-            vertical-align: .12em;
+            letter-spacing: .01em;
+            vertical-align: .14em;
           }
 
           .article p { margin: 0 0 1.15em; }
@@ -642,38 +652,45 @@
           .article ul,
           .article ol { margin: 0 0 1.15em; padding-left: 1.5em; }
           .article li + li { margin-top: .3em; }
+          .article li::marker { color: var(--ink-muted); }
 
           .article blockquote {
-            margin: 1.5em 0;
-            padding: .2em 0 .2em 1.1em;
+            margin: 1.6em 0;
+            padding: 1em 1.25em;
             border-left: 2px solid var(--accent);
+            border-radius: 0 var(--radius) var(--radius) 0;
+            background: var(--surface);
             color: var(--ink-muted);
+            font-family: var(--font-serif);
+            font-size: 1.0625em;
           }
+          .article blockquote p { margin: 0 0 .7em; }
           .article blockquote p:last-child { margin-bottom: 0; }
 
-          .article hr { margin: 2.8em 0; border: 0; border-top: 1px solid var(--line); }
+          .article hr { margin: 2.5rem 0; border: 0; border-top: 1px solid var(--line); }
 
           .article code {
             padding: .12em .35em;
             border-radius: var(--radius-sm);
-            background: var(--code-bg);
+            background: var(--surface-strong);
             font-family: var(--font-mono);
             font-size: .875em;
           }
           .article pre {
-            margin: 1.5em 0;
-            padding: 16px 18px;
+            margin: 1.4em 0;
+            padding: 1rem 1.25rem;
             overflow-x: auto;
             border: 1px solid var(--line);
-            border-radius: var(--radius);
+            border-radius: var(--radius-lg);
             background: var(--code-bg);
             scrollbar-width: thin;
           }
           .article pre code {
             padding: 0;
             background: none;
-            font-size: .8125rem;
-            line-height: 1.65;
+            color: var(--ink-muted);
+            font-size: .875rem;
+            line-height: 1.6;
           }
 
           .article img {
@@ -698,9 +715,9 @@
             padding: .25em 0;
             overflow-x: auto;
             overflow-y: hidden;
-            scrollbar-width: none;
+            scrollbar-width: thin;
+            scrollbar-color: var(--line) transparent;
           }
-          .article math[display="block"]::-webkit-scrollbar { display: none; }
 
           /* Tables */
 
@@ -712,11 +729,17 @@
             overscroll-behavior-x: contain;
             border: 1px solid var(--line);
             border-radius: var(--radius);
-            scrollbar-width: none;
-            -ms-overflow-style: none;
+            scrollbar-width: thin;
+            scrollbar-color: var(--line) transparent;
             -webkit-overflow-scrolling: touch;
           }
-          .table-scroll::-webkit-scrollbar { display: none; }
+          .table-scroll::-webkit-scrollbar { height: 8px; }
+          .table-scroll::-webkit-scrollbar-track { background: transparent; }
+          .table-scroll::-webkit-scrollbar-thumb {
+            border: 2px solid var(--bg);
+            border-radius: 999px;
+            background: var(--line);
+          }
 
           .table-scroll table {
             width: max-content;
@@ -741,9 +764,6 @@
           }
           .table-scroll td { min-width: 6em; white-space: normal; }
           .table-scroll tr:last-child td { border-bottom: 0; }
-          .table-scroll tbody tr:nth-child(even) td {
-            background: color-mix(in srgb, var(--surface) 55%, transparent);
-          }
 
           .table-block::after {
             content: "";
@@ -779,6 +799,19 @@
             cursor: pointer;
           }
           .table-block[data-overflow="true"] .table-expand { display: grid; }
+
+          /* 触屏设备滑动即可滚动，隐藏横向滚动条；鼠标设备保留滚动条作为可滚动提示 */
+          @media (hover: none) and (pointer: coarse) {
+            .article pre,
+            .article math[display="block"],
+            .table-scroll {
+              scrollbar-width: none;
+              -ms-overflow-style: none;
+            }
+            .article pre::-webkit-scrollbar,
+            .article math[display="block"]::-webkit-scrollbar,
+            .table-scroll::-webkit-scrollbar { display: none; }
+          }
 
           @media (hover: hover) and (min-width: 1001px) {
             .table-expand { opacity: 0; transition: opacity .15s; }
@@ -913,13 +946,8 @@
             .mobile-only { display: grid; }
             .resize-handle { display: none; }
             .topbar { padding-right: 12px; padding-left: 12px; }
-            .doc-kicker { display: none; }
             .icon-btn { width: 40px; height: 40px; }
             .article { padding: 36px 20px 110px; }
-          }
-
-          @media (max-width: 560px) {
-            .doc-author { display: none; }
           }
 
           @media (min-width: 1001px) {
@@ -1101,21 +1129,30 @@
                 event.preventDefault();
                 const item = toggleBtn.closest(".toc-item");
                 if (!item) return;
-                const collapsed = item.dataset.collapsed === "true";
-                item.dataset.collapsed = collapsed ? "false" : "true";
-                toggleBtn.setAttribute("aria-expanded", collapsed ? "true" : "false");
-                toggleBtn.setAttribute("aria-label", collapsed ? "折叠子目录" : "展开子目录");
+                setItemCollapsed(item, item.dataset.collapsed !== "true");
                 return;
               }
 
               const link = event.target.closest(".toc-link");
-              if (link && isMobile()) setDrawer(false);
+              if (link) {
+                const href = link.getAttribute("href") || "";
+                if (href.startsWith("#")) {
+                  // 锁定 scrollspy，避免平滑滚动途中高亮跳到中间标题
+                  lockSpy(href.slice(1));
+                  setActiveLink(href.slice(1));
+                }
+                if (isMobile()) setDrawer(false);
+              }
             });
           }
 
           let headings = [];
           let activeId = "";
           let scheduled = false;
+          // 点击目录后，平滑滚动期间暂停 scrollspy 的高亮更新
+          let spyLocked = false;
+          let spyTargetId = "";
+          let spySettleTimer = 0;
 
           function collectHeadings() {
             const article = document.querySelector(".article");
@@ -1124,50 +1161,123 @@
               : [];
           }
 
-          function updateActiveHeading() {
-            scheduled = false;
-            if (!headings.length) return;
-            const topbar = document.querySelector(".topbar");
-            const offset = (topbar ? topbar.getBoundingClientRect().height : 64) + 24;
-            let current = headings[0];
-            for (const heading of headings) {
-              if (heading.getBoundingClientRect().top <= offset) current = heading;
-              else break;
-            }
-            if (!current || current.id === activeId) return;
-            activeId = current.id;
+          function setItemCollapsed(item, collapsed) {
+            item.dataset.collapsed = collapsed ? "true" : "false";
+            const btn = item.querySelector(":scope > .toc-row > .toc-toggle");
+            if (!btn) return;
+            btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
+            btn.setAttribute("aria-label", collapsed ? "展开子目录" : "折叠子目录");
+          }
 
-            tocLinks.forEach((link, id) => {
-              const active = id === current.id;
-              link.classList.toggle("is-active", active);
-              if (active) link.setAttribute("aria-current", "location");
-              else link.removeAttribute("aria-current");
-            });
-
-            const link = tocLinks.get(current.id);
-            if (!link) return;
-
+          function expandAncestors(link) {
             let item = link.closest(".toc-item");
+            item = item && item.parentElement ? item.parentElement.closest(".toc-item") : null;
             while (item) {
-              if (item.dataset.collapsed === "true") {
-                item.dataset.collapsed = "false";
-                const btn = item.querySelector(":scope > .toc-row > .toc-toggle");
-                if (btn) {
-                  btn.setAttribute("aria-expanded", "true");
-                  btn.setAttribute("aria-label", "折叠子目录");
-                }
-              }
+              if (item.dataset.collapsed === "true") setItemCollapsed(item, false);
               item = item.parentElement ? item.parentElement.closest(".toc-item") : null;
             }
+          }
 
+          // 手风琴式目录：只展开当前标题所在的路径，折叠其它已展开的分支
+          function syncTocTree(link) {
+            const item = link.closest(".toc-item");
+            if (!item) return;
+            expandAncestors(link);
+            tocRoot.querySelectorAll('.toc-item[data-collapsed="false"]').forEach((other) => {
+              if (!other.contains(item)) setItemCollapsed(other, true);
+            });
+          }
+
+          function scrollTocLinkIntoView(link) {
             const nav = link.closest(".toc-nav");
-            if (nav) {
-              const linkRect = link.getBoundingClientRect();
-              const navRect = nav.getBoundingClientRect();
-              if (linkRect.top < navRect.top + 8 || linkRect.bottom > navRect.bottom - 8) {
-                link.scrollIntoView({ block: "nearest" });
+            if (!nav) return;
+            const linkRect = link.getBoundingClientRect();
+            const navRect = nav.getBoundingClientRect();
+            const pad = 8;
+            if (linkRect.top < navRect.top + pad) {
+              nav.scrollTop -= navRect.top + pad - linkRect.top;
+            } else if (linkRect.bottom > navRect.bottom - pad) {
+              nav.scrollTop += linkRect.bottom - (navRect.bottom - pad);
+            }
+          }
+
+          // 高亮当前标题；目录树跟随滚动，展开当前路径并折叠其它分支
+          function setActiveLink(id) {
+            if (!id) return;
+            const link = tocLinks.get(id);
+            if (!link) return;
+
+            if (id !== activeId) {
+              activeId = id;
+              tocLinks.forEach((other, lid) => {
+                const active = lid === id;
+                other.classList.toggle("is-active", active);
+                const row = other.closest(".toc-row");
+                if (row) row.classList.toggle("is-active", active);
+                if (active) other.setAttribute("aria-current", "location");
+                else other.removeAttribute("aria-current");
+              });
+              syncTocTree(link);
+            }
+
+            scrollTocLinkIntoView(link);
+          }
+
+          function lockSpy(id) {
+            spyLocked = true;
+            spyTargetId = id;
+            clearTimeout(spySettleTimer);
+            // 兜底：目标无法滚动到顶部（如页面末尾）时也要恢复 scrollspy
+            spySettleTimer = setTimeout(releaseSpy, 1600);
+          }
+
+          // 目标标题是否已抵达 header 下方的落点（scroll-margin-top: 10px）
+          function spyReachedTarget() {
+            if (!spyTargetId) return true;
+            const target = document.getElementById(spyTargetId);
+            if (!target) return true;
+            const topbar = document.querySelector(".topbar");
+            const headerH = topbar ? topbar.getBoundingClientRect().height : 64;
+            const top = target.getBoundingClientRect().top;
+            return top >= headerH - 1 && top <= headerH + 20;
+          }
+
+          function releaseSpy() {
+            clearTimeout(spySettleTimer);
+            spySettleTimer = 0;
+            if (!spyLocked) return;
+            spyLocked = false;
+
+            const id = spyTargetId;
+            spyTargetId = "";
+            const target = id ? document.getElementById(id) : null;
+            if (target) {
+              const topbar = document.querySelector(".topbar");
+              const headerH = topbar ? topbar.getBoundingClientRect().height : 64;
+              const rect = target.getBoundingClientRect();
+              // 目标仍在视口内（页面末尾无法滚到顶部）则保持高亮
+              if (rect.top < window.innerHeight && rect.bottom > headerH) {
+                setActiveLink(id);
+                return;
               }
             }
+            updateActiveHeading();
+          }
+
+          function updateActiveHeading() {
+            scheduled = false;
+            if (spyLocked) return;
+            if (!headings.length) return;
+            const topbar = document.querySelector(".topbar");
+            // 判定线：header 底部下方 10px，与 scroll-margin-top 一致
+            const offset = (topbar ? topbar.getBoundingClientRect().height : 64) + 10;
+            let current = headings[0];
+            for (const heading of headings) {
+              // +1px 容差，避免落点处的浮点误差导致高亮回退
+              if (heading.getBoundingClientRect().top <= offset + 1) current = heading;
+              else break;
+            }
+            if (current) setActiveLink(current.id);
           }
 
           function scheduleActiveHeading() {
@@ -1176,14 +1286,34 @@
             requestAnimationFrame(updateActiveHeading);
           }
 
-          if (content) content.addEventListener("scroll", scheduleActiveHeading, { passive: true });
+          if (content) {
+            content.addEventListener("scroll", () => {
+              if (spyLocked) {
+                // 平滑滚动途中锁定高亮，抵达目标落点后立即恢复 scrollspy
+                if (spyReachedTarget()) releaseSpy();
+                return;
+              }
+              scheduleActiveHeading();
+            }, { passive: true });
+            content.addEventListener("scrollend", releaseSpy, { passive: true });
+            // 用户主动滚动时立即交还控制权，避免高亮长时间冻结
+            ["wheel", "touchstart"].forEach((type) => {
+              content.addEventListener(type, () => {
+                if (spyLocked) releaseSpy();
+              }, { passive: true });
+            });
+          }
           window.addEventListener("resize", scheduleActiveHeading);
           collectHeadings();
           scheduleActiveHeading();
 
           if (location.hash.length > 1) {
+            const id = location.hash.slice(1);
+            const link = tocLinks.get(id);
+            if (link) setActiveLink(id);
+            lockSpy(id);
             requestAnimationFrame(() => {
-              const target = document.getElementById(location.hash.slice(1));
+              const target = document.getElementById(id);
               if (target) target.scrollIntoView({ block: "start" });
             });
           }
@@ -1445,8 +1575,7 @@
           ), {
             html.elem("div", attrs: (class: "sidebar-head"), {
               html.elem("div", attrs: (class: "sidebar-heading"), {
-                html.elem("span", attrs: (class: "sidebar-kicker"), "CONTENTS")
-                html.elem("span", attrs: (class: "sidebar-title"), "目录")
+                html.elem("span", attrs: (class: "sidebar-title"), toc-label)
               })
               html.elem("button", attrs: (
                 id: "sidebar-close",
@@ -1493,15 +1622,8 @@
                 })
 
                 html.elem("div", attrs: (class: "doc-heading"), {
-                  html.elem("span", attrs: (class: "doc-kicker"), "DOCUMENT")
                   html.elem("h1", attrs: (class: "doc-title"), doc-title)
                 })
-              })
-
-              html.elem("div", attrs: (class: "topbar-right"), {
-                if doc-author != "" {
-                  html.elem("span", attrs: (class: "doc-author"), doc-author)
-                }
               })
             })
 

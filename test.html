@@ -6,7 +6,7 @@
   if (savedTheme === "light" || savedTheme === "dark" || savedTheme === "green") {
     document.documentElement.dataset.theme = savedTheme;
   }
-} catch (error) {}</script><link rel="preconnect" href="https://fred-wang.github.io"><link rel="stylesheet" blocking="blocking" href="https://fred-wang.github.io/MathFonts/LatinModern/mathfonts.css"><script type="importmap">{
+} catch (error) {}</script><link rel="preconnect" href="https://fonts.googleapis.cn"><link rel="preconnect" href="https://fonts.gstatic.cn" crossorigin="anonymous"><link rel="stylesheet" href="https://fonts.googleapis.cn/css2?family=STIX+Two+Math&amp;display=swap"><script type="importmap">{
   "imports": {
     "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
     "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/",
@@ -36,7 +36,7 @@
   --font-ui: "Inter", "Source Sans 3", "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
   --font-serif: "Source Serif 4", "Source Serif Pro", Charter, Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
   --font-mono: "JetBrains Mono", "Maple Mono NF CN", "Cascadia Code", "SF Mono", Consolas, monospace;
-  --font-math: "NewComputerModernMath", "Latin Modern Math", "STIX Two Math", math;
+  --font-math: "STIX Two Math", "NewComputerModernMath", "Latin Modern Math", math;
 }</style><style>:root[data-theme='green'] {
   --bg: #f6f9f3;
   --surface: #eef4ea;
@@ -57,7 +57,7 @@
   --font-ui: "Inter", "Source Sans 3", "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
   --font-serif: "Source Serif 4", "Source Serif Pro", Charter, Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
   --font-mono: "JetBrains Mono", "Maple Mono NF CN", "Cascadia Code", "SF Mono", Consolas, monospace;
-  --font-math: "NewComputerModernMath", "Latin Modern Math", "STIX Two Math", math;
+  --font-math: "STIX Two Math", "NewComputerModernMath", "Latin Modern Math", math;
 }</style><style>:root[data-theme='dark'] {
   --bg: #262625;
   --surface: #2c2c2a;
@@ -78,7 +78,7 @@
   --font-ui: "Inter", "Source Sans 3", "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
   --font-serif: "Source Serif 4", "Source Serif Pro", Charter, Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
   --font-mono: "JetBrains Mono", "Maple Mono NF CN", "Cascadia Code", "SF Mono", Consolas, monospace;
-  --font-math: "NewComputerModernMath", "Latin Modern Math", "STIX Two Math", math;
+  --font-math: "STIX Two Math", "NewComputerModernMath", "Latin Modern Math", math;
 }</style><style>@media (prefers-color-scheme: dark) {
 :root:not([data-theme]) {
   --bg: #262625;
@@ -100,7 +100,7 @@
   --font-ui: "Inter", "Source Sans 3", "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
   --font-serif: "Source Serif 4", "Source Serif Pro", Charter, Georgia, "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
   --font-mono: "JetBrains Mono", "Maple Mono NF CN", "Cascadia Code", "SF Mono", Consolas, monospace;
-  --font-math: "NewComputerModernMath", "Latin Modern Math", "STIX Two Math", math;
+  --font-math: "STIX Two Math", "NewComputerModernMath", "Latin Modern Math", math;
 }
 }</style><style>:root {
   --sidebar-w: 300px;
@@ -499,11 +499,10 @@ html.sidebar-preclosed .sidebar { border-right-color: transparent; }
   margin-right: .5em;
   color: var(--ink-faint);
   font-family: var(--font-serif);
-  font-size: .58em;
+  font-size: inherit;
   font-weight: 400;
   font-variant-numeric: tabular-nums;
   letter-spacing: .01em;
-  vertical-align: .14em;
 }
 
 .article p { margin: 0 0 1.15em; }

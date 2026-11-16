@@ -698,11 +698,10 @@
             margin-right: .5em;
             color: var(--ink-faint);
             font-family: var(--font-serif);
-            font-size: .58em;
+            font-size: inherit;
             font-weight: 400;
             font-variant-numeric: tabular-nums;
             letter-spacing: .01em;
-            vertical-align: .14em;
           }
 
           .article p { margin: 0 0 1.15em; }

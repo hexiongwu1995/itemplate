@@ -117,16 +117,42 @@ Wide tables scroll inside their own container instead of stretching the page.
 
 `doc-title` is shown in the top bar and sidebar footer; `doc-author` is optional.
 
-`heading-numbering` controls the numbering assigned to headings (default `"1.1.1"`). Pass `none` to hide heading numbers. A `#set heading(numbering: ...)` placed after the show rule still takes precedence.
+### `heading-numbering`
 
-`import-map` controls the import map emitted for client-side modules. It defaults to `auto`, which uses the bundled `default-import-map`. Pass a dictionary to replace it, merge additions with `default-import-map + (...)`, or pass `(:)` to emit no import map:
+Numbering pattern applied to headings. Defaults to `"1.1.1"`.
 
 ```typst
+#show: itemplate.with(
+  // "1.1.1" (default), "1.1", or `none` to hide numbers
+  heading-numbering: "1.1",
+)
+```
+
+Pass `none` to hide heading numbers; anchors stay unique and the TOC still lists every section. A `#set heading(numbering: ...)` placed *after* the show rule still takes precedence, so document-level rules win. A `#set` placed *before* the show rule is overwritten by this parameter — use the argument instead.
+
+### `import-map`
+
+Controls the `<script type="importmap">` emitted for client-side modules. Defaults to `auto`, which emits the bundled `default-import-map`:
+
+`three`, `three/addons/`, `cannon-es`, `fundamental-physical-constants`, `plotly`, `echarts`, `echarts-gl`.
+
+Pass a dictionary to replace it, merge your own entries into the defaults with `default-import-map + (...)`, or pass `(:)` to emit no import map:
+
+```typst
+// Keep the defaults and add d3
 #show: itemplate.with(
   import-map: default-import-map + (
     "d3": "https://cdn.jsdelivr.net/npm/d3@7/+esm",
   ),
 )
+
+// Replace the defaults entirely
+#show: itemplate.with(
+  import-map: ("d3": "https://cdn.jsdelivr.net/npm/d3@7/+esm"),
+)
+
+// Disable the import map
+#show: itemplate.with(import-map: (:))
 ```
 
 Client-side interface labels follow `lang`: `zh*` uses the Chinese dictionary, everything else falls back to English.

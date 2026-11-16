@@ -1,6 +1,6 @@
 # itemplate
 
-`itemplate` turns Typst markup into a documentation site with a modern academic look: a numbered, collapsible sidebar table of contents, a responsive article column, horizontally scrolling tables with a fullscreen view, light and dark themes, and a built-in import map for `echarts`, `echarts-gl`, and `plotly`. Developed completely by AI tools, can't confirm stability and reliability, use with caution.
+`itemplate` turns Typst markup into a documentation site with a modern academic look: a numbered, collapsible sidebar table of contents, a responsive article column, horizontally scrolling tables with a fullscreen view, light, green, and dark themes, and a built-in import map for `echarts`, `echarts-gl`, and `plotly`. Developed completely by AI tools, can't confirm stability and reliability, use with caution.
 
 ## Usage
 
@@ -15,7 +15,7 @@
 
 = Introduction
 
-iTemplate turns Typst markup into a documentation site with a numbered sidebar table of contents, a responsive article column, and light and dark themes.
+iTemplate turns Typst markup into a documentation site with a numbered sidebar table of contents, a responsive article column, and light, green, and dark themes.
 
 == Text
 
@@ -117,11 +117,25 @@ Wide tables scroll inside their own container instead of stretching the page.
 
 `doc-title` is shown in the top bar and sidebar footer; `doc-author` is optional.
 
+`heading-numbering` controls the numbering assigned to headings (default `"1.1.1"`). Pass `none` to hide heading numbers. A `#set heading(numbering: ...)` placed after the show rule still takes precedence.
+
+`import-map` controls the import map emitted for client-side modules. It defaults to `auto`, which uses the bundled `default-import-map`. Pass a dictionary to replace it, merge additions with `default-import-map + (...)`, or pass `(:)` to emit no import map:
+
+```typst
+#show: itemplate.with(
+  import-map: default-import-map + (
+    "d3": "https://cdn.jsdelivr.net/npm/d3@7/+esm",
+  ),
+)
+```
+
+Client-side interface labels follow `lang`: `zh*` uses the Chinese dictionary, everything else falls back to English.
+
 The ECharts surface needs WebGL. Without JavaScript the container stays blank, so place charts in sections that read fine without them.
 
 ## Theme
 
-Override any token; values may be Typst colors or raw CSS color strings.
+Override any token; values may be Typst colors or raw CSS color strings. `theme` applies to both the light and green themes; `dark-theme` only overrides the dark theme. The theme button cycles light → green → dark.
 
 ```typst
 #show: itemplate.with(

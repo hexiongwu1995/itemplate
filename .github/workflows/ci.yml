@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        typst: ["0.15.0", "0.15.1"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install Typst ${{ matrix.typst }}
+        run: |
+          curl -fsSL \
+            "https://github.com/typst/typst/releases/download/v${{ matrix.typst }}/typst-x86_64-unknown-linux-musl.tar.xz" \
+            -o /tmp/typst.tar.xz
+          tar -xJf /tmp/typst.tar.xz -C /tmp
+          sudo install /tmp/typst-x86_64-unknown-linux-musl/typst /usr/local/bin/typst
+          typst --version
+
+      - name: Run smoke tests
+        run: python3 tests/run-tests.py
+
+      - name: Upload generated HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-html-typst-${{ matrix.typst }}
+          path: tests/output
+          if-no-files-found: ignore

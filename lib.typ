@@ -82,27 +82,107 @@
 }
 
 // ---------------------------------------------------------------------------
+// Interface strings
+// ---------------------------------------------------------------------------
+
+#let ui-strings = (
+  en: (
+    "toc-label": "CONTENTS",
+    "toc-nav-label": "Table of contents",
+    "toc-empty": "No sections yet",
+    "toc-expand": "Expand subsection",
+    "toc-collapse": "Collapse subsection",
+    "table-region": "Table, horizontally scrollable",
+    "table-expand": "View table fullscreen",
+    "table-exit": "Exit fullscreen",
+    "skip-content": "Skip to content",
+    "sidebar-label": "Document contents",
+    "sidebar-close": "Close contents",
+    "sidebar-expand": "Expand contents",
+    "sidebar-collapse": "Collapse contents",
+    "sidebar-resize": "Resize contents",
+    "theme-toggle": "Toggle theme",
+    "theme-current": "Toggle theme (current: {name})",
+    "theme-light": "Light",
+    "theme-green": "Green",
+    "theme-dark": "Dark",
+  ),
+  zh: (
+    "toc-label": "目录",
+    "toc-nav-label": "目录",
+    "toc-empty": "暂无目录",
+    "toc-expand": "展开子目录",
+    "toc-collapse": "折叠子目录",
+    "table-region": "表格，可横向滚动",
+    "table-expand": "全屏查看表格",
+    "table-exit": "退出全屏",
+    "skip-content": "跳到正文",
+    "sidebar-label": "文档目录",
+    "sidebar-close": "关闭目录",
+    "sidebar-expand": "展开目录",
+    "sidebar-collapse": "收起目录",
+    "sidebar-resize": "调整目录宽度",
+    "theme-toggle": "切换主题",
+    "theme-current": "切换主题（当前：{name}）",
+    "theme-light": "浅色",
+    "theme-green": "浅绿",
+    "theme-dark": "深色",
+  ),
+)
+
+// UI labels fall back to English for languages without a translation.
+#let resolve-ui-strings(lang) = {
+  let base = ui-strings.en
+  if lang.starts-with("zh") { base + ui-strings.zh } else { base }
+}
+
+// ---------------------------------------------------------------------------
+// Import map
+// ---------------------------------------------------------------------------
+
+// Defaults used when `import-map` is `auto`. Pass `import-map: (:)` to emit
+// no import map, or merge your own entries into this dictionary.
+#let default-import-map = (
+  "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/",
+  "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js",
+  "fundamental-physical-constants": "https://unpkg.com/fundamental-physical-constants/FundamentalPhysicalConstants.js",
+  "plotly": "https://cdn.jsdelivr.net/npm/plotly.js-dist-min@4.3.0/+esm",
+  "echarts": "https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.esm.min.js",
+  "echarts-gl": "https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js",
+)
+
+// ---------------------------------------------------------------------------
 // Compile-time table of contents
 // ---------------------------------------------------------------------------
 
-// Builds a nested <ol> from a flat heading list. `level` is the absolute
-// Typst heading level (1 = "="), `depth` is the nesting depth in the TOC.
-#let build-toc-level(items, start, level, depth: 1) = {
+// Single source of truth for heading anchors, shared by the TOC and headings.
+#let heading-id(nums) = "sec-" + nums.map(str).join("-")
+
+// Builds a nested <ol> from a flat heading list. `parent-level` is the level
+// of the enclosing TOC entry (0 for the root), so any heading deeper than the
+// parent is consumed as a child. This keeps all headings when levels skip.
+#let build-toc-level(items, start, parent-level, strings, depth: 1) = {
   let lis = ()
   let i = start
-  while i < items.len() and items.at(i).level >= level {
-    if items.at(i).level > level { break }
+  while i < items.len() and items.at(i).level > parent-level {
     let item = items.at(i)
     let child = none
     let next-i = i + 1
-    if i + 1 < items.len() and items.at(i + 1).level > level {
-      let (sub, ni) = build-toc-level(items, i + 1, items.at(i + 1).level, depth: depth + 1)
+    if next-i < items.len() and items.at(next-i).level > item.level {
+      let (sub, ni) = build-toc-level(
+        items,
+        next-i,
+        item.level,
+        strings,
+        depth: depth + 1,
+      )
       child = sub
       next-i = ni
     }
 
     let link = html.elem("a", attrs: (class: "toc-link", href: "#" + item.id), {
-      if item.num != "" {
+      if item.num != none {
         html.elem("span", attrs: (class: "toc-num"), item.num)
       }
       html.elem("span", attrs: (class: "toc-text"), item.body)
@@ -115,7 +195,7 @@
           class: "toc-toggle",
           type: "button",
           "aria-expanded": "false",
-          "aria-label": "展开子目录",
+          "aria-label": strings.at("toc-expand"),
         ), {
           html.elem("span", attrs: (class: "chevron"))
         })
@@ -151,43 +231,58 @@
   lang: "en",
   theme: (:),
   dark-theme: (:),
+  // Heading numbering used by the document. A `#set heading(numbering: ...)`
+  // placed after the show rule still takes precedence. Pass `none` to hide
+  // numbers while keeping stable heading anchors.
+  heading-numbering: "1.1.1",
+  // `auto` emits `default-import-map`; a dictionary replaces it. Merge your
+  // own entries with `default-import-map + (...)`, or use `(:)` to disable.
+  import-map: auto,
   body,
 ) = {
   context if target() == "html" {
     let resolved-theme = default-theme + theme
-    let resolved-green-theme = default-theme + default-green-theme
+    let resolved-green-theme = default-theme + default-green-theme + theme
     let resolved-dark-theme = default-theme + default-dark-theme + dark-theme
-
-    // 侧边栏标题跟随文档语言：中文显示“目录”，其余（默认英文）显示 “CONTENTS”
-    let toc-label = if lang.starts-with("zh") { "目录" } else { "CONTENTS" }
+    let resolved-import-map = if import-map == auto { default-import-map } else { import-map }
+    // Headings need a numbering pattern for the heading counter to advance.
+    // When numbers are hidden, use an internal pattern so anchors stay unique.
+    let internal-heading-numbering = if heading-numbering == none { "1.1.1" } else { heading-numbering }
+    let show-heading-numbers = heading-numbering != none
+    let s = resolve-ui-strings(lang)
+    let toc-label = s.at("toc-label")
 
     // Compile-time TOC. query(heading) sees the whole document, including
     // headings that appear after this sidebar in the DOM.
     let headings = query(heading)
     let toc = if headings.len() == 0 {
-      html.elem("p", attrs: (class: "toc-empty"), "暂无目录")
+      html.elem("p", attrs: (class: "toc-empty"), s.at("toc-empty"))
     } else {
       let items = headings.map(h => {
         let nums = counter(heading).at(h.location())
         (
           level: h.level,
           body: h.body,
-          num: if h.numbering != none { nums.map(str).join(".") } else { "" },
-          id: "sec-" + nums.map(str).join("-"),
+          num: if show-heading-numbers and h.numbering != none {
+            numbering(h.numbering, ..nums)
+          } else {
+            none
+          },
+          id: heading-id(nums),
         )
       })
-      let (root, _) = build-toc-level(items, 0, items.first().level)
+      let (root, _) = build-toc-level(items, 0, 0, s)
       root
     }
 
-    set heading(numbering: "1.1.1")
+    set heading(numbering: internal-heading-numbering)
 
     show heading: it => {
       if target() == "html" or target() == "bundle" {
         context {
           let nums = counter(heading).get()
-          let id = "sec-" + nums.map(str).join("-")
-          let num = if it.numbering != none {
+          let id = heading-id(nums)
+          let num = if show-heading-numbers and it.numbering != none {
             counter(heading).display(it.numbering)
           } else {
             none
@@ -212,25 +307,38 @@
             class: "table-scroll",
             tabindex: "0",
             role: "region",
-            "aria-label": "表格，可横向滚动",
+            "aria-label": s.at("table-region"),
           ), it)
           html.elem("button", attrs: (
             class: "table-expand",
             type: "button",
-            "aria-label": "全屏查看表格",
+            "aria-label": s.at("table-expand"),
           ), {
             html.elem("span", attrs: (class: "icon-expand"))
           })
           html.elem("button", attrs: (
             class: "table-exit",
             type: "button",
-            "aria-label": "退出全屏",
+            "aria-label": s.at("table-exit"),
           ), "×")
         })
       } else {
         it
       }
     }
+
+    // Strings consumed by the client-side script. Keep these plain strings so
+    // they can be embedded as JSON.
+    let ui = (
+      themeLight: s.at("theme-light"),
+      themeGreen: s.at("theme-green"),
+      themeDark: s.at("theme-dark"),
+      themeCurrent: s.at("theme-current"),
+      tocExpand: s.at("toc-expand"),
+      tocCollapse: s.at("toc-collapse"),
+      sidebarExpand: s.at("sidebar-expand"),
+      sidebarCollapse: s.at("sidebar-collapse"),
+    )
 
     html.html(lang: lang, {
       html.head({
@@ -273,22 +381,12 @@
           href: "https://fonts.googleapis.cn/css2?family=STIX+Two+Math&display=swap",
         )
 
-        html.script(
-          type: "importmap",
-          ```json
-          {
-            "imports": {
-              "three": "https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js",
-              "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.185.1/examples/jsm/",
-              "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/dist/cannon-es.js",
-              "fundamental-physical-constants": "https://unpkg.com/fundamental-physical-constants/FundamentalPhysicalConstants.js",
-              "plotly": "https://cdn.jsdelivr.net/npm/plotly.js-dist-min@4.3.0/+esm",
-              "echarts": "https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.esm.min.js",
-              "echarts-gl": "https://cdn.jsdelivr.net/npm/echarts-gl@2.0.9/dist/echarts-gl.min.js"
-            }
-          }
-          ```.text,
-        )
+        if resolved-import-map.len() > 0 {
+          html.script(
+            type: "importmap",
+            json.encode((imports: resolved-import-map)),
+          )
+        }
 
         html.style(theme-to-css(resolved-theme))
         html.style(theme-to-css(resolved-green-theme, selector: ":root[data-theme='green']"))
@@ -1071,7 +1169,7 @@
 
         html.script(
           type: "module",
-          ```js
+          "const ui = " + json.encode(ui) + ";\n" + ```js
           const mq = window.matchMedia("(max-width: 1000px)");
           const docEl = document.documentElement;
           const shell = document.querySelector(".shell");
@@ -1094,12 +1192,16 @@
             try { return localStorage.getItem(key); } catch (error) { return null; }
           }
 
-          /* Theme switching: light → dark → green */
+          /* Theme switching: light → green → dark */
 
           const themeToggle = document.getElementById("theme-toggle");
           const themeQuery = window.matchMedia("(prefers-color-scheme: dark)");
-          const themeOrder = ["light", "dark", "green"];
-          const themeNames = { light: "浅色", dark: "深色", green: "浅绿" };
+          const themeOrder = ["light", "green", "dark"];
+          const themeNames = {
+            light: ui.themeLight,
+            green: ui.themeGreen,
+            dark: ui.themeDark,
+          };
 
           function effectiveTheme() {
             return docEl.dataset.theme || (themeQuery.matches ? "dark" : "light");
@@ -1107,7 +1209,8 @@
 
           function syncThemeButton() {
             if (!themeToggle) return;
-            const label = "切换主题（当前：" + (themeNames[effectiveTheme()] || "浅色") + "）";
+            const name = themeNames[effectiveTheme()] || themeNames.light;
+            const label = ui.themeCurrent.replace("{name}", name);
             themeToggle.setAttribute("aria-label", label);
             themeToggle.setAttribute("title", label);
           }
@@ -1135,7 +1238,7 @@
             const open = sidebarIsOpen();
             if (toggle) {
               toggle.setAttribute("aria-expanded", open ? "true" : "false");
-              toggle.setAttribute("aria-label", open ? "收起目录" : "展开目录");
+              toggle.setAttribute("aria-label", open ? ui.sidebarCollapse : ui.sidebarExpand);
             }
             if (sidebar) {
               sidebar.inert = !open;
@@ -1255,7 +1358,7 @@
             const btn = item.querySelector(":scope > .toc-row > .toc-toggle");
             if (!btn) return;
             btn.setAttribute("aria-expanded", collapsed ? "false" : "true");
-            btn.setAttribute("aria-label", collapsed ? "展开子目录" : "折叠子目录");
+            btn.setAttribute("aria-label", collapsed ? ui.tocExpand : ui.tocCollapse);
           }
 
           function expandAncestors(link) {
@@ -1654,13 +1757,13 @@
       })
 
       html.body({
-        html.elem("a", attrs: (class: "skip-link", href: "#content"), "跳到正文")
+        html.elem("a", attrs: (class: "skip-link", href: "#content"), s.at("skip-content"))
 
         html.elem("div", attrs: (class: "shell"), {
           html.elem("aside", attrs: (
             id: "sidebar",
             class: "sidebar",
-            "aria-label": "文档目录",
+            "aria-label": s.at("sidebar-label"),
           ), {
             html.elem("div", attrs: (class: "sidebar-head"), {
               html.elem("div", attrs: (class: "sidebar-heading"), {
@@ -1670,13 +1773,13 @@
                 id: "sidebar-close",
                 class: "icon-btn mobile-only",
                 type: "button",
-                "aria-label": "关闭目录",
+                "aria-label": s.at("sidebar-close"),
               ), {
                 html.elem("span", attrs: (class: "icon-close"))
               })
             })
 
-            html.elem("nav", attrs: (class: "toc-nav", "aria-label": "目录"), toc)
+            html.elem("nav", attrs: (class: "toc-nav", "aria-label": s.at("toc-nav-label")), toc)
 
             html.elem("div", attrs: (class: "sidebar-foot"), {
               html.elem("span", attrs: (class: "sidebar-foot-title"), doc-title)
@@ -1689,7 +1792,7 @@
               class: "resize-handle",
               role: "separator",
               "aria-orientation": "vertical",
-              "aria-label": "调整目录宽度",
+              "aria-label": s.at("sidebar-resize"),
               tabindex: "0",
             ))
           })
@@ -1703,7 +1806,7 @@
                   id: "sidebar-toggle",
                   class: "icon-btn",
                   type: "button",
-                  "aria-label": "收起目录",
+                  "aria-label": s.at("sidebar-collapse"),
                   "aria-controls": "sidebar",
                   "aria-expanded": "true",
                 ), {
@@ -1720,8 +1823,8 @@
                   id: "theme-toggle",
                   class: "icon-btn",
                   type: "button",
-                  title: "切换主题",
-                  "aria-label": "切换主题",
+                  title: s.at("theme-toggle"),
+                  "aria-label": s.at("theme-toggle"),
                 ), {
                   html.elem("span", attrs: (class: "icon-theme"))
                 })

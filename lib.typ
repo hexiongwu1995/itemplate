@@ -1021,6 +1021,7 @@
           .lil-gui {
             --background-color: var(--surface);
             --title-background-color: var(--surface-strong);
+            --title-text-color: var(--ink);
             --widget-color: var(--surface-strong);
             --hover-color: var(--surface-strong);
             --text-color: var(--ink);

@@ -5,12 +5,21 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - uses: actions/checkout@v7
@@ -18,7 +27,8 @@ jobs:
       - uses: actions/upload-pages-artifact@v5
         with:
           path: .
-      - uses: actions/deploy-pages@v5
+      - id: deployment
+        uses: actions/deploy-pages@v5
 
 # 在 Marketplace 卡片上，官方 action 的图标是 GitHub 的蓝色 Octocat 标志 ，发布者显示为 GitHub。
 # 判断官方与否 只看`owner/repo` 前缀 ，不看标题里有没有 "GitHub Pages"。

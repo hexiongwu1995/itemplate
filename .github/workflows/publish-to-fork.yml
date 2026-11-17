@@ -41,24 +41,6 @@ jobs:
           fi
           echo "VERSION=${TAG}" >> "$GITHUB_ENV"
 
-      - name: Extract changelog entry for PR description
-        run: |
-          # 从 README.md 的 Changelog 章节中，提取从 `### v${VERSION}` 到下一个 `### v` 之间的内容
-          CHANGELOG_ENTRY=$(awk '
-            /^## Changelog/ { in_changelog = 1 }
-            in_changelog && $0 ~ /^### v'"${VERSION}"' / { entry_start = 1 }
-            entry_start && /^### v/ && $0 !~ /^### v'"${VERSION}"' / { exit }
-            entry_start { print }
-          ' README.md)
-          if [ -z "$CHANGELOG_ENTRY" ]; then
-            CHANGELOG_ENTRY="(changelog entry not found in README)"
-          fi
-          echo "CHANGELOG_ENTRY<<EOF" >> "$GITHUB_ENV"
-          echo "$CHANGELOG_ENTRY" >> "$GITHUB_ENV"
-          echo "EOF" >> "$GITHUB_ENV"
-          echo "Extracted changelog entry:"
-          echo "$CHANGELOG_ENTRY"
-
       - name: Sync fork with upstream typst/packages
         env:
           GH_TOKEN: ${{ secrets.PACKAGES_PAT }}
@@ -94,7 +76,6 @@ jobs:
             lib.typ \
             LICENSE \
             README.md \
-            src \
             typst.toml \
             "${DEST}/"
 
@@ -108,37 +89,33 @@ jobs:
           git commit -m "itemplate:${VERSION}"
           git push -u --force origin "itemplate-${VERSION}"
 
-      - name: Create pull request to typst/packages
-        working-directory: packages
-        env:
-          GH_TOKEN: ${{ secrets.PACKAGES_PAT }}
-        run: |
-          PR_BODY_FILE="${RUNNER_TEMP}/itemplate-pr-body.md"
-          cat > "${PR_BODY_FILE}" <<EOF
-          I am submitting
-          - [ ] a new package
-          - [x] an update for a package
+      # - name: Create pull request to typst/packages
+      #   working-directory: packages
+      #   env:
+      #     GH_TOKEN: ${{ secrets.PACKAGES_PAT }}
+      #   run: |
+      #     gh pr create \
+      #       --repo typst/packages \
+      #       --base main \
+      #       --head "hexiongwu1995:itemplate-${VERSION}" \
+      #       --title "itemplate:${VERSION}" \
+      #       --body "$(cat <<'EOF'
+      #     I am submitting
+      #     - [ ] a new package
+      #     - [x] an update for a package
 
-          Description:
+      #     Description: .
 
-          ${CHANGELOG_ENTRY}
+      #     These are the changes from the previous release: https://github.com/hexiongwu1995/itemplate/releases
 
-          Full changelog: https://github.com/hexiongwu1995/itemplate#changelog
-          Previous release notes: https://github.com/hexiongwu1995/itemplate/releases
-
-          <!--
-          The following are required for a package to be accepted:
-          - The package name is unique
-          - The package contains a \`typst.toml\` file with the \`package\` table
-          - The package has an entrypoint and compiles
-          -->
-          EOF
-          gh pr create \
-            --repo typst/packages \
-            --base main \
-            --head "hexiongwu1995:itemplate-${VERSION}" \
-            --title "itemplate:${VERSION}" \
-            --body-file "${PR_BODY_FILE}"
+      #     <!--
+      #     The following are required for a package to be accepted:
+      #     - The package name is unique
+      #     - The package contains a `typst.toml` file with the `package` table
+      #     - The package has an entrypoint and compiles
+      #     -->
+      #     EOF
+      #     )"
 
   # 在当前仓库创建 GitHub Release，重跑时若 release 已存在，则删除后重建
   release:

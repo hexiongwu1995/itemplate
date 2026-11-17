@@ -489,7 +489,6 @@ def test_client_script() -> None:
 def test_examples() -> None:
     for source, name in [
         ("examples/demo.typ", "demo"),
-        ("examples/tables.typ", "tables"),
     ]:
         html = compile_doc(ROOT / source, name)
         check(f"{source} compiles", bool(html))

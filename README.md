@@ -188,7 +188,7 @@ HTML export is under active development, so the emitted markup may change betwee
 | --- | --- |
 | `lib.typ` | Package entrypoint: template logic, TOC, and HTML shell |
 | `src/` | Stylesheet and client-side interaction modules |
-| `examples/` | Compilable demos (`demo.typ`, `tables.typ`) |
+| `examples/` | Compilable demo (`demo.typ`) |
 | `tests/` | Smoke tests and their Typst fixtures |
 | `docs/` | Maintenance and publishing notes |
 | `assets/` | Repository screenshots (excluded from the package) |

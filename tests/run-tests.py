@@ -432,6 +432,45 @@ def test_theme_merge() -> None:
         "page starts in the default theme",
         'return docEl.dataset.theme || "default";' in html,
     )
+    check(
+        "client reads the active background for theme-color",
+        'getComputedStyle(docEl).getPropertyValue("--bg").trim()' in html,
+    )
+    check(
+        "theme-color is synced on init and switch",
+        html.count("syncThemeColor();") >= 2,
+    )
+
+
+def test_mobile_layout() -> None:
+    html = compile_fixture("i18n-en")
+    header_height = "calc(var(--header-h) + 1px + env(safe-area-inset-top))"
+    check(
+        "mobile topbar height follows the header token",
+        f"height: {header_height};" in html,
+    )
+    check(
+        "mobile sidebar header matches topbar height",
+        f"min-height: {header_height};" in html,
+    )
+    check(
+        "mobile sidebar header reserves the safe area",
+        "padding-top: calc(9px + env(safe-area-inset-top));" in html,
+    )
+    check(
+        "mobile topbar no longer hardcodes its height",
+        "calc(59px + env(" not in html,
+    )
+
+
+def test_quote_copy() -> None:
+    for path in [ROOT / "README.md", ROOT / "examples" / "demo.typ"]:
+        text = path.read_text(encoding="utf-8")
+        check(
+            f"{path.name} quote sample matches the default palette",
+            "Block quotes use an accent-colored rule and a serif face." in text
+            and "terracotta rule" not in text,
+        )
 
 
 def test_import_maps() -> None:
@@ -571,6 +610,8 @@ def main() -> int:
         test_tables,
         test_i18n,
         test_theme_merge,
+        test_mobile_layout,
+        test_quote_copy,
         test_import_maps,
         test_client_script,
         test_examples,

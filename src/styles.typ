@@ -708,9 +708,13 @@ html.drawer-open body { overflow: hidden; }
 
   .mobile-only { display: grid; }
   .resize-handle { display: none; }
-  .sidebar-head { padding-top: 9px; padding-bottom: 9px; }
+  .sidebar-head {
+    min-height: calc(var(--header-h) + 1px + env(safe-area-inset-top));
+    padding-top: calc(9px + env(safe-area-inset-top));
+    padding-bottom: 9px;
+  }
   .topbar {
-    height: calc(59px + env(safe-area-inset-top));
+    height: calc(var(--header-h) + 1px + env(safe-area-inset-top));
     padding-right: 12px;
     padding-left: 12px;
     overflow: hidden;

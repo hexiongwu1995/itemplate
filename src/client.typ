@@ -38,6 +38,7 @@ function read(key) {
    used until the reader selects another theme. */
 
 const themeToggle = document.getElementById("theme-toggle");
+const themeColorMeta = document.querySelector('meta[name="theme-color"]');
 const themeOrder = ["default", "paper", "green", "dark"];
 const themeNames = {
   default: ui.themeDefault,
@@ -58,14 +59,22 @@ function syncThemeButton() {
   themeToggle.setAttribute("title", label);
 }
 
+function syncThemeColor() {
+  if (!themeColorMeta) return;
+  const bg = getComputedStyle(docEl).getPropertyValue("--bg").trim();
+  if (bg) themeColorMeta.setAttribute("content", bg);
+}
+
 if (themeToggle) {
   themeToggle.addEventListener("click", () => {
     const next = themeOrder[(themeOrder.indexOf(effectiveTheme()) + 1) % themeOrder.length];
     docEl.dataset.theme = next;
     store("itemplate:theme", next);
     syncThemeButton();
+    syncThemeColor();
   });
   syncThemeButton();
+  syncThemeColor();
 }
 
 /* Mobile: show the topbar only at the top of the document, so the content

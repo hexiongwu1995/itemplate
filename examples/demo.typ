@@ -19,7 +19,7 @@ iTemplate turns Typst markup into a documentation site with a numbered sidebar t
 - Second item
   - Nested item
 
-#quote(block: true)[Block quotes use a terracotta rule and a serif face.]
+#quote(block: true)[Block quotes use an accent-colored rule and a serif face.]
 
 == Code
 

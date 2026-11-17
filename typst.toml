@@ -1,6 +1,6 @@
 [package]
 name = "itemplate"
-version = "0.8.0"
+version = "0.9.0"
 entrypoint = "lib.typ"
 exclude = ["assets/demo.png"]
 authors = ["HeXiongwu"]

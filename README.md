@@ -2,21 +2,10 @@
 
 `itemplate` turns Typst markup into a documentation site with a modern academic look: a numbered, collapsible sidebar table of contents, a responsive article column, horizontally scrolling tables with a fullscreen view, light, green, and dark themes, and a built-in import map for `echarts`, `echarts-gl`, and `plotly`. Developed completely by AI tools, can't confirm stability and reliability, use with caution.
 
-## Repository layout
-
-| Path | Contents |
-| --- | --- |
-| `lib.typ` | Package entrypoint: template logic, TOC, and HTML shell |
-| `src/` | Stylesheet and client-side interaction modules |
-| `examples/` | Compilable demos (`demo.typ`, `tables.typ`) |
-| `tests/` | Smoke tests and their Typst fixtures |
-| `docs/` | Maintenance and publishing notes |
-| `assets/` | Repository screenshots (excluded from the package) |
-
 ## Usage
 
 ````typst
-#import "@preview/itemplate:0.8.0": *
+#import "@preview/itemplate:0.9.0": *
 
 #show: itemplate.with(
   doc-title: "iTemplate Demo",
@@ -192,3 +181,14 @@ typst compile --root . examples/demo.typ --features html --format html
 ![iTemplate demo page in light theme: a numbered sidebar table of contents, a Typst code sample, an interactive ECharts 3D surface chart, and a table](assets/demo.png)
 
 HTML export is under active development, so the emitted markup may change between Typst releases. `bundle` export is unsupported; a PDF target renders the body without the HTML shell.
+
+## Repository layout
+
+| Path | Contents |
+| --- | --- |
+| `lib.typ` | Package entrypoint: template logic, TOC, and HTML shell |
+| `src/` | Stylesheet and client-side interaction modules |
+| `examples/` | Compilable demos (`demo.typ`, `tables.typ`) |
+| `tests/` | Smoke tests and their Typst fixtures |
+| `docs/` | Maintenance and publishing notes |
+| `assets/` | Repository screenshots (excluded from the package) |

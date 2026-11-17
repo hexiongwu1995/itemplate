@@ -381,8 +381,7 @@
         html.meta(charset: "utf-8")
         html.meta(name: "viewport", content: "width=device-width, initial-scale=1.0, viewport-fit=cover")
         html.meta(name: "color-scheme", content: "light dark")
-        html.meta(name: "theme-color", content: theme-value(resolved-theme.bg), media: "(prefers-color-scheme: light)")
-        html.meta(name: "theme-color", content: theme-value(resolved-dark-theme.bg), media: "(prefers-color-scheme: dark)")
+        html.meta(name: "theme-color", content: theme-value(resolved-theme.bg))
         if doc-author != "" {
           html.meta(name: "author", content: doc-author)
         }
@@ -416,11 +415,6 @@
         html.style(theme-to-css(resolved-paper-theme, selector: ":root[data-theme='paper']"))
         html.style(theme-to-css(resolved-green-theme, selector: ":root[data-theme='green']"))
         html.style(theme-to-css(resolved-dark-theme, selector: ":root[data-theme='dark']"))
-        html.style(
-          "@media (prefers-color-scheme: dark) {\n"
-          + theme-to-css(resolved-dark-theme, selector: ":root:not([data-theme])")
-          + "\n}",
-        )
 
         html.style(base-styles)
 

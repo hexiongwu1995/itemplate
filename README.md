@@ -161,7 +161,7 @@ The ECharts surface needs WebGL. Without JavaScript the container stays blank, s
 
 ## Theme
 
-Override any token; values may be Typst colors or raw CSS color strings. `theme` applies to the default, paper, and green themes; `dark-theme` only overrides the dark theme. Without a saved choice the page follows the system preference: light systems use the default theme and dark systems use the dark theme. The theme button cycles default → paper → green → dark.
+Override any token; values may be Typst colors or raw CSS color strings. `theme` applies to the default, paper, and green themes; `dark-theme` only overrides the dark theme. The page starts in the default theme, and the theme button cycles default → paper → green → dark.
 
 ```typst
 #show: itemplate.with(
@@ -198,7 +198,7 @@ HTML export is under active development, so the emitted markup may change betwee
 ### Unreleased
 
 - Renamed the light theme to paper.
-- Restored automatic theme selection from the system preference: light systems use the default theme, dark systems use the dark theme.
+- Removed automatic theme selection from the system preference; the page starts in the default theme.
 - Added default theme and four-state theme switcher (default → paper → green → dark).
 - Hid the mobile topbar while scrolling, keeping it visible only at the top of the document.
 

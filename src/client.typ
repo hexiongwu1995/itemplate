@@ -4,9 +4,7 @@ try {
   if (localStorage.getItem("itemplate:sidebar-open") === "0") {
     document.documentElement.classList.add("sidebar-preclosed");
   }
-  // v2 key: choices saved before automatic system following was restored
-  // (and before light was renamed to paper) must not lock the page theme.
-  var savedTheme = localStorage.getItem("itemplate:theme:v2");
+  var savedTheme = localStorage.getItem("itemplate:theme");
   if (savedTheme === "default" || savedTheme === "paper" || savedTheme === "dark" || savedTheme === "green") {
     document.documentElement.dataset.theme = savedTheme;
   }
@@ -36,11 +34,10 @@ function read(key) {
   try { return localStorage.getItem(key); } catch (error) { return null; }
 }
 
-/* Theme switching: default → paper → green → dark. Without a saved choice,
-   the page follows the system preference (light → default, dark → dark). */
+/* Theme switching: default → paper → green → dark. The default theme is
+   used until the reader selects another theme. */
 
 const themeToggle = document.getElementById("theme-toggle");
-const themeQuery = window.matchMedia("(prefers-color-scheme: dark)");
 const themeOrder = ["default", "paper", "green", "dark"];
 const themeNames = {
   default: ui.themeDefault,
@@ -50,7 +47,7 @@ const themeNames = {
 };
 
 function effectiveTheme() {
-  return docEl.dataset.theme || (themeQuery.matches ? "dark" : "default");
+  return docEl.dataset.theme || "default";
 }
 
 function syncThemeButton() {
@@ -65,15 +62,11 @@ if (themeToggle) {
   themeToggle.addEventListener("click", () => {
     const next = themeOrder[(themeOrder.indexOf(effectiveTheme()) + 1) % themeOrder.length];
     docEl.dataset.theme = next;
-    store("itemplate:theme:v2", next);
+    store("itemplate:theme", next);
     syncThemeButton();
   });
   syncThemeButton();
 }
-
-/* Keep the button label in sync when the system preference changes and the
-   reader has not chosen a theme explicitly. */
-themeQuery.addEventListener("change", syncThemeButton);
 
 /* Mobile: show the topbar only at the top of the document, so the content
    keeps the full viewport once the reader starts scrolling. */

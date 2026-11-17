@@ -17,10 +17,6 @@
 :root[data-theme="green"] { color-scheme: light; }
 :root[data-theme="dark"] { color-scheme: dark; }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) { color-scheme: dark; }
-}
-
 @supports (height: 100dvh) {
   :root { --app-h: 100dvh; }
 }

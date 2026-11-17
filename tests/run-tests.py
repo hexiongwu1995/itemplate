@@ -351,7 +351,7 @@ def test_theme_typst_colors() -> None:
     meta_colors = re.findall(r'<meta name="theme-color" content="([^"]+)"', html)
     check(
         "theme-color meta accepts Typst colors",
-        meta_colors == ["#123456", "#101010"],
+        meta_colors == ["#123456"],
         str(meta_colors),
     )
     default = css_block(html, ":root")
@@ -429,33 +429,8 @@ def test_theme_merge() -> None:
         'const themeOrder = ["default", "paper", "green", "dark"];' in html,
     )
     check(
-        "system dark preference maps to the dark theme",
-        "@media (prefers-color-scheme: dark)" in html
-        and ":root:not([data-theme])" in html,
-        html[html.find("@media (prefers-color-scheme: dark)") :][:260],
-    )
-    check(
-        "theme falls back to default or dark based on the system",
-        'themeQuery.matches ? "dark" : "default"' in html,
-    )
-    dark_media = html[html.find("@media (prefers-color-scheme: dark)") :][:1200]
-    check(
-        "system dark media applies the dark palette",
-        "--bg: #262625;" in dark_media,
-        dark_media[:160],
-    )
-    check(
-        "system preference changes update the theme button",
-        'themeQuery.addEventListener("change", syncThemeButton);' in html,
-    )
-    check(
-        "legacy saved themes do not block system following",
-        'localStorage.getItem("itemplate:theme:v2")' in html
-        and 'localStorage.getItem("itemplate:theme")' not in html,
-    )
-    check(
-        "manual theme choices persist under the v2 key",
-        'store("itemplate:theme:v2", next);' in html,
+        "page starts in the default theme",
+        'return docEl.dataset.theme || "default";' in html,
     )
 
 

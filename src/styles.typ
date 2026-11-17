@@ -9,9 +9,10 @@
   --radius-lg: 12px;
   --ease: cubic-bezier(.32, .72, 0, 1);
   --dur: .28s;
-  color-scheme: light dark;
+  color-scheme: light;
 }
 
+:root[data-theme="default"],
 :root[data-theme="light"],
 :root[data-theme="green"] { color-scheme: light; }
 :root[data-theme="dark"] { color-scheme: dark; }

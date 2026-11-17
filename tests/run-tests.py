@@ -351,15 +351,15 @@ def test_theme_typst_colors() -> None:
     meta_colors = re.findall(r'<meta name="theme-color" content="([^"]+)"', html)
     check(
         "theme-color meta accepts Typst colors",
-        meta_colors == ["#123456", "#101010"],
+        meta_colors == ["#123456"],
         str(meta_colors),
     )
-    light = css_block(html, ":root")
-    check("Typst bg color becomes a CSS color", "--bg: #123456;" in light, light)
+    default = css_block(html, ":root")
+    check("Typst bg color becomes a CSS color", "--bg: #123456;" in default, default)
     check(
         "Typst accent color becomes a CSS color",
-        "--accent: #abcdef;" in light,
-        light,
+        "--accent: #abcdef;" in default,
+        default,
     )
 
 
@@ -387,7 +387,8 @@ def css_var(css: str, name: str) -> str:
 def test_contrast() -> None:
     html = compile_fixture("i18n-en")
     themes = {
-        "light": css_block(html, ":root"),
+        "default": css_block(html, ":root"),
+        "light": css_block(html, ":root[data-theme='light']"),
         "green": css_block(html, ":root[data-theme='green']"),
         "dark": css_block(html, ":root[data-theme='dark']"),
     }
@@ -415,15 +416,17 @@ def test_client_cancel_paths() -> None:
 
 def test_theme_merge() -> None:
     html = compile_fixture("theme-merge")
-    light = css_block(html, ":root")
+    default = css_block(html, ":root")
+    light = css_block(html, ":root[data-theme='light']")
     green = css_block(html, ":root[data-theme='green']")
     dark = css_block(html, ":root[data-theme='dark']")
-    check("light theme keeps custom accent", "--accent: #123456;" in light)
+    check("default theme keeps custom accent", "--accent: #123456;" in default)
+    check("light theme inherits custom theme overrides", "--accent: #123456;" in light)
     check("green theme inherits custom theme overrides", "--accent: #123456;" in green)
     check("dark theme keeps its own accent", "--accent: #d97757;" in dark)
     check(
-        "theme toggle order is light, green, dark",
-        'const themeOrder = ["light", "green", "dark"];' in html,
+        "theme toggle order is default, light, green, dark",
+        'const themeOrder = ["default", "light", "green", "dark"];' in html,
     )
 
 
@@ -456,6 +459,7 @@ def test_client_script() -> None:
         check(
             "client UI strings are complete",
             set(ui) == {
+                "themeDefault",
                 "themeLight",
                 "themeGreen",
                 "themeDark",

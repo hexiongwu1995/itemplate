@@ -1,6 +1,6 @@
 # itemplate
 
-`itemplate` turns Typst markup into a documentation site with a modern academic look: a numbered, collapsible sidebar table of contents, a responsive article column, horizontally scrolling tables with a fullscreen view, light, green, and dark themes, and a built-in import map for `echarts`, `echarts-gl`, and `plotly`. Developed completely by AI tools, can't confirm stability and reliability, use with caution.
+`itemplate` turns Typst markup into a documentation site with a modern academic look: a numbered, collapsible sidebar table of contents, a responsive article column, horizontally scrolling tables with a fullscreen view, default, light, green, and dark themes, and a built-in import map for `echarts`, `echarts-gl`, and `plotly`. Developed completely by AI tools, can't confirm stability and reliability, use with caution.
 
 ## Usage
 
@@ -15,7 +15,7 @@
 
 = Introduction
 
-iTemplate turns Typst markup into a documentation site with a numbered sidebar table of contents, a responsive article column, and light, green, and dark themes.
+iTemplate turns Typst markup into a documentation site with a numbered sidebar table of contents, a responsive article column, and default, light, green, and dark themes.
 
 == Text
 
@@ -161,11 +161,11 @@ The ECharts surface needs WebGL. Without JavaScript the container stays blank, s
 
 ## Theme
 
-Override any token; values may be Typst colors or raw CSS color strings. `theme` applies to both the light and green themes; `dark-theme` only overrides the dark theme. The theme button cycles light → green → dark.
+Override any token; values may be Typst colors or raw CSS color strings. `theme` applies to the default, light, and green themes; `dark-theme` only overrides the dark theme. The default theme is used on first load, and the theme button cycles default → light → green → dark.
 
 ```typst
 #show: itemplate.with(
-  theme: (accent: "#d97757", bg: "#faf9f5"),
+  theme: (accent: "#20609f", bg: "#ffffff"),
   dark-theme: (accent: "#d97757"),
 )
 ```

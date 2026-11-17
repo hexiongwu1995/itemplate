@@ -5,7 +5,7 @@ try {
     document.documentElement.classList.add("sidebar-preclosed");
   }
   var savedTheme = localStorage.getItem("itemplate:theme");
-  if (savedTheme === "light" || savedTheme === "dark" || savedTheme === "green") {
+  if (savedTheme === "default" || savedTheme === "light" || savedTheme === "dark" || savedTheme === "green") {
     document.documentElement.dataset.theme = savedTheme;
   }
 } catch (error) {}
@@ -34,24 +34,24 @@ function read(key) {
   try { return localStorage.getItem(key); } catch (error) { return null; }
 }
 
-/* Theme switching: light → green → dark */
+/* Theme switching: default → light → green → dark */
 
 const themeToggle = document.getElementById("theme-toggle");
-const themeQuery = window.matchMedia("(prefers-color-scheme: dark)");
-const themeOrder = ["light", "green", "dark"];
+const themeOrder = ["default", "light", "green", "dark"];
 const themeNames = {
+  default: ui.themeDefault,
   light: ui.themeLight,
   green: ui.themeGreen,
   dark: ui.themeDark,
 };
 
 function effectiveTheme() {
-  return docEl.dataset.theme || (themeQuery.matches ? "dark" : "light");
+  return docEl.dataset.theme || "default";
 }
 
 function syncThemeButton() {
   if (!themeToggle) return;
-  const name = themeNames[effectiveTheme()] || themeNames.light;
+  const name = themeNames[effectiveTheme()] || themeNames.default;
   const label = ui.themeCurrent.replace("{name}", name);
   themeToggle.setAttribute("aria-label", label);
   themeToggle.setAttribute("title", label);
@@ -66,8 +66,6 @@ if (themeToggle) {
   });
   syncThemeButton();
 }
-
-themeQuery.addEventListener("change", syncThemeButton);
 
 function sidebarIsOpen() {
   if (!shell) return false;

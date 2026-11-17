@@ -8,9 +8,35 @@
 // Theme
 // ---------------------------------------------------------------------------
 
+// Default theme. Palette follows the light theme used by the typst.ts
+// cookery documentation: a white page, soft gray surfaces, and a blue
+// accent for links and interactive elements.
+#let default-theme = (
+  bg: "#ffffff",
+  surface: "#fafafa",
+  "surface-strong": "#e6e6e6",
+  ink: "#000000",
+  "ink-muted": "#5f5f5f",
+  "ink-faint": "#6f6f6f",
+  line: "rgba(0, 0, 0, 0.12)",
+  "line-strong": "rgba(0, 0, 0, 0.24)",
+  accent: "#20609f",
+  "accent-soft": "rgba(32, 96, 159, 0.10)",
+  "accent-ink": "#1a4f83",
+  "sidebar-bg": "#fafafa",
+  "header-bg": "rgba(255, 255, 255, 0.86)",
+  "code-bg": "#f5f5f5",
+  selection: "rgba(125, 185, 222, 0.63)",
+  overlay: "rgba(0, 0, 0, 0.32)",
+  "font-ui": "\"Inter\", \"Source Sans 3\", \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans SC\", system-ui, sans-serif",
+  "font-serif": "\"Source Serif 4\", \"Source Serif Pro\", Charter, Georgia, \"Noto Serif SC\", \"Source Han Serif SC\", \"Songti SC\", serif",
+  "font-mono": "\"JetBrains Mono\", \"Maple Mono NF CN\", \"Cascadia Code\", \"SF Mono\", Consolas, monospace",
+  "font-math": "\"STIX Two Math\", \"NewComputerModernMath\", \"Latin Modern Math\", math",
+)
+
 // Light theme. Palette and typography follow the Claudette Typora theme:
 // warm paper, a single terracotta accent, serif headings, hairline rules.
-#let default-theme = (
+#let default-light-theme = (
   bg: "#faf9f5",
   surface: "#f5f4ed",
   "surface-strong": "#ece9df",
@@ -27,13 +53,9 @@
   "code-bg": "#f5f4ed",
   selection: "rgba(235, 201, 183, 0.55)",
   overlay: "rgba(20, 20, 19, 0.32)",
-  "font-ui": "\"Inter\", \"Source Sans 3\", \"Segoe UI\", \"PingFang SC\", \"Microsoft YaHei\", \"Noto Sans SC\", system-ui, sans-serif",
-  "font-serif": "\"Source Serif 4\", \"Source Serif Pro\", Charter, Georgia, \"Noto Serif SC\", \"Source Han Serif SC\", \"Songti SC\", serif",
-  "font-mono": "\"JetBrains Mono\", \"Maple Mono NF CN\", \"Cascadia Code\", \"SF Mono\", Consolas, monospace",
-  "font-math": "\"STIX Two Math\", \"NewComputerModernMath\", \"Latin Modern Math\", math",
 )
 
-// Light green theme. Same structure as the default light theme, with a
+// Light green theme. Same structure as the light theme, with a
 // sage-green accent and a slightly green-tinted paper.
 #let default-green-theme = (
   bg: "#f6f9f3",
@@ -107,6 +129,7 @@
     "sidebar-resize": "Resize contents",
     "theme-toggle": "Toggle theme",
     "theme-current": "Toggle theme (current: {name})",
+    "theme-default": "Default",
     "theme-light": "Light",
     "theme-green": "Green",
     "theme-dark": "Dark",
@@ -128,6 +151,7 @@
     "sidebar-resize": "调整目录宽度",
     "theme-toggle": "切换主题",
     "theme-current": "切换主题（当前：{name}）",
+    "theme-default": "默认",
     "theme-light": "浅色",
     "theme-green": "浅绿",
     "theme-dark": "深色",
@@ -251,6 +275,7 @@
 
   context if target() == "html" {
     let resolved-theme = default-theme + theme
+    let resolved-light-theme = default-theme + default-light-theme + theme
     let resolved-green-theme = default-theme + default-green-theme + theme
     let resolved-dark-theme = default-theme + default-dark-theme + dark-theme
     let resolved-import-map = if import-map == auto { default-import-map } else { import-map }
@@ -340,6 +365,7 @@
     // Strings consumed by the client-side script. Keep these plain strings so
     // they can be embedded as JSON.
     let ui = (
+      themeDefault: s.at("theme-default"),
       themeLight: s.at("theme-light"),
       themeGreen: s.at("theme-green"),
       themeDark: s.at("theme-dark"),
@@ -355,8 +381,7 @@
         html.meta(charset: "utf-8")
         html.meta(name: "viewport", content: "width=device-width, initial-scale=1.0, viewport-fit=cover")
         html.meta(name: "color-scheme", content: "light dark")
-        html.meta(name: "theme-color", content: theme-value(resolved-theme.bg), media: "(prefers-color-scheme: light)")
-        html.meta(name: "theme-color", content: theme-value(resolved-dark-theme.bg), media: "(prefers-color-scheme: dark)")
+        html.meta(name: "theme-color", content: theme-value(resolved-theme.bg))
         if doc-author != "" {
           html.meta(name: "author", content: doc-author)
         }
@@ -387,13 +412,9 @@
         }
 
         html.style(theme-to-css(resolved-theme))
+        html.style(theme-to-css(resolved-light-theme, selector: ":root[data-theme='light']"))
         html.style(theme-to-css(resolved-green-theme, selector: ":root[data-theme='green']"))
         html.style(theme-to-css(resolved-dark-theme, selector: ":root[data-theme='dark']"))
-        html.style(
-          "@media (prefers-color-scheme: dark) {\n"
-          + theme-to-css(resolved-dark-theme, selector: ":root:not([data-theme])")
-          + "\n}",
-        )
 
         html.style(base-styles)
 

@@ -1,4 +1,4 @@
 local/
 build/
 .trae-html-share-packages/
-
+tests/output/

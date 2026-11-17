@@ -539,6 +539,10 @@ def test_package_file_list() -> None:
 
 def main() -> int:
     print(f"Using typst: {TYPST}")
+    # Rebuild the output directory so renamed or removed fixtures do not leave
+    # stale HTML behind for manual inspection.
+    if OUTPUT.exists():
+        shutil.rmtree(OUTPUT)
     version = subprocess.run([TYPST, "--version"], capture_output=True, text=True)
     print(version.stdout.strip() or version.stderr.strip())
 

@@ -135,6 +135,28 @@ def test_toc_nested_levels() -> None:
     )
 
 
+def test_heading_ids_unique() -> None:
+    for name in [
+        "heading-unnumbered-local",
+        "heading-unnumbered-global",
+        "heading-counter-reset",
+    ]:
+        html = compile_fixture(name)
+        ids = re.findall(r'id="(sec-[^"]+)"', html)
+        links = re.findall(r'href="#(sec-[^"]+)"', toc_section(html))
+        check(f"{name} anchors are unique", len(ids) == len(set(ids)), str(ids))
+        check(
+            f"{name} toc lists every heading",
+            len(links) == len(ids),
+            f"links={links} ids={ids}",
+        )
+        check(
+            f"{name} toc links resolve to headings",
+            set(links) == set(ids),
+            f"links={links} ids={ids}",
+        )
+
+
 def test_toc_numbering() -> None:
     html = compile_fixture("toc-numbering")
     toc_numbers = span_text(toc_section(html), "toc-num")
@@ -198,6 +220,120 @@ def test_i18n() -> None:
     chinese = compile_fixture("i18n-zh")
     for label in ["目录", "展开子目录", "跳到正文", "文档目录", "表格，可横向滚动", "切换主题"]:
         check(f"Chinese UI contains {label}", label in chinese)
+
+
+def test_outlined_headings() -> None:
+    html = compile_fixture("heading-outlined")
+    toc_text = span_text(toc_section(html), "toc-text")
+    check("outlined headings stay in the TOC", toc_text == ["Visible", "After"], str(toc_text))
+    check("non-outlined heading is still rendered", "Hidden from TOC" in html)
+    ids = re.findall(r'id="(sec-[^"]+)"', html)
+    links = re.findall(r'href="#(sec-[^"]+)"', toc_section(html))
+    check("outlined headings keep unique anchors", len(ids) == len(set(ids)), str(ids))
+    check("outlined toc links resolve", set(links) <= set(ids), f"links={links} ids={ids}")
+
+
+def test_deep_headings() -> None:
+    html = compile_fixture("heading-deep")
+    check("deep headings never emit h7", "<h7" not in html)
+    check(
+        "headings below level 6 expose aria-level",
+        'aria-level="7"' in html,
+        html[html.find("aria-level") - 80 : html.find("aria-level") + 80],
+    )
+    deep = re.findall(r'<h6 id="(sec-[^"]+)" aria-level="7">', html)
+    check("level 6 heading is rendered as h6", len(deep) == 1, str(deep))
+    check("level 6 heading keeps its text", "Level 6" in html)
+
+
+def test_default_author() -> None:
+    html = compile_fixture("no-author")
+    check("author meta is omitted by default", 'name="author"' not in html)
+    check("sidebar author is omitted by default", "sidebar-foot-author" not in html)
+    check("no placeholder author text", ">Author<" not in html)
+
+
+def test_heading_numbering_reenabled() -> None:
+    html = compile_fixture("heading-numbering-reenabled")
+    heading_numbers = span_text(html, "h-num")
+    toc_numbers = span_text(toc_section(html), "toc-num")
+    check(
+        "a later set rule re-enables heading numbers",
+        heading_numbers == ["1", "1.1"],
+        str(heading_numbers),
+    )
+    check(
+        "toc follows re-enabled heading numbers",
+        toc_numbers == heading_numbers,
+        f"toc={toc_numbers} headings={heading_numbers}",
+    )
+
+
+def test_theme_typst_colors() -> None:
+    html = compile_fixture("theme-typst-colors")
+    meta_colors = re.findall(r'<meta name="theme-color" content="([^"]+)"', html)
+    check(
+        "theme-color meta accepts Typst colors",
+        meta_colors == ["#123456", "#101010"],
+        str(meta_colors),
+    )
+    light = css_block(html, ":root")
+    check("Typst bg color becomes a CSS color", "--bg: #123456;" in light, light)
+    check(
+        "Typst accent color becomes a CSS color",
+        "--accent: #abcdef;" in light,
+        light,
+    )
+
+
+def relative_luminance(value: str) -> float:
+    rgb = [int(value[i : i + 2], 16) / 255 for i in (1, 3, 5)]
+    linear = [c / 12.92 if c <= 0.04045 else ((c + 0.055) / 1.055) ** 2.4 for c in rgb]
+    return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+
+
+def contrast_ratio(foreground: str, background: str) -> float:
+    lighter, darker = sorted(
+        (relative_luminance(foreground), relative_luminance(background)),
+        reverse=True,
+    )
+    return (lighter + 0.05) / (darker + 0.05)
+
+
+def css_var(css: str, name: str) -> str:
+    match = re.search(rf"--{re.escape(name)}:\s*([^;]+);", css)
+    if not match:
+        raise AssertionError(f"CSS variable not found: {name}")
+    return match.group(1).strip()
+
+
+def test_contrast() -> None:
+    html = compile_fixture("i18n-en")
+    themes = {
+        "light": css_block(html, ":root"),
+        "green": css_block(html, ":root[data-theme='green']"),
+        "dark": css_block(html, ":root[data-theme='dark']"),
+    }
+    for name, css in themes.items():
+        bg = css_var(css, "bg")
+        surface = css_var(css, "surface")
+        for token, against in [
+            ("ink-muted", surface),
+            ("ink-faint", bg),
+            ("accent-ink", bg),
+        ]:
+            ratio = contrast_ratio(css_var(css, token), against)
+            check(
+                f"{name} theme {token} meets WCAG AA",
+                ratio >= 4.5,
+                f"{ratio:.2f}:1 on {against}",
+            )
+
+
+def test_client_cancel_paths() -> None:
+    html = compile_fixture("i18n-en")
+    for token in ['"touchcancel"', '"pointercancel"', "setFauxDialog", "aria-modal"]:
+        check(f"client script handles {token}", token in html)
 
 
 def test_theme_merge() -> None:
@@ -333,6 +469,14 @@ def main() -> int:
         test_toc_numbering,
         test_heading_numbering_param,
         test_heading_numbering_disabled,
+        test_heading_ids_unique,
+        test_heading_numbering_reenabled,
+        test_outlined_headings,
+        test_deep_headings,
+        test_default_author,
+        test_theme_typst_colors,
+        test_contrast,
+        test_client_cancel_paths,
         test_i18n,
         test_theme_merge,
         test_import_maps,

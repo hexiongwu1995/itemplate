@@ -197,8 +197,9 @@ HTML export is under active development, so the emitted markup may change betwee
 
 ### v0.9.0 — 2026-11-17
 
-- **CI**: Fix GitHub Pages deployment environment configuration
-- **Chore**: Update demo screenshot, clean up repository files
+- Fixed heading IDs, theme colors, numbering, default author, deep headings, and the table of contents.
+- Improved mobile use, keyboard focus, color contrast.
+- Split CSS and client code into smaller files.
 
 ### v0.8.0 — 2026-11-16
 

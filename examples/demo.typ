@@ -1,9 +1,9 @@
-#import "lib.typ": *
+#import "/lib.typ": *
 #set heading(numbering:"1.1")
 
 #show: itemplate.with(
   doc-title: "iTemplate Demo",
-  doc-author: "Hexiong Wu",
+  doc-author: "hexiongwu",
   lang: "en",
 )
 

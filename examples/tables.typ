@@ -1,9 +1,9 @@
 
-#import "lib.typ": *
+#import "/lib.typ": *
 
 #show: itemplate.with(
   doc-title: "Table Demo",
-  doc-author: "Hexiong Wu",
+  doc-author: "hexiongwu",
   lang: "en",
 )
 

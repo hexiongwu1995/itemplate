@@ -1,3 +1,6 @@
 local/
 tests/output/
+build/
+*.html
+.trae-html-share-packages/
 

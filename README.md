@@ -2,6 +2,17 @@
 
 `itemplate` turns Typst markup into a documentation site with a modern academic look: a numbered, collapsible sidebar table of contents, a responsive article column, horizontally scrolling tables with a fullscreen view, light, green, and dark themes, and a built-in import map for `echarts`, `echarts-gl`, and `plotly`. Developed completely by AI tools, can't confirm stability and reliability, use with caution.
 
+## Repository layout
+
+| Path | Contents |
+| --- | --- |
+| `lib.typ` | Package entrypoint: template logic, TOC, and HTML shell |
+| `src/` | Stylesheet and client-side interaction modules |
+| `examples/` | Compilable demos (`demo.typ`, `tables.typ`) |
+| `tests/` | Smoke tests and their Typst fixtures |
+| `docs/` | Maintenance and publishing notes |
+| `assets/` | Repository screenshots (excluded from the package) |
+
 ## Usage
 
 ````typst
@@ -9,7 +20,7 @@
 
 #show: itemplate.with(
   doc-title: "iTemplate Demo",
-  doc-author: "Hexiong Wu",
+  doc-author: "hexiongwu",
   lang: "en",
 )
 
@@ -175,9 +186,9 @@ Available tokens: `bg`, `surface`, `surface-strong`, `ink`, `ink-muted`, `ink-fa
 ## Compile
 
 ```powershell
-typst compile test.typ --features html --format html
+typst compile --root . examples/demo.typ --features html --format html
 ```
 
-![iTemplate demo page in light theme: a numbered sidebar table of contents, a Typst code sample, an interactive ECharts 3D surface chart, and a table](assets/test.png)
+![iTemplate demo page in light theme: a numbered sidebar table of contents, a Typst code sample, an interactive ECharts 3D surface chart, and a table](assets/demo.png)
 
 HTML export is under active development, so the emitted markup may change between Typst releases. `bundle` export is unsupported; a PDF target renders the body without the HTML shell.

@@ -409,11 +409,14 @@ def test_client_script() -> None:
         print("SKIP  node not found; client script syntax not checked")
 
 
-def test_existing_demos() -> None:
-    for name in ["test", "test1"]:
-        html = compile_doc(ROOT / f"{name}.typ", name)
-        check(f"{name}.typ compiles", bool(html))
-        if name == "test":
+def test_examples() -> None:
+    for source, name in [
+        ("examples/demo.typ", "demo"),
+        ("examples/tables.typ", "tables"),
+    ]:
+        html = compile_doc(ROOT / source, name)
+        check(f"{source} compiles", bool(html))
+        if name == "demo":
             toc_numbers = span_text(toc_section(html), "toc-num")
             heading_numbers = span_text(html, "h-num")
             check(
@@ -452,7 +455,7 @@ def test_package_file_list() -> None:
         f"workflow={workflow_entries} list={entries}",
     )
 
-    forbidden = ["test.typ", "test1.typ", "tests", ".github", "git-tutorial.md"]
+    forbidden = ["examples", "docs", "tests", ".github"]
     leaked = [item for item in forbidden if item in entries]
     check("dev/test files are excluded from the package", not leaked, str(leaked))
 
@@ -481,7 +484,7 @@ def main() -> int:
         test_theme_merge,
         test_import_maps,
         test_client_script,
-        test_existing_demos,
+        test_examples,
         test_package_file_list,
     ]
     for test in tests:

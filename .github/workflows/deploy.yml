@@ -35,7 +35,7 @@ jobs:
       - name: Build demo site
         run: |
           mkdir -p build
-          typst compile --root . --features html --format html test.typ build/index.html
+          typst compile --root . --features html --format html examples/demo.typ build/index.html
       - uses: actions/upload-pages-artifact@v5
         with:
           path: build

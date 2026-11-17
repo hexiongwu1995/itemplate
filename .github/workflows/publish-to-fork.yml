@@ -41,6 +41,24 @@ jobs:
           fi
           echo "VERSION=${TAG}" >> "$GITHUB_ENV"
 
+      - name: Extract changelog entry for PR description
+        run: |
+          # 从 README.md 的 Changelog 章节中，提取从 `### v${VERSION}` 到下一个 `### v` 之间的内容
+          CHANGELOG_ENTRY=$(awk '
+            /^## Changelog/ { in_changelog = 1 }
+            in_changelog && $0 ~ /^### v'"${VERSION}"' / { entry_start = 1 }
+            entry_start && /^### v/ && $0 !~ /^### v'"${VERSION}"' / { exit }
+            entry_start { print }
+          ' README.md)
+          if [ -z "$CHANGELOG_ENTRY" ]; then
+            CHANGELOG_ENTRY="(changelog entry not found in README)"
+          fi
+          echo "CHANGELOG_ENTRY<<EOF" >> "$GITHUB_ENV"
+          echo "$CHANGELOG_ENTRY" >> "$GITHUB_ENV"
+          echo "EOF" >> "$GITHUB_ENV"
+          echo "Extracted changelog entry:"
+          echo "$CHANGELOG_ENTRY"
+
       - name: Sync fork with upstream typst/packages
         env:
           GH_TOKEN: ${{ secrets.PACKAGES_PAT }}
@@ -107,7 +125,7 @@ jobs:
 
           Description:
 
-          v${VERSION} — update demo screenshot, fix GitHub Pages deployment configuration, and clean up repository files.
+          ${CHANGELOG_ENTRY}
 
           Full changelog: https://github.com/hexiongwu1995/itemplate#changelog
           Previous release notes: https://github.com/hexiongwu1995/itemplate/releases

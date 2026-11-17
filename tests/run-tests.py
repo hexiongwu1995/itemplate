@@ -351,7 +351,7 @@ def test_theme_typst_colors() -> None:
     meta_colors = re.findall(r'<meta name="theme-color" content="([^"]+)"', html)
     check(
         "theme-color meta accepts Typst colors",
-        meta_colors == ["#123456"],
+        meta_colors == ["#123456", "#101010"],
         str(meta_colors),
     )
     default = css_block(html, ":root")
@@ -388,7 +388,7 @@ def test_contrast() -> None:
     html = compile_fixture("i18n-en")
     themes = {
         "default": css_block(html, ":root"),
-        "light": css_block(html, ":root[data-theme='light']"),
+        "paper": css_block(html, ":root[data-theme='paper']"),
         "green": css_block(html, ":root[data-theme='green']"),
         "dark": css_block(html, ":root[data-theme='dark']"),
     }
@@ -417,16 +417,26 @@ def test_client_cancel_paths() -> None:
 def test_theme_merge() -> None:
     html = compile_fixture("theme-merge")
     default = css_block(html, ":root")
-    light = css_block(html, ":root[data-theme='light']")
+    paper = css_block(html, ":root[data-theme='paper']")
     green = css_block(html, ":root[data-theme='green']")
     dark = css_block(html, ":root[data-theme='dark']")
     check("default theme keeps custom accent", "--accent: #123456;" in default)
-    check("light theme inherits custom theme overrides", "--accent: #123456;" in light)
+    check("paper theme inherits custom theme overrides", "--accent: #123456;" in paper)
     check("green theme inherits custom theme overrides", "--accent: #123456;" in green)
     check("dark theme keeps its own accent", "--accent: #d97757;" in dark)
     check(
-        "theme toggle order is default, light, green, dark",
-        'const themeOrder = ["default", "light", "green", "dark"];' in html,
+        "theme toggle order is default, paper, green, dark",
+        'const themeOrder = ["default", "paper", "green", "dark"];' in html,
+    )
+    check(
+        "system dark preference maps to the dark theme",
+        "@media (prefers-color-scheme: dark)" in html
+        and ":root:not([data-theme])" in html,
+        html[html.find("@media (prefers-color-scheme: dark)") :][:260],
+    )
+    check(
+        "theme falls back to default or dark based on the system",
+        'themeQuery.matches ? "dark" : "default"' in html,
     )
 
 
@@ -460,7 +470,7 @@ def test_client_script() -> None:
             "client UI strings are complete",
             set(ui) == {
                 "themeDefault",
-                "themeLight",
+                "themePaper",
                 "themeGreen",
                 "themeDark",
                 "themeCurrent",

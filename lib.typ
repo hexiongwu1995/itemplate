@@ -34,9 +34,9 @@
   "font-math": "\"STIX Two Math\", \"NewComputerModernMath\", \"Latin Modern Math\", math",
 )
 
-// Light theme. Palette and typography follow the Claudette Typora theme:
+// Paper theme. Palette and typography follow the Claudette Typora theme:
 // warm paper, a single terracotta accent, serif headings, hairline rules.
-#let default-light-theme = (
+#let default-paper-theme = (
   bg: "#faf9f5",
   surface: "#f5f4ed",
   "surface-strong": "#ece9df",
@@ -55,7 +55,7 @@
   overlay: "rgba(20, 20, 19, 0.32)",
 )
 
-// Light green theme. Same structure as the light theme, with a
+// Green theme. Same structure as the paper theme, with a
 // sage-green accent and a slightly green-tinted paper.
 #let default-green-theme = (
   bg: "#f6f9f3",
@@ -130,7 +130,7 @@
     "theme-toggle": "Toggle theme",
     "theme-current": "Toggle theme (current: {name})",
     "theme-default": "Default",
-    "theme-light": "Light",
+    "theme-paper": "Paper",
     "theme-green": "Green",
     "theme-dark": "Dark",
   ),
@@ -152,7 +152,7 @@
     "theme-toggle": "切换主题",
     "theme-current": "切换主题（当前：{name}）",
     "theme-default": "默认",
-    "theme-light": "浅色",
+    "theme-paper": "纸张",
     "theme-green": "浅绿",
     "theme-dark": "深色",
   ),
@@ -275,7 +275,7 @@
 
   context if target() == "html" {
     let resolved-theme = default-theme + theme
-    let resolved-light-theme = default-theme + default-light-theme + theme
+    let resolved-paper-theme = default-theme + default-paper-theme + theme
     let resolved-green-theme = default-theme + default-green-theme + theme
     let resolved-dark-theme = default-theme + default-dark-theme + dark-theme
     let resolved-import-map = if import-map == auto { default-import-map } else { import-map }
@@ -366,7 +366,7 @@
     // they can be embedded as JSON.
     let ui = (
       themeDefault: s.at("theme-default"),
-      themeLight: s.at("theme-light"),
+      themePaper: s.at("theme-paper"),
       themeGreen: s.at("theme-green"),
       themeDark: s.at("theme-dark"),
       themeCurrent: s.at("theme-current"),
@@ -381,7 +381,8 @@
         html.meta(charset: "utf-8")
         html.meta(name: "viewport", content: "width=device-width, initial-scale=1.0, viewport-fit=cover")
         html.meta(name: "color-scheme", content: "light dark")
-        html.meta(name: "theme-color", content: theme-value(resolved-theme.bg))
+        html.meta(name: "theme-color", content: theme-value(resolved-theme.bg), media: "(prefers-color-scheme: light)")
+        html.meta(name: "theme-color", content: theme-value(resolved-dark-theme.bg), media: "(prefers-color-scheme: dark)")
         if doc-author != "" {
           html.meta(name: "author", content: doc-author)
         }
@@ -412,9 +413,14 @@
         }
 
         html.style(theme-to-css(resolved-theme))
-        html.style(theme-to-css(resolved-light-theme, selector: ":root[data-theme='light']"))
+        html.style(theme-to-css(resolved-paper-theme, selector: ":root[data-theme='paper']"))
         html.style(theme-to-css(resolved-green-theme, selector: ":root[data-theme='green']"))
         html.style(theme-to-css(resolved-dark-theme, selector: ":root[data-theme='dark']"))
+        html.style(
+          "@media (prefers-color-scheme: dark) {\n"
+          + theme-to-css(resolved-dark-theme, selector: ":root:not([data-theme])")
+          + "\n}",
+        )
 
         html.style(base-styles)
 

@@ -5,7 +5,7 @@ try {
     document.documentElement.classList.add("sidebar-preclosed");
   }
   var savedTheme = localStorage.getItem("itemplate:theme");
-  if (savedTheme === "default" || savedTheme === "light" || savedTheme === "dark" || savedTheme === "green") {
+  if (savedTheme === "default" || savedTheme === "paper" || savedTheme === "dark" || savedTheme === "green") {
     document.documentElement.dataset.theme = savedTheme;
   }
 } catch (error) {}
@@ -34,19 +34,21 @@ function read(key) {
   try { return localStorage.getItem(key); } catch (error) { return null; }
 }
 
-/* Theme switching: default → light → green → dark */
+/* Theme switching: default → paper → green → dark. Without a saved choice,
+   the page follows the system preference (light → default, dark → dark). */
 
 const themeToggle = document.getElementById("theme-toggle");
-const themeOrder = ["default", "light", "green", "dark"];
+const themeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+const themeOrder = ["default", "paper", "green", "dark"];
 const themeNames = {
   default: ui.themeDefault,
-  light: ui.themeLight,
+  paper: ui.themePaper,
   green: ui.themeGreen,
   dark: ui.themeDark,
 };
 
 function effectiveTheme() {
-  return docEl.dataset.theme || "default";
+  return docEl.dataset.theme || (themeQuery.matches ? "dark" : "default");
 }
 
 function syncThemeButton() {
@@ -66,6 +68,10 @@ if (themeToggle) {
   });
   syncThemeButton();
 }
+
+/* Keep the button label in sync when the system preference changes and the
+   reader has not chosen a theme explicitly. */
+themeQuery.addEventListener("change", syncThemeButton);
 
 /* Mobile: show the topbar only at the top of the document, so the content
    keeps the full viewport once the reader starts scrolling. */

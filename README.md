@@ -1,6 +1,6 @@
 # itemplate
 
-`itemplate` turns Typst markup into a documentation site with a modern academic look: a numbered, collapsible sidebar table of contents, a responsive article column, horizontally scrolling tables with a fullscreen view, default, light, green, and dark themes, and a built-in import map for `echarts`, `echarts-gl`, and `plotly`. Developed completely by AI tools, can't confirm stability and reliability, use with caution.
+`itemplate` turns Typst markup into a documentation site with a modern academic look: a numbered, collapsible sidebar table of contents, a responsive article column, horizontally scrolling tables with a fullscreen view, default, paper, green, and dark themes, and a built-in import map for `echarts`, `echarts-gl`, and `plotly`. Developed completely by AI tools, can't confirm stability and reliability, use with caution.
 
 ## Usage
 
@@ -15,7 +15,7 @@
 
 = Introduction
 
-iTemplate turns Typst markup into a documentation site with a numbered sidebar table of contents, a responsive article column, and default, light, green, and dark themes.
+iTemplate turns Typst markup into a documentation site with a numbered sidebar table of contents, a responsive article column, and default, paper, green, and dark themes.
 
 == Text
 
@@ -161,7 +161,7 @@ The ECharts surface needs WebGL. Without JavaScript the container stays blank, s
 
 ## Theme
 
-Override any token; values may be Typst colors or raw CSS color strings. `theme` applies to the default, light, and green themes; `dark-theme` only overrides the dark theme. The default theme is used on first load, and the theme button cycles default → light → green → dark.
+Override any token; values may be Typst colors or raw CSS color strings. `theme` applies to the default, paper, and green themes; `dark-theme` only overrides the dark theme. Without a saved choice the page follows the system preference: light systems use the default theme and dark systems use the dark theme. The theme button cycles default → paper → green → dark.
 
 ```typst
 #show: itemplate.with(
@@ -178,7 +178,7 @@ Available tokens: `bg`, `surface`, `surface-strong`, `ink`, `ink-muted`, `ink-fa
 typst compile --root . examples/demo.typ --features html --format html
 ```
 
-![iTemplate demo page in light theme: a numbered sidebar table of contents, a Typst code sample, an interactive ECharts 3D surface chart, and a table](assets/demo.png)
+![iTemplate demo page in paper theme: a numbered sidebar table of contents, a Typst code sample, an interactive ECharts 3D surface chart, and a table](assets/demo.png)
 
 HTML export is under active development, so the emitted markup may change between Typst releases. `bundle` export is unsupported; a PDF target renders the body without the HTML shell.
 
@@ -194,6 +194,13 @@ HTML export is under active development, so the emitted markup may change betwee
 | `assets/` | Repository screenshots (excluded from the package) |
 
 ## Changelog
+
+### Unreleased
+
+- Renamed the light theme to paper.
+- Restored automatic theme selection from the system preference: light systems use the default theme, dark systems use the dark theme.
+- Added default theme and four-state theme switcher (default → paper → green → dark).
+- Hid the mobile topbar while scrolling, keeping it visible only at the top of the document.
 
 ### v0.9.0 — 2026-11-17
 

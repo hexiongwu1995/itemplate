@@ -9,7 +9,7 @@
 
 = Introduction
 
-iTemplate turns Typst markup into a documentation site with a numbered sidebar table of contents, a responsive article column, and light and dark themes.
+iTemplate turns Typst markup into a documentation site with a numbered sidebar table of contents, a responsive article column, and default, paper, green, and dark themes.
 
 == Text
 

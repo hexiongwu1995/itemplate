@@ -195,18 +195,12 @@ HTML export is under active development, so the emitted markup may change betwee
 
 ## Changelog
 
-### Unreleased
-
-- Renamed the light theme to paper.
-- Removed automatic theme selection from the system preference; the page starts in the default theme.
-- Added default theme and four-state theme switcher (default → paper → green → dark).
-- Hid the mobile topbar while scrolling, keeping it visible only at the top of the document.
-
 ### v0.9.0 — 2026-11-17
 
 - Fixed heading IDs, theme colors, numbering, default author, deep headings, and the table of contents.
 - Improved mobile use, keyboard focus, color contrast.
 - Split CSS and client code into smaller files.
+- Hide the mobile topbar while scrolling, keeping it visible only at the top of the document.
 
 ### v0.8.0 — 2026-11-16
 

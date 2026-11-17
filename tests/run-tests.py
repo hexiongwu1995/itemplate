@@ -513,7 +513,7 @@ def test_package_file_list() -> None:
     for entry in entries:
         check(f"package file exists: {entry}", (ROOT / entry).exists())
 
-    workflow = (ROOT / ".github" / "workflows" / "publish-and-release.yml").read_text(
+    workflow = (ROOT / ".github" / "workflows" / "publish-to-fork.yml").read_text(
         encoding="utf-8"
     )
     try:

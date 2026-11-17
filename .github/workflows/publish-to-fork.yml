@@ -108,19 +108,6 @@ jobs:
           git commit -m "itemplate:${VERSION}"
           git push -u --force origin "itemplate-${VERSION}"
 
-      - name: Debug PAT scopes
-        working-directory: packages
-        env:
-          GH_TOKEN: ${{ secrets.PACKAGES_PAT }}
-        run: |
-          echo "=== PAT scopes ==="
-          curl -sI -H "Authorization: token ${GH_TOKEN}" https://api.github.com/ \
-            | grep -iE "x-oauth-scopes|x-accepted-oauth-scopes" || echo "(no scopes header visible)"
-          echo "=== Verify fork access ==="
-          gh repo view hexiongwu1995/packages --json name,url 2>&1 | head -5
-          echo "=== Verify upstream PR permission ==="
-          gh api repos/typst/packages/contents/package.json --jq .message 2>/dev/null || echo "(read test done)"
-
       - name: Create pull request to typst/packages
         working-directory: packages
         env:

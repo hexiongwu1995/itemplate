@@ -1,6 +1,6 @@
 # itemplate
 
-`itemplate` turns Typst markup into a documentation site with a modern academic look: a numbered, collapsible sidebar table of contents, a responsive article column, horizontally scrolling tables with a fullscreen view, default, paper, green, and dark themes, and a built-in import map for `echarts`, `echarts-gl`, and `plotly`. Developed completely by AI tools, can't confirm stability and reliability, use with caution.
+`itemplate` turns Typst markup into a documentation site with a modern academic look: a numbered, collapsible sidebar table of contents, a responsive article column, horizontally scrolling tables with a fullscreen view, default, paper, green, and dark themes, and a built-in import map for `echarts`, `echarts-gl`, and `plotly`. Developed completely by AI tools, can't guarantee stability and reliability, use with caution.
 
 ## Usage
 

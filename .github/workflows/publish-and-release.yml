@@ -113,7 +113,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PACKAGES_PAT }}
         run: |
-          PR_BODY_FILE="${GITHUB_TEMP}/itemplate-pr-body.md"
+          PR_BODY_FILE="${RUNNER_TEMP}/itemplate-pr-body.md"
           cat > "${PR_BODY_FILE}" <<EOF
           I am submitting
           - [ ] a new package

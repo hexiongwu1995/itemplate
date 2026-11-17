@@ -2,4 +2,5 @@ assets
 lib.typ
 LICENSE
 README.md
+src
 typst.toml

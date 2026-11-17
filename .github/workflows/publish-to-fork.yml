@@ -76,6 +76,7 @@ jobs:
             lib.typ \
             LICENSE \
             README.md \
+            src \
             typst.toml \
             "${DEST}/"
 

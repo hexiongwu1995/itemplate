@@ -192,3 +192,49 @@ HTML export is under active development, so the emitted markup may change betwee
 | `tests/` | Smoke tests and their Typst fixtures |
 | `docs/` | Maintenance and publishing notes |
 | `assets/` | Repository screenshots (excluded from the package) |
+
+## Changelog
+
+### v0.9.0 — 2026-11-17
+
+- **CI**: Fix GitHub Pages deployment environment configuration
+- **Chore**: Update demo screenshot, clean up repository files
+
+### v0.8.0 — 2026-11-16
+
+- **Features**:
+  - Add green theme and three-state theme switcher (light → green → dark)
+  - Add built-in import map for `three`, `echarts`, `echarts-gl`, `plotly`, `cannon-es`, and `fundamental-physical-constants`, with support for custom merging or replacement
+  - Add i18n support: client-side labels switch automatically between English and Chinese based on `lang`
+  - Recolor theme to the Claudette warm paper palette
+  - Add interactive ECharts 3D surface chart example
+  - Add plotly.js support
+- **UX**: Improve touch-drawer swipe behavior on mobile (`fix(touch drawer)`)
+- **Build**: Optimize Google Fonts CDN endpoint for China access; reorder math font loading
+- **Docs**: Rewrite README, expand `heading-numbering` and `import-map` parameter documentation
+
+### v0.7.0 — 2026-11-10
+
+- **Features**:
+  - Add customizable theme system (CSS variables / theme tokens). `theme` and `dark-theme` parameters can override any semantic token
+  - Refactor sidebar / TOC JavaScript code
+- **Refactor**: Remove unused heading numbering and "expand all TOC" related code
+- **Build**: Update `typst.toml` exclude configuration
+
+### v0.6.0 — 2026-11-09
+
+- **Features**:
+  - Add HTML styling and SVG / image display utilities
+  - Add mobile touch-swipe sidebar interaction (swipe right to open, swipe left to close)
+- **Docs**: Remove empty lines from README, drop unused heading numbering code
+
+### v0.5.0 — 2026-10-11
+
+- **Breaking**: Switch from `bundle` export to `html` export; `bundle` targets now emit an explicit unsupported message
+- **Fix**: Remove the extra trailing period in heading numbering
+
+### v0.4.0 — 2026-10-09
+
+- Switch math font family to NewComputerModern
+- Rename the entrypoint file
+- Initial publishable release

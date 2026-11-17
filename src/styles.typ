@@ -709,7 +709,35 @@ html.drawer-open body { overflow: hidden; }
   .mobile-only { display: grid; }
   .resize-handle { display: none; }
   .sidebar-head { padding-top: 9px; padding-bottom: 9px; }
-  .topbar { padding-right: 12px; padding-left: 12px; }
+  .topbar {
+    height: calc(59px + env(safe-area-inset-top));
+    padding-right: 12px;
+    padding-left: 12px;
+    overflow: hidden;
+    transition:
+      height var(--dur) var(--ease),
+      padding var(--dur) var(--ease),
+      opacity .2s,
+      border-bottom-width var(--dur) var(--ease),
+      visibility 0s;
+  }
+  /* On small screens the topbar is only shown at the very top of the
+     document, so the content gets the full viewport while scrolling. */
+  .main.topbar-hidden .topbar {
+    height: 0;
+    min-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    border-bottom-width: 0;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      height var(--dur) var(--ease),
+      padding var(--dur) var(--ease),
+      opacity .2s,
+      border-bottom-width var(--dur) var(--ease),
+      visibility 0s var(--dur);
+  }
   .icon-btn { width: 40px; height: 40px; }
   .article { padding: 36px 20px 110px; }
 }

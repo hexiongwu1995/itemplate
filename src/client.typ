@@ -67,6 +67,14 @@ if (themeToggle) {
   syncThemeButton();
 }
 
+/* Mobile: show the topbar only at the top of the document, so the content
+   keeps the full viewport once the reader starts scrolling. */
+
+function syncTopbar() {
+  if (!mainEl || !content) return;
+  mainEl.classList.toggle("topbar-hidden", isMobile() && content.scrollTop > 0);
+}
+
 function sidebarIsOpen() {
   if (!shell) return false;
   return isMobile()
@@ -141,6 +149,7 @@ mq.addEventListener("change", () => {
   shell.dataset.drawer = "closed";
   docEl.classList.remove("drawer-open");
   syncSidebarA11y();
+  syncTopbar();
   requestAnimationFrame(refreshAllTables);
 });
 
@@ -319,6 +328,7 @@ function scheduleActiveHeading() {
 }
 
 if (content) {
+  content.addEventListener("scroll", syncTopbar, { passive: true });
   content.addEventListener("scroll", () => {
     if (spyLocked) {
       // 平滑滚动途中锁定高亮，抵达目标落点后立即恢复 scrollspy
@@ -336,8 +346,10 @@ if (content) {
   });
 }
 window.addEventListener("resize", scheduleActiveHeading);
+window.addEventListener("resize", syncTopbar);
 collectHeadings();
 scheduleActiveHeading();
+syncTopbar();
 
 if (location.hash.length > 1) {
   const id = location.hash.slice(1);

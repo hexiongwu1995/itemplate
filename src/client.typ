@@ -374,11 +374,38 @@ function focusTableControl(block, selector) {
   if (target) requestAnimationFrame(() => target.focus());
 }
 
+function fauxFocusables() {
+  if (!fauxBlock) return [];
+  return Array.from(
+    fauxBlock.querySelectorAll('button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])')
+  ).filter((element) => element.getClientRects().length > 0);
+}
+
+function trapFauxFocus(event) {
+  if (!fauxBlock || event.key !== "Tab") return;
+  const items = fauxFocusables();
+  if (!items.length) return;
+  const first = items[0];
+  const last = items[items.length - 1];
+  if (!fauxBlock.contains(document.activeElement)) {
+    event.preventDefault();
+    first.focus();
+  } else if (event.shiftKey && document.activeElement === first) {
+    event.preventDefault();
+    last.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first.focus();
+  }
+}
+
 function refreshTable(block) {
   const scroller = block.querySelector(".table-scroll");
   if (!scroller) return;
   const overflow = scroller.scrollWidth > scroller.clientWidth + 1;
   block.dataset.overflow = overflow ? "true" : "false";
+  // A region that cannot scroll should not add an empty tab stop.
+  scroller.tabIndex = overflow ? 0 : -1;
   const atEnd = scroller.scrollLeft + scroller.clientWidth >= scroller.scrollWidth - 2;
   block.dataset.atEnd = atEnd ? "true" : "false";
 }
@@ -583,6 +610,7 @@ document.addEventListener("touchcancel", () => {
 /* Keyboard */
 
 document.addEventListener("keydown", (event) => {
+  if (fauxBlock) trapFauxFocus(event);
   if (event.key !== "Escape") return;
   if (isMobile() && shell && shell.dataset.drawer === "open") {
     setDrawer(false, true);

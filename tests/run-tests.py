@@ -205,6 +205,83 @@ def test_heading_numbering_disabled() -> None:
     check("hidden numbering keeps unique anchors", len(ids) == len(set(ids)), str(ids))
 
 
+def test_tables() -> None:
+    html = compile_fixture("table-basic")
+    check("both tables are wrapped", html.count('class="table-block"') == 2)
+    check("each table has a scroll region", html.count('class="table-scroll"') == 2)
+    check(
+        "scroll regions are labelled and focusable",
+        html.count('class="table-scroll" tabindex="0" role="region" aria-label="Table, horizontally scrollable"')
+        == 2,
+    )
+    check("expand buttons are emitted", html.count('class="table-expand"') == 2)
+    check("exit buttons are emitted", html.count('class="table-exit"') == 2)
+    check(
+        "table controls are explicit buttons",
+        len(re.findall(r'<button class="table-(?:expand|exit)" type="button"', html)) == 4,
+    )
+    check(
+        "table controls use localized labels",
+        'aria-label="View table fullscreen"' in html
+        and 'aria-label="Exit fullscreen"' in html,
+    )
+    check(
+        "table header semantics survive",
+        "<thead>" in html and "<th>" in html,
+    )
+    check(
+        "table content survives wrapping",
+        all(text in html for text in ["Name", "Type", "Notes", "Alpha", "Beta"]),
+    )
+
+    scroll_css = css_block(html, ".table-scroll")
+    check(
+        "table scroll container scrolls horizontally",
+        "overflow-x: auto;" in scroll_css and "overflow-y: hidden;" in scroll_css,
+        scroll_css,
+    )
+    fade_css = css_block(
+        html, '.table-block[data-overflow="true"][data-at-end="false"]::after'
+    )
+    check("overflow fade is conditional", "opacity: 1;" in fade_css, fade_css)
+    th_css = css_block(html, ".table-scroll th")
+    check("header cells do not wrap", "white-space: nowrap;" in th_css, th_css)
+    sticky_css = css_block(
+        html, ".table-block:fullscreen thead th,\n.table-block.is-faux thead th"
+    )
+    check("fullscreen header stays sticky", "position: sticky;" in sticky_css, sticky_css)
+    faux_css = css_block(html, ".table-block.is-faux")
+    check(
+        "faux fullscreen respects safe areas",
+        "env(safe-area-inset-top)" in faux_css,
+        faux_css,
+    )
+    check(
+        "touch targets are enlarged",
+        "@media (pointer: coarse)" in html
+        and ".table-expand,\n  .table-exit { width: 44px; height: 44px; }" in html,
+    )
+
+    for token in [
+        "function refreshTable",
+        "new ResizeObserver",
+        "requestFullscreen",
+        "screen.orientation.lock",
+        "table-locked",
+        "trapFauxFocus",
+        "scroller.tabIndex = overflow ? 0 : -1",
+    ]:
+        check(f"table script contains {token}", token in html)
+
+    chinese = compile_fixture("i18n-zh")
+    check(
+        "Chinese table labels are localized",
+        'aria-label="表格，可横向滚动"' in chinese
+        and 'aria-label="全屏查看表格"' in chinese
+        and 'aria-label="退出全屏"' in chinese,
+    )
+
+
 def test_i18n() -> None:
     english = compile_fixture("i18n-en")
     check("English TOC label", "CONTENTS" in english)
@@ -480,6 +557,7 @@ def main() -> int:
         test_theme_typst_colors,
         test_contrast,
         test_client_cancel_paths,
+        test_tables,
         test_i18n,
         test_theme_merge,
         test_import_maps,

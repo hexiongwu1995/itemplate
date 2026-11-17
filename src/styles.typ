@@ -631,6 +631,12 @@ html.sidebar-preclosed .sidebar { border-right-color: transparent; }
 }
 .table-block:fullscreen::backdrop { background: var(--bg); }
 .table-block:fullscreen .table-scroll { flex: 1; height: auto; overflow: auto; }
+.table-block:fullscreen thead th,
+.table-block.is-faux thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
 
 .table-block.is-faux {
   position: fixed;
@@ -639,7 +645,8 @@ html.sidebar-preclosed .sidebar { border-right-color: transparent; }
   flex-direction: column;
   gap: 12px;
   margin: 0;
-  padding: 16px;
+  padding: calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right))
+    calc(16px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
   border-radius: 0;
   background: var(--bg);
   box-shadow: 0 0 0 100vmax var(--bg);

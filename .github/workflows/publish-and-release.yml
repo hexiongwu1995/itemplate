@@ -113,12 +113,8 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.PACKAGES_PAT }}
         run: |
-          gh pr create \
-            --repo typst/packages \
-            --base main \
-            --head "hexiongwu1995:itemplate-${VERSION}" \
-            --title "itemplate:${VERSION}" \
-            --body "$(cat <<EOF
+          PR_BODY_FILE="${GITHUB_TEMP}/itemplate-pr-body.md"
+          cat > "${PR_BODY_FILE}" <<EOF
           I am submitting
           - [ ] a new package
           - [x] an update for a package
@@ -137,7 +133,12 @@ jobs:
           - The package has an entrypoint and compiles
           -->
           EOF
-          )"
+          gh pr create \
+            --repo typst/packages \
+            --base main \
+            --head "hexiongwu1995:itemplate-${VERSION}" \
+            --title "itemplate:${VERSION}" \
+            --body-file "${PR_BODY_FILE}"
 
   # 在当前仓库创建 GitHub Release，重跑时若 release 已存在，则删除后重建
   release:

@@ -197,44 +197,44 @@ HTML export is under active development, so the emitted markup may change betwee
 
 ### v0.9.0 — 2026-11-17
 
-- **CI**: 修复 GitHub Pages 部署环境配置
-- **Chore**: 更新 demo 截图，清理仓库杂项文件
+- **CI**: Fix GitHub Pages deployment environment configuration
+- **Chore**: Update demo screenshot, clean up repository files
 
 ### v0.8.0 — 2026-11-16
 
 - **Features**:
-  - 新增绿色主题（green theme）和三态主题切换（light → green → dark）
-  - 新增 import map 支持，内置 `three`、`echarts`、`echarts-gl`、`plotly`、`cannon-es`、`fundamental-physical-constants` 的 CDN 映射，并支持自定义合并或替换
-  - 新增 i18n 国际化支持，客户端界面跟随 `lang` 参数自动切换中英文
-  - 主题色调整为 Claudette warm paper 调色板
-  - 新增 ECharts 3D surface 交互式图表示例
-  - 新增 plotly.js 支持
-- **UX**: 移动端侧边栏触摸滑动优化（`fix(touch drawer)`）
-- **Build**: Google Fonts CDN 国内访问优化，调整数学字体加载顺序
-- **Docs**: 大幅重写 README，补充 `heading-numbering` 和 `import-map` 参数说明
+  - Add green theme and three-state theme switcher (light → green → dark)
+  - Add built-in import map for `three`, `echarts`, `echarts-gl`, `plotly`, `cannon-es`, and `fundamental-physical-constants`, with support for custom merging or replacement
+  - Add i18n support: client-side labels switch automatically between English and Chinese based on `lang`
+  - Recolor theme to the Claudette warm paper palette
+  - Add interactive ECharts 3D surface chart example
+  - Add plotly.js support
+- **UX**: Improve touch-drawer swipe behavior on mobile (`fix(touch drawer)`)
+- **Build**: Optimize Google Fonts CDN endpoint for China access; reorder math font loading
+- **Docs**: Rewrite README, expand `heading-numbering` and `import-map` parameter documentation
 
 ### v0.7.0 — 2026-11-10
 
 - **Features**:
-  - 新增可定制主题系统（CSS 变量 / theme tokens），`theme` 和 `dark-theme` 参数可覆盖任意语义 token
-  - 侧边栏 / TOC JavaScript 代码重构
-- **Refactor**: 移除未使用的 heading numbering 和 "expand all TOC" 相关代码
-- **Build**: 更新 `typst.toml` 排除配置
+  - Add customizable theme system (CSS variables / theme tokens). `theme` and `dark-theme` parameters can override any semantic token
+  - Refactor sidebar / TOC JavaScript code
+- **Refactor**: Remove unused heading numbering and "expand all TOC" related code
+- **Build**: Update `typst.toml` exclude configuration
 
 ### v0.6.0 — 2026-11-09
 
 - **Features**:
-  - 新增 HTML 样式和 SVG / 图片显示工具
-  - 新增移动端触摸滑动侧边栏交互（手指右滑滑出，左滑收起）
-- **Docs**: 清理 README 空行，移除未使用的 heading numbering 代码
+  - Add HTML styling and SVG / image display utilities
+  - Add mobile touch-swipe sidebar interaction (swipe right to open, swipe left to close)
+- **Docs**: Remove empty lines from README, drop unused heading numbering code
 
 ### v0.5.0 — 2026-10-11
 
-- **Breaking**: 从 `bundle` 导出切换为 `html` 导出；`bundle` 目标现在显式提示不支持
-- **Fix**: 修复 heading numbering 末尾多余的句点
+- **Breaking**: Switch from `bundle` export to `html` export; `bundle` targets now emit an explicit unsupported message
+- **Fix**: Remove the extra trailing period in heading numbering
 
 ### v0.4.0 — 2026-10-09
 
-- 数学字体切换为 NewComputerModern
-- 重命名入口文件
-- 初始可发布版本
+- Switch math font family to NewComputerModern
+- Rename the entrypoint file
+- Initial publishable release

@@ -438,6 +438,25 @@ def test_theme_merge() -> None:
         "theme falls back to default or dark based on the system",
         'themeQuery.matches ? "dark" : "default"' in html,
     )
+    dark_media = html[html.find("@media (prefers-color-scheme: dark)") :][:1200]
+    check(
+        "system dark media applies the dark palette",
+        "--bg: #262625;" in dark_media,
+        dark_media[:160],
+    )
+    check(
+        "system preference changes update the theme button",
+        'themeQuery.addEventListener("change", syncThemeButton);' in html,
+    )
+    check(
+        "legacy saved themes do not block system following",
+        'localStorage.getItem("itemplate:theme:v2")' in html
+        and 'localStorage.getItem("itemplate:theme")' not in html,
+    )
+    check(
+        "manual theme choices persist under the v2 key",
+        'store("itemplate:theme:v2", next);' in html,
+    )
 
 
 def test_import_maps() -> None:

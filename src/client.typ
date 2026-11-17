@@ -4,7 +4,9 @@ try {
   if (localStorage.getItem("itemplate:sidebar-open") === "0") {
     document.documentElement.classList.add("sidebar-preclosed");
   }
-  var savedTheme = localStorage.getItem("itemplate:theme");
+  // v2 key: choices saved before automatic system following was restored
+  // (and before light was renamed to paper) must not lock the page theme.
+  var savedTheme = localStorage.getItem("itemplate:theme:v2");
   if (savedTheme === "default" || savedTheme === "paper" || savedTheme === "dark" || savedTheme === "green") {
     document.documentElement.dataset.theme = savedTheme;
   }
@@ -63,7 +65,7 @@ if (themeToggle) {
   themeToggle.addEventListener("click", () => {
     const next = themeOrder[(themeOrder.indexOf(effectiveTheme()) + 1) % themeOrder.length];
     docEl.dataset.theme = next;
-    store("itemplate:theme", next);
+    store("itemplate:theme:v2", next);
     syncThemeButton();
   });
   syncThemeButton();

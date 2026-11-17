@@ -2,7 +2,7 @@
 #let base-styles = ```css
 :root {
   --sidebar-w: 300px;
-  --header-h: 64px;
+  --header-h: 58px;
   --app-h: 100vh;
   --radius-sm: 4px;
   --radius: 8px;
@@ -101,7 +101,8 @@ html.sidebar-preclosed .sidebar { border-right-color: transparent; }
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 20px 20px 14px;
+  min-height: var(--header-h);
+  padding: 19px 20px 14px;
   border-bottom: 1px solid var(--line);
 }
 .sidebar-heading { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
@@ -246,7 +247,7 @@ html.sidebar-preclosed .sidebar { border-right-color: transparent; }
   justify-content: space-between;
   gap: 16px;
   min-height: calc(var(--header-h) + env(safe-area-inset-top));
-  padding: calc(10px + env(safe-area-inset-top)) 24px 10px;
+  padding: calc(9px + env(safe-area-inset-top)) 24px 9px;
   border-bottom: 1px solid var(--line);
   background: var(--header-bg);
   backdrop-filter: blur(14px);
@@ -707,6 +708,7 @@ html.drawer-open body { overflow: hidden; }
 
   .mobile-only { display: grid; }
   .resize-handle { display: none; }
+  .sidebar-head { padding-top: 9px; padding-bottom: 9px; }
   .topbar { padding-right: 12px; padding-left: 12px; }
   .icon-btn { width: 40px; height: 40px; }
   .article { padding: 36px 20px 110px; }

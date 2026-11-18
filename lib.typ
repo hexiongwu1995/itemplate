@@ -260,6 +260,12 @@
   doc-author: "",
   lang: "en",
   theme: (:),
+  // Per-theme overrides layered on top of `theme`. `theme` still applies to
+  // all light themes (default/paper/green); these parameters only affect the
+  // named theme, so you can change e.g. paper's `bg`/`sidebar-bg` without
+  // touching default or green.
+  paper-theme: (:),
+  green-theme: (:),
   dark-theme: (:),
   // Heading numbering used by the document. A `#set heading(numbering: ...)`
   // placed after the show rule still takes precedence. Pass `none` to hide
@@ -275,8 +281,8 @@
 
   context if target() == "html" {
     let resolved-theme = default-theme + theme
-    let resolved-paper-theme = default-theme + default-paper-theme + theme
-    let resolved-green-theme = default-theme + default-green-theme + theme
+    let resolved-paper-theme = default-theme + default-paper-theme + theme + paper-theme
+    let resolved-green-theme = default-theme + default-green-theme + theme + green-theme
     let resolved-dark-theme = default-theme + default-dark-theme + dark-theme
     let resolved-import-map = if import-map == auto { default-import-map } else { import-map }
     let s = resolve-ui-strings(lang)

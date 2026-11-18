@@ -161,11 +161,15 @@ The ECharts surface needs WebGL. Without JavaScript the container stays blank, s
 
 ## Theme
 
-Override any token; values may be Typst colors or raw CSS color strings. `theme` applies to the default, paper, and green themes; `dark-theme` only overrides the dark theme. The page starts in the default theme, and the theme button cycles default → paper → green → dark.
+Override any token; values may be Typst colors or raw CSS color strings. `theme` applies to the default, paper, and green themes; `dark-theme` only overrides the dark theme. To change a single light theme without touching the others, use `paper-theme` or `green-theme` — these are layered on top of `theme`, so a token set there wins for that theme only. The page starts in the default theme, and the theme button cycles default → paper → green → dark.
 
 ```typst
 #show: itemplate.with(
-  theme: (accent: "#20609f", bg: "#ffffff"),
+  theme: (accent: "#20609f"),
+  // Change only the paper theme's surface colors.
+  paper-theme: (bg: "#faf9f5", "sidebar-bg": "#f2f0e9"),
+  // Change only the green theme's surface colors.
+  green-theme: (bg: "#f6f9f3", "sidebar-bg": "#eff5ea"),
   dark-theme: (accent: "#d97757"),
 )
 ```

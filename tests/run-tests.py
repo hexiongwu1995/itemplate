@@ -442,6 +442,36 @@ def test_theme_merge() -> None:
     )
 
 
+def test_theme_per_theme() -> None:
+    html = compile_fixture("theme-per-theme")
+    default = css_block(html, ":root")
+    paper = css_block(html, ":root[data-theme='paper']")
+    green = css_block(html, ":root[data-theme='green']")
+    dark = css_block(html, ":root[data-theme='dark']")
+
+    # The shared `theme` accent reaches every light theme but not dark.
+    check("shared accent reaches default", css_var(default, "accent") == "#123456")
+    check("shared accent reaches paper", css_var(paper, "accent") == "#123456")
+    check("shared accent reaches green", css_var(green, "accent") == "#123456")
+    check("shared accent does not reach dark", css_var(dark, "accent") == "#d97757")
+
+    # paper-theme only changes the paper theme's bg/sidebar-bg.
+    check("paper bg is paper-only override", css_var(paper, "bg") == "#a1b2c3")
+    check("paper sidebar-bg is paper-only override", css_var(paper, "sidebar-bg") == "#d4e5f6")
+    check("default bg is untouched by paper-theme", css_var(default, "bg") == "#ffffff")
+    check("green bg is untouched by paper-theme", css_var(green, "bg") == "#aabbcc")
+
+    # green-theme only changes the green theme's bg/sidebar-bg.
+    check("green bg is green-only override", css_var(green, "bg") == "#aabbcc")
+    check("green sidebar-bg is green-only override", css_var(green, "sidebar-bg") == "#ddeeff")
+    check("default sidebar-bg is untouched by green-theme", css_var(default, "sidebar-bg") == "#fafafa")
+    check("paper sidebar-bg is untouched by green-theme", css_var(paper, "sidebar-bg") == "#d4e5f6")
+
+    # Dark keeps its own palette regardless of light overrides.
+    check("dark bg keeps its default", css_var(dark, "bg") == "#262625")
+    check("dark sidebar-bg keeps its default", css_var(dark, "sidebar-bg") == "#1f1f1e")
+
+
 def test_mobile_layout() -> None:
     html = compile_fixture("i18n-en")
     header_height = "calc(var(--header-h) + 1px + env(safe-area-inset-top))"
@@ -610,6 +640,7 @@ def main() -> int:
         test_tables,
         test_i18n,
         test_theme_merge,
+        test_theme_per_theme,
         test_mobile_layout,
         test_quote_copy,
         test_import_maps,

@@ -5,7 +5,7 @@
 ## Usage
 
 ````typst
-#import "@preview/itemplate:0.9.0": *
+#import "@preview/itemplate:1.0.0": *
 
 #show: itemplate.with(
   doc-title: "iTemplate Demo",
@@ -200,6 +200,11 @@ HTML export is under active development, so the emitted markup may change betwee
 | `assets/` | Repository screenshots (excluded from the package) |
 
 ## Changelog
+
+### v1.0.0 — 2026-11-18
+
+- **Breaking**: Removed the shared `theme` parameter. Each theme now has its own override parameter (`default-theme`, `paper-theme`, `green-theme`, `dark-theme`), so customizing one theme never affects the others.
+- Added `default-theme` parameter for overriding the default theme specifically.
 
 ### v0.9.0 — 2026-11-17
 

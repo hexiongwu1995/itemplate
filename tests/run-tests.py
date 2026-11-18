@@ -421,8 +421,8 @@ def test_theme_merge() -> None:
     green = css_block(html, ":root[data-theme='green']")
     dark = css_block(html, ":root[data-theme='dark']")
     check("default theme keeps custom accent", "--accent: #123456;" in default)
-    check("paper theme inherits custom theme overrides", "--accent: #123456;" in paper)
-    check("green theme inherits custom theme overrides", "--accent: #123456;" in green)
+    check("paper theme keeps its own accent", "--accent: #d97757;" in paper)
+    check("green theme keeps its own accent", "--accent: #4d8f5f;" in green)
     check("dark theme keeps its own accent", "--accent: #d97757;" in dark)
     check(
         "theme toggle order is default, paper, green, dark",
@@ -449,27 +449,27 @@ def test_theme_per_theme() -> None:
     green = css_block(html, ":root[data-theme='green']")
     dark = css_block(html, ":root[data-theme='dark']")
 
-    # The shared `theme` accent reaches every light theme but not dark.
-    check("shared accent reaches default", css_var(default, "accent") == "#123456")
-    check("shared accent reaches paper", css_var(paper, "accent") == "#123456")
-    check("shared accent reaches green", css_var(green, "accent") == "#123456")
-    check("shared accent does not reach dark", css_var(dark, "accent") == "#d97757")
+    # default-theme only affects the default theme.
+    check("default accent is default-only override", css_var(default, "accent") == "#123456")
+    check("default bg is default-only override", css_var(default, "bg") == "#112233")
+    check("default sidebar-bg is default-only override", css_var(default, "sidebar-bg") == "#445566")
+    check("paper accent untouched by default-theme", css_var(paper, "accent") == "#d97757")
+    check("green accent untouched by default-theme", css_var(green, "accent") == "#4d8f5f")
+    check("dark accent untouched by default-theme", css_var(dark, "accent") == "#d97757")
 
     # paper-theme only changes the paper theme's bg/sidebar-bg.
     check("paper bg is paper-only override", css_var(paper, "bg") == "#a1b2c3")
     check("paper sidebar-bg is paper-only override", css_var(paper, "sidebar-bg") == "#d4e5f6")
-    check("default bg is untouched by paper-theme", css_var(default, "bg") == "#ffffff")
-    check("green bg is untouched by paper-theme", css_var(green, "bg") == "#aabbcc")
+    check("default bg untouched by paper-theme", css_var(default, "bg") == "#112233")
+    check("green bg untouched by paper-theme", css_var(green, "bg") == "#aabbcc")
+    check("dark bg untouched by paper-theme", css_var(dark, "bg") == "#262625")
 
     # green-theme only changes the green theme's bg/sidebar-bg.
     check("green bg is green-only override", css_var(green, "bg") == "#aabbcc")
     check("green sidebar-bg is green-only override", css_var(green, "sidebar-bg") == "#ddeeff")
-    check("default sidebar-bg is untouched by green-theme", css_var(default, "sidebar-bg") == "#fafafa")
-    check("paper sidebar-bg is untouched by green-theme", css_var(paper, "sidebar-bg") == "#d4e5f6")
-
-    # Dark keeps its own palette regardless of light overrides.
-    check("dark bg keeps its default", css_var(dark, "bg") == "#262625")
-    check("dark sidebar-bg keeps its default", css_var(dark, "sidebar-bg") == "#1f1f1e")
+    check("default sidebar-bg untouched by green-theme", css_var(default, "sidebar-bg") == "#445566")
+    check("paper sidebar-bg untouched by green-theme", css_var(paper, "sidebar-bg") == "#d4e5f6")
+    check("dark sidebar-bg untouched by green-theme", css_var(dark, "sidebar-bg") == "#1f1f1e")
 
 
 def test_mobile_layout() -> None:

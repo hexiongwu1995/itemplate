@@ -11,7 +11,9 @@
 // Default theme. Palette follows the light theme used by the typst.ts
 // cookery documentation: a white page, soft gray surfaces, and a blue
 // accent for links and interactive elements.
-#let default-theme = (
+// Renamed to `default-theme-base` so the `default-theme` parameter name is
+// free for per-theme overrides (the parameter shadows module scope).
+#let default-theme-base = (
   bg: "#ffffff",
   surface: "#fafafa",
   "surface-strong": "#e6e6e6",
@@ -259,11 +261,12 @@
   doc-title: "Document",
   doc-author: "",
   lang: "en",
-  theme: (:),
-  // Per-theme overrides layered on top of `theme`. `theme` still applies to
-  // all light themes (default/paper/green); these parameters only affect the
-  // named theme, so you can change e.g. paper's `bg`/`sidebar-bg` without
-  // touching default or green.
+  // Per-theme override dictionaries. Each one affects only the named theme,
+  // so changing e.g. paper's `bg`/`sidebar-bg` does not touch default, green,
+  // or dark. There is intentionally no shared `theme` parameter: paper and
+  // green have very different color styles, so a single shared palette is
+  // hard to tune consistently.
+  default-theme: (:),
   paper-theme: (:),
   green-theme: (:),
   dark-theme: (:),
@@ -280,10 +283,10 @@
   set heading(numbering: heading-numbering)
 
   context if target() == "html" {
-    let resolved-theme = default-theme + theme
-    let resolved-paper-theme = default-theme + default-paper-theme + theme + paper-theme
-    let resolved-green-theme = default-theme + default-green-theme + theme + green-theme
-    let resolved-dark-theme = default-theme + default-dark-theme + dark-theme
+    let resolved-theme = default-theme-base + default-theme
+    let resolved-paper-theme = default-theme-base + default-paper-theme + paper-theme
+    let resolved-green-theme = default-theme-base + default-green-theme + green-theme
+    let resolved-dark-theme = default-theme-base + default-dark-theme + dark-theme
     let resolved-import-map = if import-map == auto { default-import-map } else { import-map }
     let s = resolve-ui-strings(lang)
     let toc-label = s.at("toc-label")

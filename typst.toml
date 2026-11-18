@@ -8,5 +8,5 @@ license = "MIT"
 description = "A modern academic HTML documentation template with a numbered, collapsible sidebar and a responsive app shell."
 repository = "https://github.com/hexiongwu1995/itemplate"
 keywords = ["html", "template"]
-categories = ["components", "model", "utility"]
+categories = ["components", "layout", "utility"]
 compiler = "0.15.0"

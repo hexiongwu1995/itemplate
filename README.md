@@ -205,6 +205,7 @@ HTML export is under active development, so the emitted markup may change betwee
 
 - **Breaking**: Removed the shared `theme` parameter. Each theme now has its own override parameter (`default-theme`, `paper-theme`, `green-theme`, `dark-theme`), so customizing one theme never affects the others.
 - Added `default-theme` parameter for overriding the default theme specifically.
+- **Breaking**: The module-level palette constant `default-theme` is now `default-theme-base`, since `default-theme` is the new parameter name.
 
 ### v0.9.0 — 2026-11-17
 

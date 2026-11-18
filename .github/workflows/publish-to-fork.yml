@@ -1,6 +1,5 @@
 name: Publish to fork
 
-# a test message to prove the workflow works
 # 推送以 v 开头的 tag 时触发
 # 注意：GitHub Actions 的 tag 触发器无法直接限定分支（branches 与 tags 过滤器
 # 是「或」的关系），因此「tag 必须位于 main 分支」的校验在下方步骤中完成

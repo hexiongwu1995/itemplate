@@ -3,6 +3,7 @@
 #show: itemplate.with(
   doc-title: "Table fixture",
   lang: "en",
+  letmeout: false,
 )
 
 = Tables

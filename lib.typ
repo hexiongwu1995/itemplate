@@ -3,6 +3,14 @@
 
 #import "src/styles.typ": base-styles
 #import "src/client.typ": client-script, prepaint-script
+// Bundled letmeout: exported for direct use and called by the template to
+// adapt HTML layout. The alias keeps the `letmeout` parameter name free.
+#import "src/letmeout/document.typ": letmeout
+#import "src/letmeout/document.typ": letmeout as letmeout-bridge
+#import "letmeout-extras.typ"
+
+// Captured before the `page` parameter shadows the built-in element.
+#let page-setter = page
 
 // ---------------------------------------------------------------------------
 // Theme
@@ -277,6 +285,17 @@
   // `auto` emits `default-import-map`; a dictionary replaces it. Merge your
   // own entries with `default-import-map + (...)`, or use `(:)` to disable.
   import-map: auto,
+  // Page settings for the document, as a dictionary for `set page`. With
+  // letmeout adaption enabled, configure paper, margins, headers, footers and
+  // numbering here: these settings are applied outside the article shell, so
+  // letmeout can turn them into continuous HTML pages. `none` keeps the
+  // document's own page settings.
+  page: none,
+  // Letmeout's HTML layout adaption for the article body. `true` enables it
+  // with defaults, a dictionary forwards options to `letmeout`
+  // (`color-scheme`, `dark-colors`, `dark-frames`, `css`, `selector`).
+  // `false` keeps the plain itemplate output.
+  letmeout: true,
   body,
 ) = {
   // Applies to HTML and PDF alike. Later document-level set rules still win.
@@ -290,6 +309,16 @@
     let resolved-import-map = if import-map == auto { default-import-map } else { import-map }
     let s = resolve-ui-strings(lang)
     let toc-label = s.at("toc-label")
+    let letmeout-enabled = letmeout != false
+    let letmeout-options = if type(letmeout) == dictionary { letmeout } else { (:) }
+    // The shell keeps its own typography; letmeout applies the document's font
+    // and colors to the article only. Its dark variants follow the active
+    // itemplate theme instead of the operating system preference.
+    let letmeout-options = (
+      selector: ".article",
+      "dark-selector": ":root[data-theme='dark']",
+      embedded: true,
+    ) + letmeout-options
 
     // Compile-time TOC. query(heading) sees the whole document, including
     // headings that appear after this sidebar in the DOM. Headings with
@@ -344,8 +373,12 @@
     }
 
     // Wrap tables so they can scroll horizontally without touching the page.
+    // When letmeout is enabled it owns table scrolling (`.letmeout-scroll`),
+    // so itemplate stays out of the way to avoid nested scroll containers.
     show table: it => {
-      if target() == "html" or target() == "bundle" {
+      if letmeout-enabled or not (target() == "html" or target() == "bundle") {
+        it
+      } else {
         html.elem("div", attrs: (class: "table-block"), {
           html.elem("div", attrs: (
             class: "table-scroll",
@@ -366,8 +399,6 @@
             "aria-label": s.at("table-exit"),
           ), "×")
         })
-      } else {
-        it
       }
     }
 
@@ -384,6 +415,18 @@
       sidebarExpand: s.at("sidebar-expand"),
       sidebarCollapse: s.at("sidebar-collapse"),
     )
+
+    // Adapt the article body after the heading and table rules above, so
+    // letmeout sees their output and the rules still apply to its content.
+    // `page` is forwarded as letmeout's `page-key`: letmeout resolves the
+    // dictionary (`paper`, `margin`, `header`, …) itself, outside the HTML
+    // container, without a page style that Typst would reject in here.
+    let letmeout-options = (page-key: page) + letmeout-options
+    let article-body = if letmeout-enabled {
+      letmeout-bridge(body, ..letmeout-options)
+    } else {
+      body
+    }
 
     html.html(lang: lang, {
       html.head({
@@ -509,7 +552,7 @@
             })
 
             html.elem("main", attrs: (id: "content", class: "content", tabindex: "-1"), {
-              html.elem("article", attrs: (class: "article"), body)
+              html.elem("article", attrs: (class: "article"), article-body)
             })
           })
         })
@@ -518,6 +561,7 @@
   } else if target() == "bundle" {
     panic("bundle export is not supported by itemplate, please export the document to html instead")
   } else {
+    if page != none { set page-setter(..page) }
     body
   }
 }

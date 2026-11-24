@@ -3,6 +3,7 @@
 #show: itemplate.with(
   doc-title: "中文界面",
   lang: "zh",
+  letmeout: false,
 )
 
 = 第一节

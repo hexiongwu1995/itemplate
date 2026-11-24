@@ -282,6 +282,41 @@ def test_tables() -> None:
     )
 
 
+def test_letmeout_integration() -> None:
+    html = compile_fixture("letmeout-layout")
+    check("letmeout renders a page sheet", "letmeout-page-sheet" in html)
+    # A5 is 148 mm wide, i.e. 419.53 pt.
+    check("page paper is applied", "max-width: 419.5275590551181pt" in html)
+    check(
+        "page header is rendered",
+        "Merged header" in html and "letmeout-page-header" in html,
+    )
+    check("grid becomes CSS layout", "letmeout-grid-cell" in html)
+    check("line becomes an HTML stroke", "letmeout-line" in html)
+    check("align is adapted", "letmeout-align" in html)
+    check("pagebreak is a print hint", "letmeout-pagebreak" in html)
+    check(
+        "letmeout owns table scrolling",
+        "letmeout-scroll" in html and 'class="table-block"' not in html,
+    )
+    check(
+        "dark rules follow the itemplate theme",
+        ":root[data-theme='dark'] letmeout-light" in html,
+    )
+    article = re.search(r"\.article \{[^}]*\}", html)
+    check(
+        "article text follows the active theme",
+        article is not None and "light-dark(" in article.group(0),
+        article.group(0) if article else "",
+    )
+
+    standalone = compile_fixture("letmeout-standalone")
+    check(
+        "standalone letmeout entry compiles",
+        "letmeout-page" in standalone and "Standalone" in standalone,
+    )
+
+
 def test_i18n() -> None:
     english = compile_fixture("i18n-en")
     check("English TOC label", "CONTENTS" in english)
@@ -638,6 +673,7 @@ def main() -> int:
         test_contrast,
         test_client_cancel_paths,
         test_tables,
+        test_letmeout_integration,
         test_i18n,
         test_theme_merge,
         test_theme_per_theme,

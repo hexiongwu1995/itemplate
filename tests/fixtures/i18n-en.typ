@@ -3,6 +3,7 @@
 #show: itemplate.with(
   doc-title: "English UI",
   lang: "en",
+  letmeout: false,
 )
 
 = Section

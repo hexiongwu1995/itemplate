@@ -522,6 +522,41 @@ html.sidebar-preclosed .sidebar { border-right-color: transparent; }
 .table-scroll td { min-width: 6em; white-space: normal; overflow-wrap: break-word; }
 .table-scroll tr:last-child td { border-bottom: 0; }
 
+/* Letmeout owns table scrolling in the merged layout. */
+.article .letmeout-scroll:has(> table) {
+  margin: 1.6em 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  scrollbar-width: thin;
+  scrollbar-color: var(--line) transparent;
+}
+.article .letmeout-scroll > table {
+  width: 100%;
+  margin: 0;
+  border-collapse: collapse;
+  font-size: .9375rem;
+}
+.article .letmeout-scroll > table th,
+.article .letmeout-scroll > table td {
+  padding: .6em .9em;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+}
+.article .letmeout-scroll > table th {
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 600;
+  white-space: nowrap;
+}
+.article .letmeout-scroll > table td {
+  min-width: 6em;
+  white-space: normal;
+  overflow-wrap: break-word;
+}
+.article .letmeout-scroll > table tr:last-child td { border-bottom: 0; }
+
 .table-block::after {
   content: "";
   position: absolute;
